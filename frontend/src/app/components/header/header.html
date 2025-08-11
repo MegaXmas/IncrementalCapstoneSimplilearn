@@ -1,0 +1,93 @@
+<!-- Bootstrap Navigation Bar for travel booking website -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+  <div class="container-fluid">
+    
+    <!-- Brand/Logo section -->
+    <!-- <a class="navbar-brand d-flex align-items-center" routerLink="/home">
+      <img src="assets/logo.png" alt="Travel Booking" width="40" height="40" class="me-2">
+      <span class="fw-bold text-info">TravelBook</span>
+    </a> -->
+    
+    <!-- Mobile hamburger button (shows on small screens) -->
+    <button 
+      class="navbar-toggler" 
+      type="button" 
+      data-bs-toggle="collapse" 
+      data-bs-target="#navbarNav" 
+      aria-controls="navbarNav" 
+      aria-expanded="false" 
+      aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <!-- Collapsible navigation content -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      
+      <!-- Main navigation links -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/home" routerLinkActive="active">
+            <i class="fas fa-home me-1"></i>Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/flights" routerLinkActive="active">
+            <i class="fas fa-plane me-1"></i>Flights
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/trains" routerLinkActive="active">
+            <i class="fas fa-train me-1"></i>Trains
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/buses" routerLinkActive="active">
+            <i class="fas fa-bus me-1"></i>Buses
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/bookings" routerLinkActive="active">
+            <i class="fas fa-ticket-simple me-1"></i>My Bookings
+          </a>
+        </li>
+      </ul>
+      <ul class="navbar-nav ms-auto me-3">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="admin" routerLinkActive="active">
+            <i class="fas fa-user-tie me-1"></i>Admin Dashboard
+          </a>
+        </li>
+      </ul>
+
+      
+      <!-- User section on the right -->
+      <!-- <div class="d-flex align-items-center"> -->
+          
+          <!-- will implement the login button at a later time once a databse is set up for admin authentication -->
+          <!-- Welcome message when logged in
+          <span class="navbar-text me-3" *ngIf="isLoggedIn">
+            <i class="fas fa-user-circle me-1"></i>
+            Welcome, <strong>{{ userName }}</strong>
+          </span> -->
+          
+          <!-- Logout button (red) -->
+          <!-- <button 
+            *ngIf="isLoggedIn" 
+            class="btn btn-outline-danger btn-sm me-2" 
+            (click)="onLogout()">
+            <i class="fas fa-sign-out-alt me-1"></i>
+            Logout
+          </button> -->
+          
+          <!-- Login button (green) -->
+          <!-- <button 
+            *ngIf="!isLoggedIn" 
+            class="btn btn-outline-success btn-sm" 
+            (click)="onLogin()">
+            <i class="fas fa-sign-in-alt me-1"></i>
+            Login
+          </button> -->
+      <!-- </div> -->
+    </div>
+  </div>
+</nav>

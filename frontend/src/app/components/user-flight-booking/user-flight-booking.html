@@ -1,0 +1,90 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-10">
+            <!-- Header -->
+            <div class="card shadow">
+                <div class="card-header bg-warning text-black text-center">
+                    <h3><i class="fas fa-user-plus"></i>✈️ Travel Buddy Flight Booking ✈️</h3>
+                    <p class="subtitle">Book your flight with Travel Buddy below!</p>
+                    <!-- Test Client Info Display -->
+                    <div class="alert alert-info mt-2 mb-0">
+                        <small><strong> Test Mode:</strong> You are logged in as <strong id="testClientName"></strong>
+                            (test@example.com) | Card: <strong>****-****-****-1234</strong></small>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Success/Error Messages -->
+                    <div id="messageArea"></div>
+
+                    <!-- Booking Form -->
+                    <form class="form" [formGroup]="userFlightBookingForm" (ngSubmit)="onSubmit()">
+                        <!-- From Location -->
+                        <div class="row form-group mb-3">
+
+                            <div class="col-md-6">
+                                <label for="flightOrigin" class="form-label text-center d-block">Flight Origin Airport</label>
+
+                                <select class="form-select text-center" id="flightOrigin" name="flightOrigin" required>
+                                    <option value="">-- Select your airport of origin --</option>
+
+                                    
+                                </select>
+                            </div>
+
+                            <!-- To Location -->
+                            <div class="col-md-6">
+                                <label for="flightDestination" class="form-label text-center d-block">Flight Destination Airport</label>
+
+                                <select class="form-select text-center" id="flightDestination" name="flightDestination" required>
+                                    <option value="">-- Select your airport destination --</option>
+
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="flightDepartureDate" class="form-label text-center d-block">Flight Departure Date</label>
+                                <app-date-dropdown
+                                    label="Flight Departure Date"
+                                    id="flightDepartureDate"
+                                    formControlName="flightDepartureDate">
+                                </app-date-dropdown>
+
+                                <select class="form-select text-center" id="flightDepartureDate" name="flightDepartureDate" required>
+                                    <option value="">-- Select your date of departure --</option>
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button Section -->
+                        <div class="row mt-4">
+                            <div class="col-12 text-center">
+                                <!-- Main submit button with Bootstrap styling -->
+                                <button type="submit" class="btn btn-success btn-lg px-5 py-3 me-3" id="bookingButton">
+                                    ✈️  Book Flight! ✈️ 
+                                </button>
+
+                                <!-- Optional: Reset button to clear the form -->
+                                <button type="reset" class="btn btn-outline-secondary btn-lg px-4 py-3">
+                                    🔄 Clear Form
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Loading indicator -->
+                        <div class="row mt-3">
+                            <div class="col-12 text-center">
+                                <div id="loadingIndicator" class="spinner-border text-primary" role="status" style="display: none;">
+                                </div>
+                                <div id="loadingText" style="display: none;" class="mt-2">
+                                    <small class="text-muted">Processing your booking...</small>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    

@@ -1,0 +1,96 @@
+<div class="container">
+  <h1 class="heading">Admin Airport Form</h1>
+  <form class="form" [formGroup]="adminAirportForm" (ngSubmit)="onSubmit()">
+
+    <!-- Airport Full Name Field Group -->
+    <div class="form-group">
+      <label for="airportFullName">Airport Full Name</label>
+      <input type="text" 
+             class="form-control" 
+             id="airportFullName" 
+             name="airportFullName" 
+             formControlName="airportFullName" 
+             required
+             [class.invalid]="adminAirportForm.get('airportFullName')?.invalid && (adminAirportForm.get('airportFullName')?.dirty || adminAirportForm.get('airportFullName')?.touched)">
+      @if (isFieldInvalid('airportFullName')) {
+        <div class="text-danger">
+            Enter the full name of the airport
+        </div>
+      }
+      </div><br>
+
+    <!-- Airport Code field group -->
+    <div class="form-group">
+      <label for="airportCode">Airport Code</label>
+      <input type="text" 
+             class="form-control" 
+             id="airportCode" 
+             name="airportCode" 
+             formControlName="airportCode" 
+             required
+             [class.invalid]="adminAirportForm.get('airportCode')?.invalid && (adminAirportForm.get('airportCode')?.dirty || adminAirportForm.get('airportCode')?.touched)">
+       @if (isFieldInvalid('airportCode')) {
+        <div class="text-danger">
+            Enter the airport code
+        </div>
+      }
+    </div><br>
+
+    <!-- Airport Location City field group -->
+    <div class="form-group">
+        <label for="airportLocationCity">Airport Location City</label>
+        <input type="text" 
+                 class="form-control" 
+                 id="airportLocationCity" 
+                 name="airportLocationCity" 
+                 formControlName="airportLocationCity" 
+                 required
+                 [class.invalid]="adminAirportForm.get('airportLocationCity')?.invalid && (adminAirportForm.get('airportLocationCity')?.dirty || adminAirportForm.get('airportLocationCity')?.touched)">
+         @if (isFieldInvalid('airportLocationCity')) {
+        <div class="text-danger">
+            Enter the city in which the airport is located
+        </div>
+      }
+    </div><br>
+
+    <!-- Airport Location Country field group -->
+    <div class="form-group">
+        <label for="airportLocationCountry">Airport Location Country</label>
+        <input type="text" 
+                 class="form-control" 
+                 id="airportLocationCountry" 
+                 name="airportLocationCountry" 
+                 formControlName="airportLocationCountry" 
+                 required
+                 [class.invalid]="adminAirportForm.get('airportLocationCountry')?.invalid && (adminAirportForm.get('airportLocationCountry')?.dirty || adminAirportForm.get('airportLocationCountry')?.touched)">
+         @if (isFieldInvalid('airportLocationCountry')) {
+        <div class="text-danger">
+            Enter the country in which the airport is located
+        </div>
+      }
+    </div><br>
+
+    <!-- Airport Timezone field group -->
+    <div class="form-group">
+      <label for="airportTimezone">Airport Timezone</label>
+      <input type="text" 
+             class="form-control" 
+             id="airportTimezone" 
+             name="airportTimezone" 
+             formControlName="airportTimezone" 
+             required
+             [class.invalid]="adminAirportForm.get('airportTimezone')?.invalid && (adminAirportForm.get('airportTimezone')?.dirty || adminAirportForm.get('airportTimezone')?.touched)">
+      @if (isFieldInvalid('airportTimezone')) {
+        <div class="text-danger">
+            Enter the timezone of the airport
+        </div>
+      }
+    </div><br>
+    
+    <button type="submit" 
+            class="btn btn-primary" 
+            [disabled]="adminAirportForm.invalid">
+        Submit
+    </button>
+  </form>
+</div>

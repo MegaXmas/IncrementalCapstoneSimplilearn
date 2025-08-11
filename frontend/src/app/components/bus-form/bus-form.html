@@ -1,0 +1,148 @@
+    <div class="container">
+      <h1 class="heading">Add/edit Bus details</h1>
+      <form class="form" [formGroup]="busForm" (ngSubmit)="onSubmit()">
+
+        <div class="form-group">
+          <label for="busNumber">Bus Number</label>
+          <input type="text" 
+                 class="form-control" 
+                 id="busNumber" 
+                 name="busNumber" 
+                 formControlName="busNumber" 
+                 required
+                 [class.invalid]="isFieldInvalid('busNumber')">
+          @if (isFieldInvalid('busNumber')) {
+            <div class="text-danger">
+                Bus Number must be exactly 5 characters
+            </div>
+          }
+        </div><br>
+
+        <div class="form-group">
+          <label for="busLine">Bus Line</label>
+          <input type="text" 
+                 class="form-control" 
+                 id="busLine" 
+                 name="busLine" 
+                 formControlName="busLine" 
+                 required
+                 [class.invalid]="isFieldInvalid('busLine')">
+          @if (isFieldInvalid('busLine')) {
+            <div class="text-danger">
+                Enter the line for this bus (minimum 2 characters)
+            </div>
+          }
+        </div><br>
+
+        <div class="form-group">
+          <label for="busbusDepartureStation">Bus Station of Departure</label>
+          <input type="text" 
+                 class="form-control" 
+                 id="busDepartureStation" 
+                 formControlName="busDepartureStation" 
+                 required
+                 [class.invalid]="isFieldInvalid('busDepartureStation')">
+          @if (isFieldInvalid('busDepartureStation')) {
+            <div class="text-danger">
+                Enter Bus departure station (minimum 2 characters)
+            </div>
+          }
+        </div><br>
+
+        <div class="form-group">
+            <label for="busArrivalStation">Bus Station of Arrival</label>
+            <input type="text" 
+                   class="form-control" 
+                   id="busArrivalStation" 
+                   formControlName="busArrivalStation" 
+                   required
+                   [class.invalid]="isFieldInvalid('busArrivalStation')">
+            @if (isFieldInvalid('busArrivalStation')) {
+              <div class="text-danger">
+                  Enter Bus arrival station (minimum 2 characters)
+              </div>
+            }
+        </div><br>
+
+        <!-- Date Dropdown Components - Simplified validation -->
+        <div class="form-group">
+          <app-date-dropdown
+            label="bus Departure Date"
+            id="busDepartureDate"
+            formControlName="busDepartureDate">
+          </app-date-dropdown>
+          @if (isFieldInvalid('busDepartureDate')) {
+            <div class="text-danger">Please select the departure date</div>
+          }
+        </div><br>
+
+        <div class="form-group">
+          <app-date-dropdown
+            label="bus Arrival Date"
+            id="busArrivalDate"
+            formControlName="busArrivalDate">
+          </app-date-dropdown>
+          @if (isFieldInvalid('busArrivalDate')) {
+            <div class="text-danger">Please select the arrival date</div>
+          }
+        </div><br>
+
+        <!-- Time Dropdown Components - Simplified validation -->
+        <div class="form-group">
+          <app-time-dropdown
+            label="bus Departure Time"
+            id="busDepartureTime"
+            formControlName="busDepartureTime">
+          </app-time-dropdown>
+          @if (isFieldInvalid('busDepartureTime')) {
+            <div class="text-danger">Please select the departure time</div>
+          }
+        </div><br>
+
+        <div class="form-group">
+          <app-time-dropdown
+            label="bus Arrival Time"
+            id="busArrivalTime"
+            formControlName="busArrivalTime">
+          </app-time-dropdown>
+          @if (isFieldInvalid('busArrivalTime')) {
+            <div class="text-danger">Please select the arrival time</div>
+          }
+        </div><br>
+
+        <!-- Duration Dropdown Component - Simplified validation -->
+        <div class="form-group">
+          <app-duration-dropdown
+            label="bus Ride Duration"
+            id="busRideDuration"
+            formControlName="busRideDuration">
+          </app-duration-dropdown>
+          @if (isFieldInvalid('busRideDuration')) {
+            <div class="text-danger">Please enter the estimated travel time</div>
+          }
+        </div><br>
+
+        <div class="form-group">
+          <label for="busRidePrice">bus Ride Price</label>
+          <input type="number" 
+                 class="form-control" 
+                 id="busRidePrice" 
+                 formControlName="busRidePrice" 
+                 required
+                 min="0"
+                 step="0.01"
+                 [class.invalid]="isFieldInvalid('busRidePrice')">
+          @if (isFieldInvalid('busRidePrice')) {
+            <div class="text-danger">
+                Enter a valid price (minimum $0)
+            </div>
+          }
+        </div><br>
+
+        <button type="submit" 
+                class="btn btn-primary" 
+                [disabled]="busForm.invalid">
+            Submit
+        </button>
+      </form>
+    </div>

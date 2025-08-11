@@ -1,0 +1,68 @@
+<div class="container">
+  <h1 class="heading">Admin Bus Station Form</h1>
+  <form class="form" [formGroup]="adminBusStationForm" (ngSubmit)="onSubmit()">
+
+    <!-- Debug information (remove after testing) -->
+    <div style="background-color: #f0f0f0; padding: 10px; margin: 10px 0;">
+      <strong>Debug Info:</strong><br>
+      Form state: {{ adminBusStationForm.value | json }}<br>
+    </div>
+
+    <!-- Bus Station Full Name field group -->
+    <div class="form-group">
+      <label for="busStationFullName">Bus Station Name</label>
+      <input type="text" 
+             class="form-control" 
+             id="busStationFullName" 
+             name="busStationFullName" 
+             formControlName="busStationFullName" 
+             required
+             [class.invalid]="adminBusStationForm.get('busStationFullName')?.invalid && (adminBusStationForm.get('busStationFullName')?.dirty || adminBusStationForm.get('busStationFullName')?.touched)">
+    @if (isFieldInvalid('busStationFullName')) {
+            <div class="text-danger">
+                Enter the full name of the airport
+            </div>
+      }
+    </div><br>
+
+    <!-- Bus Station Code field group -->
+    <div class="form-group">
+        <label for="busStationCode">Bus Station Code</label>
+        <input type="text" 
+                 class="form-control" 
+                 id="busStationCode" 
+                 name="busStationCode" 
+                 formControlName="busStationCode" 
+                 required
+                 [class.invalid]="adminBusStationForm.get('busStationCode')?.invalid && (adminBusStationForm.get('busStationCode')?.dirty || adminBusStationForm.get('busStationCode')?.touched)">
+    @if (isFieldInvalid('busStationCode')) {
+            <div class="text-danger">
+                Enter the code for the bus station
+            </div>
+      }
+        </div>
+
+    <!-- Bus Station Location field group -->
+    <div class="form-group">
+      <label for="busStationCityLocation">Bus Station Location</label>
+      <input type="text" 
+             class="form-control" 
+             id="busStationCityLocation" 
+             name="busStationCityLocation" 
+             formControlName="busStationCityLocation" 
+             required
+             [class.invalid]="adminBusStationForm.get('busStationCityLocation')?.invalid && (adminBusStationForm.get('busStationCityLocation')?.dirty || adminBusStationForm.get('busStationCityLocation')?.touched)">
+    @if (isFieldInvalid('busStationCityLocation')) {
+                <div class="text-danger">
+                    Enter the city where the bus station is located
+                </div>
+        }
+      </div><br>
+      
+    <button type="submit" 
+            class="btn btn-primary" 
+            [disabled]="adminBusStationForm.invalid">
+        Submit
+    </button>
+  </form>
+</div>

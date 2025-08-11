@@ -1,0 +1,64 @@
+<div class="container">
+    <h1 class="heading">Admin Train Station Form</h1>
+    <form class="form" [formGroup]="adminTrainStationForm" (ngSubmit)="onSubmit()">
+    
+        <!-- Debug information (remove after testing) -->
+        <div style="background-color: #f0f0f0; padding: 10px; margin: 10px 0;">
+        <strong>Debug Info:</strong><br>
+        Form state: {{ adminTrainStationForm.value | json }}<br>
+        </div>
+    
+        <!-- Train Station Full Name field group -->
+        <div class="form-group">
+        <label for="trainStationFullName">Train Station Name</label>
+        <input type="text" 
+                 class="form-control" 
+                 id="trainStationFullName" 
+                 name="trainStationFullName" 
+                 formControlName="trainStationFullName" 
+                 required
+                 [class.invalid]="adminTrainStationForm.get('trainStationFullName')?.invalid && (adminTrainStationForm.get('trainStationFullName')?.dirty || adminTrainStationForm.get('trainStationFullName')?.touched)">
+        @if (isFieldInvalid('trainStationFullName')) {
+             <div class="text-danger">
+                Enter the full name of the train station
+             </div>
+        }
+        </div><br>
+    
+        <!-- Train Station Code field group -->
+        <div class="form-group">
+        <label for="trainStationCode">Train Station Code</label>
+        <input type="text" 
+                 class="form-control" 
+                 id="trainStationCode" 
+                 name="trainStationCode" 
+                 formControlName="trainStationCode" 
+                 required
+                 [class.invalid]="adminTrainStationForm.get('trainStationCode')?.invalid && (adminTrainStationForm.get('trainStationCode')?.dirty || adminTrainStationForm.get('trainStationCode')?.touched)">
+        @if (isFieldInvalid('trainStationCode')) {
+             <div class="text-danger"> 
+                Enter the code for the train station
+             </div>
+        }
+        </div> <br>
+
+        <!-- Train Station Location field group -->
+        <div class="form-group">
+        <label for="trainStationCityLocation">Train Station Location</label>
+        <input type="text"
+                 class="form-control" 
+                 id="trainStationCityLocation" 
+                 name="trainStationCityLocation" 
+                 formControlName="trainStationCityLocation" 
+                 required
+                 [class.invalid]="adminTrainStationForm.get('trainStationCityLocation')?.invalid && (adminTrainStationForm.get('trainStationCityLocation')?.dirty || adminTrainStationForm.get('trainStationCityLocation')?.touched)">
+        @if (isFieldInvalid('trainStationCityLocation')) {
+            <div class="text-danger">
+                Enter the city where the train station is located 
+            </div>
+        }
+        </div><br>  
+
+        <button type="submit" class="btn btn-primary" [disabled]="adminTrainStationForm.invalid">Submit</button>
+    </form>
+</div>

@@ -1,0 +1,148 @@
+    <div class="container">
+      <h1 class="heading">Add/edit train details</h1>
+      <form class="form" [formGroup]="trainForm" (ngSubmit)="onSubmit()">
+
+        <div class="form-group">
+          <label for="trainNumber">Train Number</label>
+          <input type="text" 
+                 class="form-control" 
+                 id="trainNumber" 
+                 name="trainNumber" 
+                 formControlName="trainNumber" 
+                 required
+                 [class.invalid]="isFieldInvalid('trainNumber')">
+          @if (isFieldInvalid('trainNumber')) {
+            <div class="text-danger">
+                Train Number must be exactly 5 characters
+            </div>
+          }
+        </div><br>
+
+        <div class="form-group">
+          <label for="trainLine">Train Line</label>
+          <input type="text" 
+                 class="form-control" 
+                 id="trainLine" 
+                 name="trainLine" 
+                 formControlName="trainLine" 
+                 required
+                 [class.invalid]="isFieldInvalid('trainLine')">
+          @if (isFieldInvalid('trainLine')) {
+            <div class="text-danger">
+                Enter the line for this train (minimum 2 characters)
+            </div>
+          }
+        </div><br>
+
+        <div class="form-group">
+          <label for="traintrainDepartureStation">Train Station of Departure</label>
+          <input type="text" 
+                 class="form-control" 
+                 id="trainDepartureStation" 
+                 formControlName="trainDepartureStation" 
+                 required
+                 [class.invalid]="isFieldInvalid('trainDepartureStation')">
+          @if (isFieldInvalid('trainDepartureStation')) {
+            <div class="text-danger">
+                Enter train departure station (minimum 2 characters)
+            </div>
+          }
+        </div><br>
+
+        <div class="form-group">
+            <label for="trainArrivalStation">Train Station of Arrival</label>
+            <input type="text" 
+                   class="form-control" 
+                   id="trainArrivalStation" 
+                   formControlName="trainArrivalStation" 
+                   required
+                   [class.invalid]="isFieldInvalid('trainArrivalStation')">
+            @if (isFieldInvalid('trainArrivalStation')) {
+              <div class="text-danger">
+                  Enter train arrival station (minimum 2 characters)
+              </div>
+            }
+        </div><br>
+
+        <!-- Date Dropdown Components - Simplified validation -->
+        <div class="form-group">
+          <app-date-dropdown
+            label="Train Departure Date"
+            id="trainDepartureDate"
+            formControlName="trainDepartureDate">
+          </app-date-dropdown>
+          @if (isFieldInvalid('trainDepartureDate')) {
+            <div class="text-danger">Please select the departure date</div>
+          }
+        </div><br>
+
+        <div class="form-group">
+          <app-date-dropdown
+            label="Train Arrival Date"
+            id="trainArrivalDate"
+            formControlName="trainArrivalDate">
+          </app-date-dropdown>
+          @if (isFieldInvalid('trainArrivalDate')) {
+            <div class="text-danger">Please select the arrival date</div>
+          }
+        </div><br>
+
+        <!-- Time Dropdown Components - Simplified validation -->
+        <div class="form-group">
+          <app-time-dropdown
+            label="Train Departure Time"
+            id="trainDepartureTime"
+            formControlName="trainDepartureTime">
+          </app-time-dropdown>
+          @if (isFieldInvalid('trainDepartureTime')) {
+            <div class="text-danger">Please select the departure time</div>
+          }
+        </div><br>
+
+        <div class="form-group">
+          <app-time-dropdown
+            label="Train Arrival Time"
+            id="trainArrivalTime"
+            formControlName="trainArrivalTime">
+          </app-time-dropdown>
+          @if (isFieldInvalid('trainArrivalTime')) {
+            <div class="text-danger">Please select the arrival time</div>
+          }
+        </div><br>
+
+        <!-- Duration Dropdown Component - Simplified validation -->
+        <div class="form-group">
+          <app-duration-dropdown
+            label="Train Ride Duration"
+            id="trainRideDuration"
+            formControlName="trainRideDuration">
+          </app-duration-dropdown>
+          @if (isFieldInvalid('trainRideDuration')) {
+            <div class="text-danger">Please enter the estimated travel time</div>
+          }
+        </div><br>
+
+        <div class="form-group">
+          <label for="trainRidePrice">Train Ride Price</label>
+          <input type="number" 
+                 class="form-control" 
+                 id="trainRidePrice" 
+                 formControlName="trainRidePrice" 
+                 required
+                 min="0"
+                 step="0.01"
+                 [class.invalid]="isFieldInvalid('trainRidePrice')">
+          @if (isFieldInvalid('trainRidePrice')) {
+            <div class="text-danger">
+                Enter a valid price (minimum $0)
+            </div>
+          }
+        </div><br>
+
+        <button type="submit" 
+                class="btn btn-primary" 
+                [disabled]="trainForm.invalid">
+            Submit
+        </button>
+      </form>
+    </div>

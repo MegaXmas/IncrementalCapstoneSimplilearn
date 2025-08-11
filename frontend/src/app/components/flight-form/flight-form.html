@@ -1,0 +1,148 @@
+    <div class="container">
+      <h1 class="heading">Add/edit flight details</h1>
+      <form class="form" [formGroup]="flightForm" (ngSubmit)="onSubmit()">
+
+        <div class="form-group">
+          <label for="flightNumber">Flight Number</label>
+          <input type="text" 
+                 class="form-control" 
+                 id="flightNumber" 
+                 name="flightNumber" 
+                 formControlName="flightNumber" 
+                 required
+                 [class.invalid]="isFieldInvalid('flightNumber')">
+          @if (isFieldInvalid('flightNumber')) {
+            <div class="text-danger">
+                Flight Number must be exactly 5 characters
+            </div>
+          }
+        </div><br>
+
+        <div class="form-group">
+          <label for="flightAirline">Airline</label>
+          <input type="text" 
+                 class="form-control" 
+                 id="flightAirline" 
+                 name="flightAirline" 
+                 formControlName="flightAirline" 
+                 required
+                 [class.invalid]="isFieldInvalid('flightAirline')">
+          @if (isFieldInvalid('flightAirline')) {
+            <div class="text-danger">
+                Enter the Airline for this flight (minimum 2 characters)
+            </div>
+          }
+        </div><br>
+
+        <div class="form-group">
+          <label for="flightOrigin">Flight Origin Airport</label>
+          <input type="text" 
+                 class="form-control" 
+                 id="flightOrigin" 
+                 formControlName="flightOrigin" 
+                 required
+                 [class.invalid]="isFieldInvalid('flightOrigin')">
+          @if (isFieldInvalid('flightOrigin')) {
+            <div class="text-danger">
+                Enter this flight's airport of origin (minimum 2 characters)
+            </div>
+          }
+        </div><br>
+
+        <div class="form-group">
+            <label for="flightDestination">Flight Destination Airport</label>
+            <input type="text" 
+                   class="form-control" 
+                   id="flightDestination" 
+                   formControlName="flightDestination" 
+                   required
+                   [class.invalid]="isFieldInvalid('flightDestination')">
+            @if (isFieldInvalid('flightDestination')) {
+              <div class="text-danger">
+                  Enter the destination airport (minimum 2 characters)
+              </div>
+            }
+        </div><br>
+
+        <!-- Date Dropdown Components - Simplified validation -->
+        <div class="form-group">
+          <app-date-dropdown
+            label="Flight Departure Date"
+            id="flightDepartureDate"
+            formControlName="flightDepartureDate">
+          </app-date-dropdown>
+          @if (isFieldInvalid('flightDepartureDate')) {
+            <div class="text-danger">Please select the departure date</div>
+          }
+        </div><br>
+
+        <div class="form-group">
+          <app-date-dropdown
+            label="Flight Arrival Date"
+            id="flightArrivalDate"
+            formControlName="flightArrivalDate">
+          </app-date-dropdown>
+          @if (isFieldInvalid('flightArrivalDate')) {
+            <div class="text-danger">Please select the arrival date</div>
+          }
+        </div><br>
+
+        <!-- Time Dropdown Components - Simplified validation -->
+        <div class="form-group">
+          <app-time-dropdown
+            label="Flight Departure Time"
+            id="flightDepartureTime"
+            formControlName="flightDepartureTime">
+          </app-time-dropdown>
+          @if (isFieldInvalid('flightDepartureTime')) {
+            <div class="text-danger">Please select the departure time</div>
+          }
+        </div><br>
+
+        <div class="form-group">
+          <app-time-dropdown
+            label="Flight Arrival Time"
+            id="flightArrivalTime"
+            formControlName="flightArrivalTime">
+          </app-time-dropdown>
+          @if (isFieldInvalid('flightArrivalTime')) {
+            <div class="text-danger">Please select the arrival time</div>
+          }
+        </div><br>
+
+        <!-- Duration Dropdown Component - Simplified validation -->
+        <div class="form-group">
+          <app-duration-dropdown
+            label="Flight Travel Time"
+            id="flightTravelTime"
+            formControlName="flightTravelTime">
+          </app-duration-dropdown>
+          @if (isFieldInvalid('flightTravelTime')) {
+            <div class="text-danger">Please select the travel time</div>
+          }
+        </div><br>
+
+        <div class="form-group">
+          <label for="flightPrice">Flight Price</label>
+          <input type="number" 
+                 class="form-control" 
+                 id="flightPrice" 
+                 formControlName="flightPrice" 
+                 required
+                 min="0"
+                 step="0.01"
+                 [class.invalid]="isFieldInvalid('flightPrice')">
+          @if (isFieldInvalid('flightPrice')) {
+            <div class="text-danger">
+                Enter a valid price (minimum $0)
+            </div>
+          }
+        </div><br>
+
+        <button type="submit" 
+                class="btn btn-primary" 
+                [disabled]="flightForm.invalid">
+            Submit
+        </button>
+      </form>
+    </div>

@@ -1,0 +1,45 @@
+.form-control {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.form-control.invalid {
+    border-color: red;
+}
+.text-danger {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* Style the placeholder options */
+.form-control option[disabled] {
+  color: #999;
+  font-style: italic;
+  background-color: #f8f9fa;
+}
+
+/* Alternative: Make placeholder more obvious */
+.form-control option[value=""] {
+  color: #6c757d;
+  font-weight: normal;
+  background-color: #f8f9fa;
+}
+
+/* Style for selected options */
+.form-control option:not([disabled]) {
+  color: #333;
+  background-color: white;
+}
+
+.form-control option:not([disabled]):hover {
+  background-color: #e9ecef;
+}
+
+.date-selectors,
+.time-selectors, 
+.duration-selectors {
+  display: flex;
+  gap: 10px;
+}

@@ -1,0 +1,60 @@
+<div class="container">
+  <h1 class="heading">Admin Login Form</h1>
+  <form class="form" [formGroup]="adminLoginForm" (ngSubmit)="onSubmit()">
+
+    <!-- Debug information (remove after testing) -->
+    <div style="background-color: #f0f0f0; padding: 10px; margin: 10px 0;">
+      <strong>Debug Info:</strong><br>
+      showPassword value: {{ showPassword }}<br>
+      Input type will be: {{ showPassword ? 'text' : 'password' }}<br>
+      Checkbox should be: {{ showPassword ? 'checked' : 'unchecked' }}
+    </div>
+
+    <!-- Username field group -->
+    <div class="form-group">
+      <label for="adminUsername">Admin Username</label>
+      <input type="text" 
+             class="form-control" 
+             id="adminUsername" 
+             name="adminUsername" 
+             formControlName="adminUsername" 
+             required
+             [class.invalid]="adminLoginForm.get('adminUsername')?.invalid && (adminLoginForm.get('adminUsername')?.dirty || adminLoginForm.get('adminUsername')?.touched)">
+      <div *ngIf="adminLoginForm.get('adminUsername')?.invalid && adminLoginForm.get('adminUsername')?.touched" 
+           class="text-danger">
+          Enter Admin Username
+      </div>
+    </div><br>
+
+    <!-- Password field group -->
+    <div class="form-group">
+      <label for="adminPassword">Enter Password</label>
+      <input [type]="showPassword ? 'text' : 'password'" 
+             class="form-control" 
+             id="adminPassword" 
+             formControlName="adminPassword" 
+             required
+             [class.invalid]="adminLoginForm.get('adminPassword')?.invalid && (adminLoginForm.get('adminPassword')?.dirty || adminLoginForm.get('adminPassword')?.touched)">
+      <div *ngIf="adminLoginForm.get('adminPassword')?.invalid && adminLoginForm.get('adminPassword')?.touched" 
+           class="text-danger">
+          Enter Admin Password
+      </div>
+    </div><br>
+    
+    <!-- Checkbox field group with proper binding -->
+    <div class="form-group">
+        <label for="showPassword">Show Password</label> 
+        <i class="me-1"></i> 
+        <input type="checkbox" 
+               id="showPassword" 
+               [checked]="showPassword"
+               (change)="togglePasswordVisibility()" />
+    </div><br>
+    
+    <button type="submit" 
+            class="btn btn-primary" 
+            [disabled]="adminLoginForm.invalid">
+        Submit
+    </button>
+  </form>
+</div>

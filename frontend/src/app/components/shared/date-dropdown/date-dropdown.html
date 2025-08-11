@@ -1,0 +1,34 @@
+<div class="date-dropdown">
+      <label [for]="id">{{ label }}</label>
+      <div class="date-selectors">
+        <select [id]="id + '-day'" 
+                class="form-control" 
+                [value]="selectedDay" 
+                (change)="onDayChange($event)">
+          <option value="" disabled selected>Day</option>
+          @for (day of days; track day) {
+            <option [value]="day">{{ day }}</option>
+          }
+        </select>
+        
+        <select [id]="id + '-month'" 
+                class="form-control" 
+                [value]="selectedMonth" 
+                (change)="onMonthChange($event)">
+          <option value="" disabled selected>Month</option>
+          @for (month of months; track month; let i = $index) {
+            <option [value]="i + 1">{{ month }}</option>
+          }
+        </select>
+        
+        <select [id]="id + '-year'" 
+                class="form-control" 
+                [value]="selectedYear" 
+                (change)="onYearChange($event)">
+          <option value="" disabled selected>Year</option>
+          @for (year of years; track year) {
+            <option [value]="year">{{ year }}</option>
+          }
+        </select>
+      </div>
+    </div>
