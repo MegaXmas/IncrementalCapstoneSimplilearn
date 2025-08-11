@@ -130,7 +130,7 @@ yarn-error.log*
 /out-tsc/
 
 # Angular cache and temporary files created during development
-.angular/cache/
+/frontend/.angular/
 
 # TypeScript compiler cache - speeds up compilation but can be regenerated
 *.tsbuildinfo
