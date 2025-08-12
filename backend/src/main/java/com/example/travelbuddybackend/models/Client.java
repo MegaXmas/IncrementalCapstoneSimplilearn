@@ -1,52 +1,171 @@
 package com.example.travelbuddybackend.models;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
+
+/**
+ * Client model with authentication capabilities
+ *
+ * This represents a customer in our travel booking system who can:
+ * - Create an account and log in
+ * - Book travel tickets
+ * - Manage their personal information
+ *
+ * Think of this as a complete customer profile that includes both
+ * personal information (for bookings) and login credentials (for security).
+ *
+ * Note: Admins are handled separately through the AdminUser model.
+ */
 public class Client {
 
-    private Integer id;
-    private String name;
-    private String email;
-    private String phone;
-    private String address;
-    private String credit_card;
+    // ============================================================================
+    // CORE IDENTITY FIELDS
+    // ============================================================================
 
-    //==================-Constructors===================
-    public Client() {}
+    private Integer id;                    // Unique identifier for each client
 
+    // Authentication credentials - these allow the client to log in
+    @NotBlank(message = "Username is required")
+    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+    private String username;               // Unique username for login
 
-    public Client(Integer id, String name, String email, String phone, String address, String credit_card) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
-        this.address = address;
-        this.credit_card = credit_card;
+    @NotBlank(message = "Email is required")
+    @Email(message = "Please provide a valid email address")
+    private String email;                  // Email address (also used for login)
+
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters long")
+    private String password;               // Encrypted password - never store plain text!
+
+    // ============================================================================
+    // PERSONAL INFORMATION FIELDS - Used for bookings and contact
+    // ============================================================================
+
+    @NotBlank(message = "First name is required")
+    private String firstName;              // Client's first name
+
+    @NotBlank(message = "Last name is required")
+    private String lastName;               // Client's last name
+
+    private String phone;                  // Phone number for booking confirmations
+    private String address;                // Address for billing and contact
+    private String credit_card;            // Credit card for payments (encrypted)
+
+    // ============================================================================
+    // ACCOUNT MANAGEMENT FIELDS - Control account access and track activity
+    // ============================================================================
+
+    private boolean enabled = true;        // Can the client log in? (account active/inactive)
+    private boolean accountLocked = false; // Is account temporarily locked? (security measure)
+    private LocalDateTime createdAt;       // When was this account created?
+    private LocalDateTime lastLogin;       // When did client last successfully log in?
+
+    // ============================================================================
+    // CONSTRUCTORS
+    // ============================================================================
+
+    /**
+     * Default constructor
+     * Automatically sets the account creation timestamp to now
+     */
+    public Client() {
+        this.createdAt = LocalDateTime.now();
     }
 
-    //===================Getters and Setters===================
+    /**
+     * Constructor for creating a new client account
+     * This is typically used during registration when all basic info is provided
+     *
+     * @param username Unique username for login
+     * @param email Email address for login and communication
+     * @param password Raw password (will be encrypted by the service layer)
+     * @param firstName Client's first name
+     * @param lastName Client's last name
+     */
+    public Client(String username, String email, String password, String firstName, String lastName) {
+        this(); // Call default constructor to set createdAt
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    /**
+     * Constructor for basic client information (useful for booking operations)
+     * This might be used when creating a client record from booking information
+     *
+     * @param firstName Client's first name
+     * @param lastName Client's last name
+     * @param email Email address
+     * @param phone Phone number
+     */
+    public Client(String firstName, String lastName, String email, String phone) {
+        this();
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+    }
+
+    // ============================================================================
+    // GETTERS AND SETTERS
+    // ============================================================================
+
     public Integer getId() {
         return id;
     }
+
     public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
-    public void setName(String name) {
-        this.name = name;
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getPhone() {
         return phone;
     }
+
     public void setPhone(String phone) {
         this.phone = phone;
     }
@@ -54,24 +173,209 @@ public class Client {
     public String getAddress() {
         return address;
     }
+
     public void setAddress(String address) {
         this.address = address;
     }
 
-    public String getCredit_card() { return credit_card; }
-    public void setCredit_card(String credit_card) { this.credit_card = credit_card; }
+    public String getCredit_card() {
+        return credit_card;
+    }
 
+    public void setCredit_card(String credit_card) {
+        this.credit_card = credit_card;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isAccountLocked() {
+        return accountLocked;
+    }
+
+    public void setAccountLocked(boolean accountLocked) {
+        this.accountLocked = accountLocked;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(LocalDateTime lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    // ============================================================================
+    // UTILITY METHODS - Helper functions for common operations
+    // ============================================================================
+
+    /**
+     * Get the client's full name
+     * This combines first and last name into a single string for display purposes
+     *
+     * @return "FirstName LastName" format
+     */
+    public String getFullName() {
+        if (firstName != null && lastName != null) {
+            return firstName + " " + lastName;
+        } else if (firstName != null) {
+            return firstName;
+        } else if (lastName != null) {
+            return lastName;
+        }
+        return "";
+    }
+
+    /**
+     * Get a name field for backward compatibility
+     * Some parts of your system might expect a single 'name' field
+     *
+     * @return The full name as a single string
+     */
+    public String getName() {
+        return getFullName();
+    }
+
+    /**
+     * Set the full name by splitting it into first and last names
+     * This helps when you receive a full name and need to split it
+     *
+     * @param fullName Name in "First Last" format
+     */
+    public void setName(String fullName) {
+        if (fullName != null && fullName.trim().length() > 0) {
+            String[] nameParts = fullName.trim().split("\\s+", 2);
+            this.firstName = nameParts[0];
+            this.lastName = nameParts.length > 1 ? nameParts[1] : "";
+        }
+    }
+
+    /**
+     * Check if this client can log in to their account
+     *
+     * For a client to log in successfully, their account must be:
+     * - Enabled (not deactivated)
+     * - Not locked (not temporarily suspended)
+     *
+     * @return true if client can log in, false otherwise
+     */
+    public boolean canLogin() {
+        return enabled && !accountLocked;
+    }
+
+    /**
+     * Check if the client has complete booking information
+     *
+     * This verifies that the client has all the essential information
+     * needed to make travel bookings. This includes:
+     * - Email (for confirmations)
+     * - Name (for tickets)
+     * - Phone (for contact)
+     *
+     * @return true if profile is complete enough for booking, false otherwise
+     */
+    public boolean hasCompleteBookingProfile() {
+        return email != null && !email.trim().isEmpty() &&
+                firstName != null && !firstName.trim().isEmpty() &&
+                lastName != null && !lastName.trim().isEmpty() &&
+                phone != null && !phone.trim().isEmpty();
+    }
+
+    /**
+     * Check if the client has payment information
+     * This verifies that credit card information is available for bookings
+     *
+     * @return true if credit card is available, false otherwise
+     */
+    public boolean hasPaymentInfo() {
+        return credit_card != null && !credit_card.trim().isEmpty();
+    }
+
+    /**
+     * Get a safe version of this client object
+     *
+     * This creates a copy of the client with sensitive information removed.
+     * It's used when sending client data to the frontend - we never want to
+     * send passwords or full credit card numbers to the browser.
+     *
+     * @return Client object with sensitive fields removed
+     */
+    public Client getSafeClient() {
+        Client safeClient = new Client();
+        safeClient.setId(this.id);
+        safeClient.setUsername(this.username);
+        safeClient.setEmail(this.email);
+        safeClient.setFirstName(this.firstName);
+        safeClient.setLastName(this.lastName);
+        safeClient.setPhone(this.phone);
+        safeClient.setAddress(this.address);
+        safeClient.setEnabled(this.enabled);
+        safeClient.setAccountLocked(this.accountLocked);
+        safeClient.setCreatedAt(this.createdAt);
+        safeClient.setLastLogin(this.lastLogin);
+
+        // Sensitive fields are intentionally excluded:
+        // - password (never send to frontend)
+        // - credit_card (only send masked version if needed)
+
+        return safeClient;
+    }
+
+    /**
+     * Get a masked credit card number for display
+     * This shows only the last 4 digits for security
+     *
+     * @return Masked credit card like "****-****-****-1234" or null if no card
+     */
+    public String getMaskedCreditCard() {
+        if (credit_card == null || credit_card.length() < 4) {
+            return null;
+        }
+
+        String lastFour = credit_card.substring(credit_card.length() - 4);
+        return "****-****-****-" + lastFour;
+    }
+
+    /**
+     * Check if this client account was created recently
+     * This can be useful for new user onboarding or special promotions
+     *
+     * @param days Number of days to consider "recent"
+     * @return true if account was created within the specified days
+     */
+    public boolean isNewClient(int days) {
+        if (createdAt == null) {
+            return false;
+        }
+
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(days);
+        return createdAt.isAfter(cutoff);
+    }
 
     @Override
     public String toString() {
         return "Client{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
+                ", fullName='" + getFullName() + '\'' +
+                ", enabled=" + enabled +
+                ", accountLocked=" + accountLocked +
                 ", phone='" + phone + '\'' +
-                ", address='" + address + '\'' +
-                ", credit_card=" + credit_card + '\'' +
+                ", createdAt=" + createdAt +
                 '}';
     }
 }
-
