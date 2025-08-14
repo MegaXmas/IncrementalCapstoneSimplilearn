@@ -36,7 +36,7 @@ public class Client {
     private String email;                  // Email address (also used for login)
 
     @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters long")
+    @Size(min = 8, message = "Password must be at least 8 characters long, contain a number, a capital letter, and a special character")
     private String password;               // Encrypted password - never store plain text!
 
     // ============================================================================
@@ -49,7 +49,10 @@ public class Client {
     @NotBlank(message = "Last name is required")
     private String lastName;               // Client's last name
 
+    @NotBlank(message = "Phone number is required")
     private String phone;                  // Phone number for booking confirmations
+
+    @NotBlank(message = "Address is required")
     private String address;                // Address for billing and contact
     private String credit_card;            // Credit card for payments (encrypted)
 
