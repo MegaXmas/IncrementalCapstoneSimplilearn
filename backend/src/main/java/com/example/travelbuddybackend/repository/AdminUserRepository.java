@@ -24,7 +24,6 @@ public class AdminUserRepository {
             adminUser.setId(rs.getInt("id"));
             adminUser.setAdminUsername(rs.getString("adminUsername"));
             adminUser.setAdminPassword(rs.getString("adminPassword"));
-            adminUser.
             return adminUser;
         }
     }
