@@ -23,23 +23,25 @@
                         <div class="row form-group mb-3">
 
                             <div class="col-md-6">
-                                <label for="trainDepartureStation" class="form-label text-center d-block">Train Station of Departure</label>
-
-                                <select class="form-select text-center" id="trainDepartureStation" name="trainDepartureStation" required>
-                                    <option value="">-- Select the train station you are departing from --</option>
-
-                                    
-                                </select>
+                                <app-station-search
+                                    label="Train Station of Departure"
+                                    id="trainDepartureStation"
+                                    placeholder="Search departure station..."
+                                    stationType="train"
+                                    formControlName="trainDepartureStation">
+                                </app-station-search>
                             </div>
+
 
                             <!-- To Location -->
                             <div class="col-md-6">
-                                <label for="trainArrivalStation" class="form-label text-center d-block">Train Station Destination</label>
-
-                                <select class="form-select text-center" id="trainArrivalStation" name="trainArrivalStation" required>
-                                    <option value="">-- Select the train station you will arrive at --</option>
-
-                                </select>
+                                <app-station-search
+                                    label="Train Station of Arrival"
+                                    id="trainArrivalStation"
+                                    placeholder="Search arrival station..."
+                                    stationType="train"
+                                    formControlName="trainArrivalStation">
+                                </app-station-search>
                             </div>
 
                             <div class="col-md-6">

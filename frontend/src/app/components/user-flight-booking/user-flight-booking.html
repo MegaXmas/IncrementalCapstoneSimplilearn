@@ -23,23 +23,25 @@
                         <div class="row form-group mb-3">
 
                             <div class="col-md-6">
-                                <label for="flightOrigin" class="form-label text-center d-block">Flight Origin Airport</label>
-
-                                <select class="form-select text-center" id="flightOrigin" name="flightOrigin" required>
-                                    <option value="">-- Select your airport of origin --</option>
-
-                                    
-                                </select>
+                                <app-station-search
+                                    label="Airport of Departure"
+                                    id="airportDeparture"
+                                    placeholder="Search departure airport..."
+                                    stationType="airport"
+                                    formControlName="airportDeparture">
+                                </app-station-search>
                             </div>
+
 
                             <!-- To Location -->
                             <div class="col-md-6">
-                                <label for="flightDestination" class="form-label text-center d-block">Flight Destination Airport</label>
-
-                                <select class="form-select text-center" id="flightDestination" name="flightDestination" required>
-                                    <option value="">-- Select your airport destination --</option>
-
-                                </select>
+                                <app-station-search
+                                    label="Airport of Arrival"
+                                    id="airportArrival"
+                                    placeholder="Search arrival airport..."
+                                    stationType="airport"
+                                    formControlName="airportArrival">
+                                </app-station-search>
                             </div>
 
                             <div class="col-md-6">
