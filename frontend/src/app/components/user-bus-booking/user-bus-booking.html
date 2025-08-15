@@ -48,24 +48,27 @@
                                 <app-date-dropdown
                                     label="Bus Departure Date"
                                     id="busDepartureDate"
-                                    formControlName="busDepartureDate">
+                                    formControlName="busDepartureDate"
+>
                                 </app-date-dropdown>
                             </div>
                         </div>
 
                         <!-- Real-time Input Tracking Display (for testing) -->
-                        <div class="row mb-3" *ngIf="showInputTracking">
-                            <div class="col-12">
-                                <div class="alert alert-light">
-                                    <h6>Current Form Values:</h6>
-                                    <small>
-                                        <strong>Departure Station ID:</strong> {{currentInputs.busDepartureStation || 'Not selected'}}<br>
-                                        <strong>Arrival Station ID:</strong> {{currentInputs.busArrivalStation || 'Not selected'}}<br>
-                                        <strong>Departure Date:</strong> {{currentInputs.busDepartureDate || 'Not selected'}}
-                                    </small>
+                        @if (showInputTracking) {
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="alert alert-light">
+                                        <h6>Current Form Values:</h6>
+                                        <small>
+                                            <strong>Departure Station ID:</strong> {{currentInputs.busDepartureStation || 'Not selected'}}<br>
+                                            <strong>Arrival Station ID:</strong> {{currentInputs.busArrivalStation || 'Not selected'}}<br>
+                                            <strong>Departure Date:</strong> {{currentInputs.busDepartureDate || 'Not selected'}}
+                                        </small>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        }
 
                         <!-- Submit Button Section -->
                         <div class="row mt-4">
