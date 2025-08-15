@@ -23,34 +23,24 @@
                         <div class="row form-group mb-3">
 
                             <div class="col-md-6">
-                                <label for="busDepartureStation" class="form-label text-center d-block">Bus Station of Departure</label>
-
-                                <select class="form-select text-center" 
-                                        id="busDepartureStation" 
-                                        name="busDepartureStation" 
-                                        formControlName="busDepartureStation"
-                                        (keyup)="onFieldKeyup('busDepartureStation', $event)"
-                                        (change)="onFieldChange('busDepartureStation', $event)" 
-                                        required>
-                                    <option value="">-- Select the bus station you are departing from --</option>
-                                    <!-- Options will be populated dynamically -->
-                                </select>
+                                <app-station-search
+                                    label="Bus Station of Departure"
+                                    id="busDepartureStation"
+                                    placeholder="Search departure station..."
+                                    stationType="bus"
+                                    formControlName="busDepartureStation">
+                                </app-station-search>
                             </div>
 
                             <!-- To Location -->
                             <div class="col-md-6">
-                                <label for="busArrivalStation" class="form-label text-center d-block">Bus Station Destination</label>
-
-                                <select class="form-select text-center" 
-                                        id="busArrivalStation" 
-                                        name="busArrivalStation"
-                                        formControlName="busArrivalStation"
-                                        (keyup)="onFieldKeyup('busArrivalStation', $event)"
-                                        (change)="onFieldChange('busArrivalStation', $event)" 
-                                        required>
-                                    <option value="">-- Select the bus station you will arrive at --</option>
-                                    <!-- Options will be populated dynamically -->
-                                </select>
+                                <app-station-search
+                                    label="Bus Station Destination"
+                                    id="busArrivalStation"
+                                    placeholder="Search destination station..."
+                                    stationType="bus"
+                                    formControlName="busArrivalStation">
+                                </app-station-search>
                             </div>
 
                             <div class="col-md-6">
@@ -58,11 +48,7 @@
                                 <app-date-dropdown
                                     label="Bus Departure Date"
                                     id="busDepartureDate"
-                                    formControlName="busDepartureDate"
-                                    (keyup)="onFieldKeyup('busDepartureDate', $event)"
-                                    (change)="onFieldChange('busDepartureDate', $event)"
-                                    required>
-                                    <option value="">-- Select the date you will depart --</option>
+                                    formControlName="busDepartureDate">
                                 </app-date-dropdown>
                             </div>
                         </div>
@@ -71,12 +57,11 @@
                         <div class="row mb-3" *ngIf="showInputTracking">
                             <div class="col-12">
                                 <div class="alert alert-light">
-                                    <h6>Real-time Input Tracking:</h6>
+                                    <h6>Current Form Values:</h6>
                                     <small>
-                                        <strong>Departure Station:</strong> {{currentInputs.busDepartureStation || 'Not selected'}}<br>
-                                        <strong>Arrival Station:</strong> {{currentInputs.busArrivalStation || 'Not selected'}}<br>
-                                        <strong>Departure Date:</strong> {{currentInputs.busDepartureDate || 'Not selected'}}<br>
-                                        <strong>Last Key Pressed:</strong> {{lastKeyPressed || 'None'}}
+                                        <strong>Departure Station ID:</strong> {{currentInputs.busDepartureStation || 'Not selected'}}<br>
+                                        <strong>Arrival Station ID:</strong> {{currentInputs.busArrivalStation || 'Not selected'}}<br>
+                                        <strong>Departure Date:</strong> {{currentInputs.busDepartureDate || 'Not selected'}}
                                     </small>
                                 </div>
                             </div>

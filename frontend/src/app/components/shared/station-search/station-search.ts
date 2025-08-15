@@ -2,8 +2,8 @@ import { Component, Input, forwardRef, OnInit } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { Subject, Observable, of, from } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
+import { Subject, Observable, of } from 'rxjs';
 import { StationService, BusStation, TrainStation, Airport } from '../../../services/station-service';
 
 // Simple station interface
@@ -15,11 +15,11 @@ export interface Station {
 }
 
 @Component({
-  selector: 'app-bus-station-search',
+  selector: 'app-station-search',
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="bus-station-search-container">
+    <div class="station-search-container">
       <label [for]="id" class="form-label text-center d-block">{{ label }}</label>
       
       <!-- Search Input -->
@@ -60,16 +60,16 @@ export interface Station {
       </div>
     </div>
   `,
-  styleUrls: ['./bus-station-search.css'],
+  styleUrls: ['./station-search.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => BusStationSearchComponent),
+      useExisting: forwardRef(() => StationSearchComponent),
       multi: true
     }
   ]
 })
-export class BusStationSearchComponent implements ControlValueAccessor, OnInit {
+export class StationSearchComponent implements ControlValueAccessor, OnInit {
   
   @Input() label: string = 'Station';
   @Input() id: string = 'station-search';
