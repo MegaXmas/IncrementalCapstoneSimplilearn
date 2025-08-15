@@ -54,6 +54,7 @@ public class Client {
 
     @NotBlank(message = "Address is required")
     private String address;                // Address for billing and contact
+
     private String credit_card;            // Credit card for payments (encrypted)
 
     // ============================================================================

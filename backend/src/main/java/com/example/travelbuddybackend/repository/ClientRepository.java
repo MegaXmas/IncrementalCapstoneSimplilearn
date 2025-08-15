@@ -1,6 +1,7 @@
 package com.example.travelbuddybackend.repository;
 
 import com.example.travelbuddybackend.models.Client;
+import com.jayway.jsonpath.Criteria;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -34,13 +35,7 @@ public class ClientRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    /**
-     * RowMapper for converting database rows to Client objects
-     *
-     * This is like having a translator that knows how to read client files
-     * from the database and convert them into Java objects that our code can use.
-     * Each database column maps to a specific field in our Client model.
-     */
+
     private static class ClientRowMapper implements RowMapper<Client> {
         @Override
         public Client mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -74,6 +69,8 @@ public class ClientRepository {
             return client;
         }
     }
+
+
 
     // ============================================================================
     // CORE CLIENT MANAGEMENT METHODS

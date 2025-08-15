@@ -5,17 +5,19 @@ import { HeaderComponent } from './components/header/header';
 import { FlightFormComponent } from "./components/flight-form/flight-form";
 import { TrainFormComponent } from "./components/train-form/train-form";
 import { BusFormComponent } from "./components/bus-form/bus-form";
+import { UserBusBookingComponent } from "./components/user-bus-booking/user-bus-booking";
 
 @Component({
   selector: 'app-root',
   imports: [
-    RouterOutlet, 
-    LoginComponent, 
-    HeaderComponent, 
-    FlightFormComponent, 
-    TrainFormComponent, 
-    BusFormComponent
-  ],
+    RouterOutlet,
+    LoginComponent,
+    HeaderComponent,
+    FlightFormComponent,
+    TrainFormComponent,
+    BusFormComponent,
+    UserBusBookingComponent
+],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
