@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
 import { Subject, Observable, of } from 'rxjs';
-import { StationService, BusStation, TrainStation, Airport } from '../../../services/station-service';
+// import { StationService, BusStation, TrainStation, Airport } from '../../../services/station-service';
 
 // Simple station interface
 export interface Station {
@@ -88,16 +88,16 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
   onChange = (value: any) => {};
   onTouch = () => {};
 
-  constructor(private stationService: StationService) {
-    // Set up search with debouncing
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap(query => this.searchStations(query))
-    ).subscribe(stations => {
-      this.filteredStations = stations;
-    });
-  }
+  // constructor(private stationService: StationService) {
+  //   // Set up search with debouncing
+  //   this.searchSubject.pipe(
+  //     debounceTime(300),
+  //     distinctUntilChanged(),
+  //     switchMap(query => this.searchStations(query))
+  //   ).subscribe(stations => {
+  //     this.filteredStations = stations;
+  //   });
+  // }
 
   ngOnInit(): void {
     // Component is ready
@@ -128,29 +128,29 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
   /**
    * Search stations using backend service
    */
-  private searchStations(query: string): Observable<Station[]> {
-    if (!query || query.trim().length === 0) {
-      return of([]);
-    }
+  // private searchStations(query: string): Observable<Station[]> {
+  //   if (!query || query.trim().length === 0) {
+  //     return of([]);
+  //   }
 
-    // Choose search method based on station type
-    switch (this.stationType) {
-      case 'bus':
-        return this.stationService.universalBusStationSearch(query).pipe(
-          map(stations => this.convertToStationInterface(stations, 'bus'))
-        );
-      case 'train':
-        return this.stationService.universalTrainStationSearch(query).pipe(
-          map(stations => this.convertToStationInterface(stations, 'train'))
-        );
-      case 'airport':
-        return this.stationService.searchAirports(query).pipe(
-          map(stations => this.convertToStationInterface(stations, 'airport'))
-        );
-      default:
-        return of([]);
-    }
-  }
+  //   // Choose search method based on station type
+  //   switch (this.stationType) {
+  //     case 'bus':
+  //       return this.stationService.universalBusStationSearch(query).pipe(
+  //         map(stations => this.convertToStationInterface(stations, 'bus'))
+  //       );
+  //     case 'train':
+  //       return this.stationService.universalTrainStationSearch(query).pipe(
+  //         map(stations => this.convertToStationInterface(stations, 'train'))
+  //       );
+  //     case 'airport':
+  //       return this.stationService.searchAirports(query).pipe(
+  //         map(stations => this.convertToStationInterface(stations, 'airport'))
+  //       );
+  //     default:
+  //       return of([]);
+  //   }
+  // }
 
   /**
    * Convert backend data to simple Station interface
