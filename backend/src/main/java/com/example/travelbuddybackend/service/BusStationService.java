@@ -159,18 +159,18 @@ public class BusStationService {
 
     /**
      * Find bus stations by city location
-     * @param cityLocation The city location to search for
-     * @return List of bus stations in the specified city
+     * @param code The code to search for
+     * @return bus station with specified code
      */
-    public List<BusStation> findBusStationsByCity(String cityLocation) {
-        if (cityLocation == null || cityLocation.trim().isEmpty()) {
+    public List<BusStation> findBusStationsByCode(String code) {
+        if (code == null || code.trim().isEmpty()) {
             System.out.println("✗ Service Error: City location cannot be null or empty");
             return new ArrayList<>();
         }
 
         List<BusStation> allBusStations = getAllBusStations();
         return allBusStations.stream()
-                .filter(station -> station.getBusStationCityLocation().equalsIgnoreCase(cityLocation))
+                .filter(station -> station.getBusStationCode().equalsIgnoreCase(code))
                 .collect(Collectors.toList());
     }
 
