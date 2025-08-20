@@ -1,0 +1,55 @@
+// frontend/Jenkinsfile
+pipeline {
+    agent any
+    
+    tools {
+        nodejs 'NodeJS-20' // Make sure this matches your Jenkins NodeJS installation
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                // Get code from your repository
+                checkout scm
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                dir('frontend') {
+                    sh 'npm install'
+                }
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                dir('frontend') {
+                    sh 'npm run build'
+                }
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                dir('frontend') {
+                    sh 'npm test -- --watch=false --browsers=ChromeHeadless'
+                }
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                dir('frontend') {
+                    sh 'docker build -t travel-frontend:latest .'
+                }
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                sh 'docker run -d -p 4200:80 travel-frontend:latest'
+            }
+        }
+    }
+}
