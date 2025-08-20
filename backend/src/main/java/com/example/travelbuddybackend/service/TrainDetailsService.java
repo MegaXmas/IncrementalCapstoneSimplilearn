@@ -172,6 +172,18 @@ public class TrainDetailsService {
         return trainDetailsList.size();
     }
 
+    public List<TrainDetails> findTrainsByTrainNumber(String trainNumber) {
+        if (trainNumber == null || trainNumber.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Train number cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<TrainDetails> allTrains = getAllTrainDetails();
+        return allTrains.stream()
+                .filter(train -> train.getTrainNumber().equalsIgnoreCase(trainNumber))
+                .collect(Collectors.toList());
+    }
+
     /**
      * Find trains by train line/company
      * @param trainLine The train line to search for
@@ -186,23 +198,6 @@ public class TrainDetailsService {
         List<TrainDetails> allTrains = getAllTrainDetails();
         return allTrains.stream()
                 .filter(train -> train.getTrainLine().equalsIgnoreCase(trainLine))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Find trains by departure date
-     * @param departureDate The departure date to search for (format should match database)
-     * @return List of trains departing on the specified date
-     */
-    public List<TrainDetails> findTrainsByDepartureDate(String departureDate) {
-        if (departureDate == null || departureDate.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Departure date cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        List<TrainDetails> allTrains = getAllTrainDetails();
-        return allTrains.stream()
-                .filter(train -> train.getTrainDepartureDate().equals(departureDate))
                 .collect(Collectors.toList());
     }
 
@@ -241,6 +236,89 @@ public class TrainDetailsService {
     }
 
     /**
+     * Find trains by departure date
+     * @param departureDate The departure date to search for (format should match database)
+     * @return List of trains departing on the specified date
+     */
+    public List<TrainDetails> findTrainsByDepartureDate(String departureDate) {
+        if (departureDate == null || departureDate.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Departure date cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<TrainDetails> allTrains = getAllTrainDetails();
+        return allTrains.stream()
+                .filter(train -> train.getTrainDepartureDate().equals(departureDate))
+                .collect(Collectors.toList());
+    }
+
+    public List<TrainDetails> findTrainsByDepartureTime(String departureTime) {
+        if (departureTime == null || departureTime.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Departure time cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<TrainDetails> allTrains = getAllTrainDetails();
+        return allTrains.stream()
+                .filter(train -> train.getTrainDepartureTime().equals(departureTime))
+                .collect(Collectors.toList());
+    }
+
+    public List<TrainDetails> findTrainsByArrivalDate(String arrivalDate) {
+        if (arrivalDate == null || arrivalDate.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Arrival date cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<TrainDetails> allTrains = getAllTrainDetails();
+        return allTrains.stream()
+                .filter(train -> train.getTrainArrivalDate().equals(arrivalDate))
+                .collect(Collectors.toList());
+    }
+
+    public List<TrainDetails> findTrainsByArrivalTime(String arrivalTime) {
+        if (arrivalTime == null || arrivalTime.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Departure time cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<TrainDetails> allTrains = getAllTrainDetails();
+        return allTrains.stream()
+                .filter(train -> train.getTrainArrivalTime().equals(arrivalTime))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Find trains by ride duration range (useful for time-conscious travelers)
+     * @param maxDurationHours Maximum duration in hours
+     * @return List of trains with duration less than or equal to specified hours
+     */
+    public List<TrainDetails> findTrainsByMaxDuration(int maxDurationHours) {
+        if (maxDurationHours <= 0) {
+            System.out.println("✗ Service Error: Duration must be positive");
+            return new ArrayList<>();
+        }
+
+        List<TrainDetails> allTrains = getAllTrainDetails();
+        return allTrains.stream()
+                .filter(train -> {
+                    String duration = train.getTrainRideDuration();
+                    if (duration != null && duration.contains("h")) {
+                        try {
+                            // Extract hours from duration string (assumes format like "2h 30m" or "2h")
+                            String[] parts = duration.split("h");
+                            int hours = Integer.parseInt(parts[0].trim());
+                            return hours <= maxDurationHours;
+                        } catch (NumberFormatException e) {
+                            return false;
+                        }
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Find trains within a price range
      * @param minPrice The minimum price (as string to match model)
      * @param maxPrice The maximum price (as string to match model)
@@ -275,36 +353,6 @@ public class TrainDetailsService {
     }
 
     /**
-     * Find trains by ride duration range (useful for time-conscious travelers)
-     * @param maxDurationHours Maximum duration in hours
-     * @return List of trains with duration less than or equal to specified hours
-     */
-    public List<TrainDetails> findTrainsByMaxDuration(int maxDurationHours) {
-        if (maxDurationHours <= 0) {
-            System.out.println("✗ Service Error: Duration must be positive");
-            return new ArrayList<>();
-        }
-
-        List<TrainDetails> allTrains = getAllTrainDetails();
-        return allTrains.stream()
-                .filter(train -> {
-                    String duration = train.getTrainRideDuration();
-                    if (duration != null && duration.contains("h")) {
-                        try {
-                            // Extract hours from duration string (assumes format like "2h 30m" or "2h")
-                            String[] parts = duration.split("h");
-                            int hours = Integer.parseInt(parts[0].trim());
-                            return hours <= maxDurationHours;
-                        } catch (NumberFormatException e) {
-                            return false;
-                        }
-                    }
-                    return false;
-                })
-                .collect(Collectors.toList());
-    }
-
-    /**
      * Search trains by multiple criteria (for advanced search functionality)
      * @param searchTerm The search term to match against train number, line, departure station, or arrival station
      * @return List of trains matching the search term
@@ -321,9 +369,15 @@ public class TrainDetailsService {
         return allTrains.stream()
                 .filter(train ->
                         train.getTrainNumber().toLowerCase().contains(lowerSearchTerm) ||
-                                train.getTrainLine().toLowerCase().contains(lowerSearchTerm) ||
-                                train.getTrainDepartureStation().toLowerCase().contains(lowerSearchTerm) ||
-                                train.getTrainArrivalStation().toLowerCase().contains(lowerSearchTerm))
+                        train.getTrainLine().toLowerCase().contains(lowerSearchTerm) ||
+                        train.getTrainDepartureStation().toLowerCase().contains(lowerSearchTerm) ||
+                        train.getTrainArrivalStation().toLowerCase().contains(lowerSearchTerm)  ||
+                        train.getTrainDepartureDate().toLowerCase().contains(lowerSearchTerm)  ||
+                        train.getTrainDepartureTime().toLowerCase().contains(lowerSearchTerm)  ||
+                        train.getTrainArrivalDate().toLowerCase().contains(lowerSearchTerm)  ||
+                        train.getTrainArrivalTime().toLowerCase().contains(lowerSearchTerm)  ||
+                        train.getTrainRideDuration().toLowerCase().contains(lowerSearchTerm)  ||
+                        train.getTrainRidePrice().toLowerCase().contains(lowerSearchTerm))
                 .collect(Collectors.toList());
     }
 

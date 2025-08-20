@@ -1,5 +1,6 @@
 package com.example.travelbuddybackend.service;
 
+import com.example.travelbuddybackend.models.BusDetails;
 import com.example.travelbuddybackend.models.FlightDetails;
 import com.example.travelbuddybackend.repository.FlightDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,6 +173,18 @@ public class FlightDetailsService {
         return flightDetailsList.size();
     }
 
+    public List<FlightDetails> findFlightsByFlightNumber(String flightNumber) {
+        if (flightNumber == null || flightNumber.trim().isEmpty()) {
+            System.out.println("✗ Service Error: flightNumber cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<FlightDetails> allFlights = getAllFlightDetails();
+        return allFlights.stream()
+                .filter(flight -> flight.getFlightNumber().equalsIgnoreCase(flightNumber))
+                .collect(Collectors.toList());
+    }
+
     /**
      * Find flights by airline
      * @param airline The airline to search for
@@ -186,23 +199,6 @@ public class FlightDetailsService {
         List<FlightDetails> allFlights = getAllFlightDetails();
         return allFlights.stream()
                 .filter(flight -> flight.getFlightAirline().equalsIgnoreCase(airline))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Find flights by departure date
-     * @param departureDate The departure date to search for (format should match database)
-     * @return List of flights departing on the specified date
-     */
-    public List<FlightDetails> findFlightsByDepartureDate(String departureDate) {
-        if (departureDate == null || departureDate.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Departure date cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        List<FlightDetails> allFlights = getAllFlightDetails();
-        return allFlights.stream()
-                .filter(flight -> flight.getFlightDepartureDate().equals(departureDate))
                 .collect(Collectors.toList());
     }
 
@@ -237,6 +233,79 @@ public class FlightDetailsService {
         List<FlightDetails> allFlights = getAllFlightDetails();
         return allFlights.stream()
                 .filter(flight -> flight.getFlightDestination().equalsIgnoreCase(destination))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Find bus details by departure and arrival airports
+     * @param origin The departure airport to search for
+     * @param destination The arrival airport to search for
+     * @return List of flight details matching the route
+     */
+    public List<FlightDetails> findFlightDetailsByRoute(String origin, String destination) {
+        if (origin == null || origin.trim().isEmpty() ||
+                destination == null || destination.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Both departure and arrival airports are required");
+            return new ArrayList<>();
+        }
+
+        List<FlightDetails> allFlights = getAllFlightDetails();
+        return allFlights.stream()
+                .filter(flights -> flights.getFlightOrigin().equalsIgnoreCase(origin) &&
+                        flights.getFlightDestination().equalsIgnoreCase(destination))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Find flights by departure date
+     * @param departureDate The departure date to search for (format should match database)
+     * @return List of flights departing on the specified date
+     */
+    public List<FlightDetails> findFlightsByDepartureDate(String departureDate) {
+        if (departureDate == null || departureDate.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Departure date cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<FlightDetails> allFlights = getAllFlightDetails();
+        return allFlights.stream()
+                .filter(flight -> flight.getFlightDepartureDate().equals(departureDate))
+                .collect(Collectors.toList());
+    }
+
+    public List<FlightDetails> findFlightsByArrivalDate(String arrival) {
+        if (arrival == null || arrival.trim().isEmpty()) {
+            System.out.println("✗ Service Error: arrival date cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<FlightDetails> allFlights = getAllFlightDetails();
+        return allFlights.stream()
+                .filter(flight -> flight.getFlightArrivalDate().equals(arrival))
+                .collect(Collectors.toList());
+    }
+
+    public List<FlightDetails> findFlightsByDepartureTime(String departureTime) {
+        if (departureTime == null || departureTime.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Departure time cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<FlightDetails> allFlights = getAllFlightDetails();
+        return allFlights.stream()
+                .filter(flight -> flight.getFlightDepartureTime().equals(departureTime))
+                .collect(Collectors.toList());
+    }
+
+    public List<FlightDetails> findFlightsByArrivalTime(String arrivalTime) {
+        if (arrivalTime == null || arrivalTime.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Arrival time cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<FlightDetails> allFlights = getAllFlightDetails();
+        return allFlights.stream()
+                .filter(flight -> flight.getFlightArrivalTime().equals(arrivalTime))
                 .collect(Collectors.toList());
     }
 
@@ -291,9 +360,14 @@ public class FlightDetailsService {
         return allFlights.stream()
                 .filter(flight ->
                         flight.getFlightNumber().toLowerCase().contains(lowerSearchTerm) ||
-                                flight.getFlightAirline().toLowerCase().contains(lowerSearchTerm) ||
-                                flight.getFlightOrigin().toLowerCase().contains(lowerSearchTerm) ||
-                                flight.getFlightDestination().toLowerCase().contains(lowerSearchTerm))
+                        flight.getFlightAirline().toLowerCase().contains(lowerSearchTerm) ||
+                        flight.getFlightOrigin().toLowerCase().contains(lowerSearchTerm) ||
+                        flight.getFlightDestination().toLowerCase().contains(lowerSearchTerm) ||
+                        flight.getFlightDepartureDate().toLowerCase().contains(lowerSearchTerm) ||
+                        flight.getFlightArrivalDate().toLowerCase().contains(lowerSearchTerm) ||
+                        flight.getFlightDepartureTime().toLowerCase().contains(lowerSearchTerm) ||
+                        flight.getFlightArrivalTime().toLowerCase().contains(lowerSearchTerm) ||
+                        flight.getFlightPrice().toLowerCase().contains(lowerSearchTerm))
                 .collect(Collectors.toList());
     }
 

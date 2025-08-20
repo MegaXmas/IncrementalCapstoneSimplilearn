@@ -1,5 +1,6 @@
 package com.example.travelbuddybackend.service;
 
+import com.example.travelbuddybackend.models.BusStation;
 import com.example.travelbuddybackend.models.Client;
 import com.example.travelbuddybackend.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,9 +8,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Enhanced Client Service with Authentication Support
@@ -416,6 +419,124 @@ public class ClientService {
     public List<Client> getRecentClients(int days) {
         LocalDateTime cutoffDate = LocalDateTime.now().minusDays(days);
         return clientRepository.findClientsCreatedBetween(cutoffDate, LocalDateTime.now());
+    }
+
+    // ============================================================================
+    // SEARCH METHODS - For the search functionality with search bar
+    // ============================================================================
+
+
+    public List<Client> findClientByUsername(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Username cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<Client> allClients = getAllClients();
+        return allClients.stream()
+                .filter(station -> station.getUsername().toLowerCase()
+                        .contains(username.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Client> findClientByEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            System.out.println("✗ Service Error: email cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<Client> allClients = getAllClients();
+        return allClients.stream()
+                .filter(station -> station.getEmail().toLowerCase()
+                        .contains(email.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Client> findClientByFirstName(String firstName) {
+        if (firstName == null || firstName.trim().isEmpty()) {
+            System.out.println("✗ Service Error: first name cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<Client> allClients = getAllClients();
+        return allClients.stream()
+                .filter(station -> station.getFirstName().toLowerCase()
+                        .contains(firstName.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Client> findClientByLastName(String lastName) {
+        if (lastName == null || lastName.trim().isEmpty()) {
+            System.out.println("✗ Service Error: first name cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<Client> allClients = getAllClients();
+        return allClients.stream()
+                .filter(station -> station.getLastName().toLowerCase()
+                        .contains(lastName.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Client> findClientByPhoneNumber(String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            System.out.println("✗ Service Error: phone number cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<Client> allClients = getAllClients();
+        return allClients.stream()
+                .filter(station -> station.getPhone().toLowerCase()
+                        .contains(phoneNumber.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Client> findClientByAddress(String address) {
+        if (address == null || address.trim().isEmpty()) {
+            System.out.println("✗ Service Error: address cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<Client> allClients = getAllClients();
+        return allClients.stream()
+                .filter(station -> station.getAddress().toLowerCase()
+                        .contains(address.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Client> findClientByCreditCard(String creditCard) {
+        if (creditCard == null || creditCard.trim().isEmpty()) {
+            System.out.println("✗ Service Error: creditCard cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<Client> allClients = getAllClients();
+        return allClients.stream()
+                .filter(station -> station.getCredit_card()
+                        .contains(creditCard))
+                .collect(Collectors.toList());
+    }
+
+    public List<Client> searchClients(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Search term cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        String lowerSearchTerm = searchTerm.toLowerCase();
+        List<Client> allBusStations = getAllClients();
+
+        return allBusStations.stream()
+                .filter(client ->
+                        client.getUsername().toLowerCase().contains(lowerSearchTerm) ||
+                        client.getEmail().toLowerCase().contains(lowerSearchTerm) ||
+                        client.getFullName().toLowerCase().contains(lowerSearchTerm)  ||
+                        client.getFirstName().toLowerCase().contains(lowerSearchTerm)  ||
+                        client.getLastName().toLowerCase().contains(lowerSearchTerm)  ||
+                        client.getPhone().toLowerCase().contains(lowerSearchTerm)  ||
+                        client.getAddress().toLowerCase().contains(lowerSearchTerm)  ||
+                        client.getCredit_card().toLowerCase().contains(lowerSearchTerm))
+                .collect(Collectors.toList());
     }
 
     // ============================================================================

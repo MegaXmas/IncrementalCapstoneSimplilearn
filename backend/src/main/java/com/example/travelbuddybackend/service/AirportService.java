@@ -1,6 +1,8 @@
 package com.example.travelbuddybackend.service;
 
 import com.example.travelbuddybackend.models.Airport;
+import com.example.travelbuddybackend.models.BusStation;
+import com.example.travelbuddybackend.models.TrainStation;
 import com.example.travelbuddybackend.repository.AirportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -150,5 +152,81 @@ public class AirportService {
     public int getAirportCount() {
         List<Airport> airports = getAllAirports();
         return airports.size();
+    }
+
+    public List<Airport> findAirportByPartialName(String partialName) {
+        if (partialName == null || partialName.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Partial name cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<Airport> allAirports = getAllAirports();
+        return allAirports.stream()
+                .filter(station -> station.getAirportFullName().toLowerCase()
+                        .contains(partialName.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Airport> findAirportByCode(String code) {
+        if (code == null || code.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Code cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<Airport> allAirports = getAllAirports();
+        return allAirports.stream()
+                .filter(station -> station.getAirportCode().toLowerCase()
+                        .contains(code.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Airport> findAirportByCityLocation(String cityLocation) {
+        if (cityLocation == null || cityLocation.trim().isEmpty()) {
+            System.out.println("✗ Service Error: City location cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<Airport> allAirports = getAllAirports();
+        return allAirports.stream()
+                .filter(station -> station.getAirportCityLocation().toLowerCase()
+                        .contains(cityLocation.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Airport> findAirportByCountryLocation(String countryLocation) {
+        if (countryLocation == null || countryLocation.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Country location cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<Airport> allAirports = getAllAirports();
+        return allAirports.stream()
+                .filter(station -> station.getAirportCountryLocation().toLowerCase()
+                        .contains(countryLocation.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Search train stations by multiple criteria (for advanced search functionality)
+     * @param searchTerm The search term to match against station name, code, or city
+     * @return List of train stations matching the search term
+     */
+    public List<Airport> searchAirports(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Search term cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        String lowerSearchTerm = searchTerm.toLowerCase();
+        List<Airport> allAirports = getAllAirports();
+
+        return allAirports.stream()
+                .filter(airport ->
+                        airport.getAirportFullName().toLowerCase().contains(lowerSearchTerm) ||
+                                airport.getAirportCode().toLowerCase().contains(lowerSearchTerm) ||
+                                airport.getAirportCityLocation().toLowerCase().contains(lowerSearchTerm) ||
+                                airport.getAirportCountryLocation().toLowerCase().contains(lowerSearchTerm) ||
+                                airport.getAirportTimezone().toLowerCase().contains(lowerSearchTerm))
+                .collect(Collectors.toList());
     }
 }

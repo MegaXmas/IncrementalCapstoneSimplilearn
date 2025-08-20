@@ -1,6 +1,8 @@
 package com.example.travelbuddybackend.service;
 
+import com.example.travelbuddybackend.models.Airport;
 import com.example.travelbuddybackend.models.BusDetails;
+import com.example.travelbuddybackend.models.FlightDetails;
 import com.example.travelbuddybackend.repository.BusDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -182,7 +184,7 @@ public class BusDetailsService {
      * @param departureDate The departure date to search for (format should match database)
      * @return List of bus details departing on the specified date
      */
-    public List<BusDetails> findBusDetailsByDate(String departureDate) {
+    public List<BusDetails> findBusDetailsByDepartureDate(String departureDate) {
         if (departureDate == null || departureDate.trim().isEmpty()) {
             System.out.println("✗ Service Error: Departure date cannot be null or empty");
             return new ArrayList<>();
@@ -191,6 +193,136 @@ public class BusDetailsService {
         List<BusDetails> allBusDetails = getAllBusDetails();
         return allBusDetails.stream()
                 .filter(bus -> bus.getBusDepartureDate().equals(departureDate))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Find bus details by arrival date
+     * @param arrivalDate The arrival date to search for (format should match database)
+     * @return List of bus details arriving at the specified date
+     */
+    public List<BusDetails> findBusDetailsByArrivalDate(String arrivalDate) {
+        if (arrivalDate == null || arrivalDate.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Arrival date cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<BusDetails> allBusDetails = getAllBusDetails();
+        return allBusDetails.stream()
+                .filter(bus -> bus.getBusArrivalDate().equals(arrivalDate))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Find bus details by departure time
+     * @param departureTime The departure time to search for (format should match database)
+     * @return List of bus details departing on the specified time
+     */
+    public List<BusDetails> findBusDetailsByDepartureTime(String departureTime) {
+        if (departureTime == null || departureTime.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Departure time cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<BusDetails> allBusDetails = getAllBusDetails();
+        return allBusDetails.stream()
+                .filter(bus -> bus.getBusDepartureTime().equals(departureTime))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Find bus details by arrival time
+     * @param arrivalTime The arrival time to search for (format should match database)
+     * @return List of bus details arriving at the specified time
+     */
+    public List<BusDetails> findBusDetailsByArrivalTime(String arrivalTime) {
+        if (arrivalTime == null || arrivalTime.trim().isEmpty()) {
+            System.out.println("✗ Service Error: arrival time cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<BusDetails> allBusDetails = getAllBusDetails();
+        return allBusDetails.stream()
+                .filter(bus -> bus.getBusArrivalTime().equals(arrivalTime))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Find bus details by ride duration
+     * @param rideDuration The ride duration to search for (format should match database)
+     * @return List of bus details based on the duration of the ride
+     */
+    public List<BusDetails> findBusDetailsByRideDuration(String rideDuration) {
+        if (rideDuration == null || rideDuration.trim().isEmpty()) {
+            System.out.println("✗ Service Error: duration cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<BusDetails> allBusDetails = getAllBusDetails();
+        return allBusDetails.stream()
+                .filter(bus -> bus.getBusRideDuration().equals(rideDuration))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Find bus details within a price range
+     * @param minPrice The minimum price (as string to match model)
+     * @param maxPrice The maximum price (as string to match model)
+     * @return List of bus details within the specified price range
+     */
+    public List<BusDetails> findBusDetailsByPriceRange(String minPrice, String maxPrice) {
+        if (minPrice == null || minPrice.trim().isEmpty() ||
+                maxPrice == null || maxPrice.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Both minimum and maximum prices are required");
+            return new ArrayList<>();
+        }
+
+        try {
+            double min = Double.parseDouble(minPrice);
+            double max = Double.parseDouble(maxPrice);
+
+            List<BusDetails> allBusDetails = getAllBusDetails();
+            return allBusDetails.stream()
+                    .filter(flight -> {
+                        try {
+                            double price = Double.parseDouble(flight.getBusRidePrice());
+                            return price >= min && price <= max;
+                        } catch (NumberFormatException e) {
+                            return false;
+                        }
+                    })
+                    .collect(Collectors.toList());
+        } catch (NumberFormatException e) {
+            System.out.println("✗ Service Error: Invalid price format");
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Search train stations by multiple criteria (for advanced search functionality)
+     * @param searchTerm The search term to match against station name, code, or city
+     * @return List of train stations matching the search term
+     */
+    public List<BusDetails> searchBusDetails(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Search term cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        String lowerSearchTerm = searchTerm.toLowerCase();
+        List<BusDetails> allBusDetails = getAllBusDetails();
+
+        return allBusDetails.stream()
+                .filter(bus -> bus.getBusNumber().toLowerCase().contains(lowerSearchTerm) ||
+                        bus.getBusLine().toLowerCase().contains(lowerSearchTerm) ||
+                        bus.getBusDepartureStation().toLowerCase().contains(lowerSearchTerm) ||
+                        bus.getBusArrivalStation().toLowerCase().contains(lowerSearchTerm) ||
+                        bus.getBusDepartureDate().toLowerCase().contains(lowerSearchTerm) ||
+                        bus.getBusArrivalDate().toLowerCase().contains(lowerSearchTerm) ||
+                        bus.getBusDepartureTime().toLowerCase().contains(lowerSearchTerm) ||
+                        bus.getBusArrivalTime().toLowerCase().contains(lowerSearchTerm) ||
+                        bus.getBusRideDuration().toLowerCase().contains(lowerSearchTerm) ||
+                        bus.getBusRidePrice().toLowerCase().contains(lowerSearchTerm))
                 .collect(Collectors.toList());
     }
 }

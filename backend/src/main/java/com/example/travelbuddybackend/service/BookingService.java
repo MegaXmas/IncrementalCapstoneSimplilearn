@@ -352,6 +352,54 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
+    public List<Booking> findBookingsByClientEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Transport type cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<Booking> allBookings = getAllBookings();
+        return allBookings.stream()
+                .filter(booking -> booking.getClientEmail().startsWith(email.toUpperCase()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Booking> findBookingsByClientPhoneNumber(String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Transport type cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<Booking> allBookings = getAllBookings();
+        return allBookings.stream()
+                .filter(booking -> booking.getClientPhone().startsWith(phoneNumber.toUpperCase()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Search train stations by multiple criteria (for advanced search functionality)
+     * @param searchTerm The search term to match against station name, code, or city
+     * @return List of train stations matching the search term
+     */
+    public List<Booking> searchTrainStations(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Search term cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        String lowerSearchTerm = searchTerm.toLowerCase();
+        List<Booking> allBookings = getAllBookings();
+
+        return allBookings.stream()
+                .filter(station ->
+                        station.getBookingId().toLowerCase().contains(lowerSearchTerm) ||
+                                station.getTransportDetailsJson().toLowerCase().contains(lowerSearchTerm) ||
+                                station.getClientName().toLowerCase().contains(lowerSearchTerm) ||
+                                station.getClientEmail().toLowerCase().contains(lowerSearchTerm) ||
+                                station.getClientPhone().toLowerCase().contains(lowerSearchTerm))
+                .collect(Collectors.toList());
+    }
+
     /**
      * Get booking statistics by transport type
      * Returns count of bookings for each transport mode

@@ -1,5 +1,6 @@
 package com.example.travelbuddybackend.service;
 
+import com.example.travelbuddybackend.models.Airport;
 import com.example.travelbuddybackend.models.BusStation;
 import com.example.travelbuddybackend.repository.BusStationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -189,6 +190,36 @@ public class BusStationService {
         return allBusStations.stream()
                 .filter(station -> station.getBusStationFullName().toLowerCase()
                         .contains(partialName.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public List<BusStation> findBusStationsByCityLocation(String location) {
+        if (location == null || location.trim().isEmpty()) {
+            System.out.println("✗ Service Error: location cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<BusStation> allBusStations = getAllBusStations();
+        return allBusStations.stream()
+                .filter(station -> station.getBusStationCityLocation().toLowerCase()
+                        .contains(location.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public List<BusStation> searchBusStations(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Search term cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        String lowerSearchTerm = searchTerm.toLowerCase();
+        List<BusStation> allBusStations = getAllBusStations();
+
+        return allBusStations.stream()
+                .filter(busStation ->
+                        busStation.getBusStationFullName().toLowerCase().contains(lowerSearchTerm) ||
+                        busStation.getBusStationCode().toLowerCase().contains(lowerSearchTerm) ||
+                        busStation.getBusStationCityLocation().toLowerCase().contains(lowerSearchTerm))
                 .collect(Collectors.toList());
     }
 }

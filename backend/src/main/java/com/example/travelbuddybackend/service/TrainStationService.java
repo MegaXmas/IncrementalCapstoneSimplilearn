@@ -1,5 +1,6 @@
 package com.example.travelbuddybackend.service;
 
+import com.example.travelbuddybackend.models.BusStation;
 import com.example.travelbuddybackend.models.TrainStation;
 import com.example.travelbuddybackend.repository.TrainStationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -188,6 +189,19 @@ public class TrainStationService {
                 .collect(Collectors.toList());
     }
 
+    public List<TrainStation> findTrainStationsByCode(String code) {
+        if (code == null || code.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Partial name cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        List<TrainStation> allTrainStations = getAllTrainStations();
+        return allTrainStations.stream()
+                .filter(station -> station.getTrainStationCode().toLowerCase()
+                        .contains(code.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
     /**
      * Find train stations by partial city match (useful for autocomplete)
      * @param partialCity The partial city name to search for
@@ -238,53 +252,6 @@ public class TrainStationService {
                 .map(TrainStation::getTrainStationCityLocation)
                 .distinct()
                 .sorted()
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Find departure stations for route planning
-     * @param departureCity The departure city
-     * @return List of train stations that can serve as departure points
-     */
-    public List<TrainStation> findDepartureStations(String departureCity) {
-        if (departureCity == null || departureCity.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Departure city cannot be null or empty");
-            return new ArrayList<>();
-        }
-        return getTrainStationsByCity(departureCity);
-    }
-
-    /**
-     * Find arrival stations for route planning
-     * @param arrivalCity The arrival city
-     * @return List of train stations that can serve as arrival points
-     */
-    public List<TrainStation> findArrivalStations(String arrivalCity) {
-        if (arrivalCity == null || arrivalCity.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Arrival city cannot be null or empty");
-            return new ArrayList<>();
-        }
-        return getTrainStationsByCity(arrivalCity);
-    }
-
-    /**
-     * Find stations for route planning (departure and arrival options)
-     * @param departureCity The departure city
-     * @param arrivalCity The arrival city
-     * @return List of all stations that serve either departure or arrival city
-     */
-    public List<TrainStation> findRouteStations(String departureCity, String arrivalCity) {
-        if (departureCity == null || departureCity.trim().isEmpty() ||
-                arrivalCity == null || arrivalCity.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Both departure and arrival cities are required");
-            return new ArrayList<>();
-        }
-
-        List<TrainStation> allTrainStations = getAllTrainStations();
-        return allTrainStations.stream()
-                .filter(station ->
-                        station.getTrainStationCityLocation().equalsIgnoreCase(departureCity) ||
-                                station.getTrainStationCityLocation().equalsIgnoreCase(arrivalCity))
                 .collect(Collectors.toList());
     }
 
