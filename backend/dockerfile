@@ -1,5 +1,3 @@
-# travel-buddy-backend/Dockerfile
-
 # Use official OpenJDK 17 image
 FROM openjdk:17-jdk-slim
 
@@ -10,17 +8,23 @@ WORKDIR /app
 COPY mvnw pom.xml ./
 COPY .mvn .mvn
 
+# Make mvnw executable
+RUN chmod +x ./mvnw
+
 # Download dependencies (this layer will be cached)
 RUN ./mvnw dependency:go-offline
 
 # Copy source code
 COPY src ./src
 
-# Build the application
-RUN ./mvnw clean package -DskipTests
+# Build the application with Java 17
+RUN ./mvnw clean package -DskipTests -Dmaven.compiler.source=17 -Dmaven.compiler.target=17
+
+# Find the actual jar file and copy it to a standard name
+RUN find target -name "*.jar" -not -name "*-sources.jar" -not -name "*-javadoc.jar" -exec cp {} app.jar \;
 
 # Expose port 8080
 EXPOSE 8080
 
 # Run the application
-CMD ["java", "-jar", "target/travel-buddy-backend-1.0.0.jar"]
+CMD ["java", "-jar", "app.jar"]

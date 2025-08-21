@@ -6,6 +6,7 @@ import { FlightFormComponent } from "./components/flight-form/flight-form";
 import { TrainFormComponent } from "./components/train-form/train-form";
 import { BusFormComponent } from "./components/bus-form/bus-form";
 import { UserBusBookingComponent } from "./components/user-bus-booking/user-bus-booking";
+import { StationSearchComponent } from './components/shared/station-search/station-search';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,8 @@ import { UserBusBookingComponent } from "./components/user-bus-booking/user-bus-
     FlightFormComponent,
     TrainFormComponent,
     BusFormComponent,
-    UserBusBookingComponent
+    UserBusBookingComponent,
+    StationSearchComponent
 ],
   templateUrl: './app.html',
   styleUrl: './app.css'

@@ -1,0 +1,31 @@
+services:
+  # Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+    container_name: travel-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - travel-network
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: dockerfile
+    container_name: travel-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - travel-network
+
+# Create a custom network for communication between services
+networks:
+  travel-network:
+    driver: bridge
