@@ -4,9 +4,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
 import { Subject, Observable, of } from 'rxjs';
-// import { StationService, BusStation, TrainStation, Airport } from '../../../services/station-service';
+import { StationService } from '../../../services/station-service';
 
-// Simple station interface
+// Simple station interface for component use
 export interface Station {
   id: string;
   fullName: string;
@@ -33,12 +33,13 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
   @Input() label: string = 'Station';
   @Input() id: string = 'station-search';
   @Input() placeholder: string = 'Search for a station...';
-  @Input() stationType: 'bus' | 'train' | 'airport' = 'bus';
+  @Input() stationType: 'bus' | 'train' | 'airport' = 'airport'; // Default to airport for now
   
   // Basic component state
   searchQuery: string = '';
   selectedStation: Station | null = null;
   filteredStations: Station[] = [];
+  isSearching: boolean = false;
 
   // RxJS for search
   private searchSubject = new Subject<string>();
@@ -47,19 +48,23 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
   onChange = (value: any) => {};
   onTouch = () => {};
 
-  // constructor(private stationService: StationService) {
-  //   // Set up search with debouncing
-  //   this.searchSubject.pipe(
-  //     debounceTime(300),
-  //     distinctUntilChanged(),
-  //     switchMap(query => this.searchStations(query))
-  //   ).subscribe(stations => {
-  //     this.filteredStations = stations;
-  //   });
-  // }
+  constructor(private stationService: StationService) {
+    // Set up search with debouncing
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(query => {
+        this.isSearching = true;
+        return this.searchStations(query);
+      })
+    ).subscribe(stations => {
+      this.filteredStations = stations;
+      this.isSearching = false;
+    });
+  }
 
   ngOnInit(): void {
-    // Component is ready
+    console.log('Station search component initialized for type:', this.stationType);
   }
 
   /**
@@ -69,47 +74,47 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
     const query = (event.target as HTMLInputElement).value;
     this.searchQuery = query;
 
-    // Trigger search
-    if (query.length > 0) {
-      this.searchSubject.next(query);
-    } else {
-      this.filteredStations = [];
-    }
-
-    // Log keyup for tracking
+    // Log keyup for tracking as requested
     console.log('Station search keyup:', {
       key: event.key,
       query: query,
+      stationType: this.stationType,
       timestamp: new Date().toLocaleTimeString()
     });
+
+    // Trigger search
+    if (query.length >= 2) { // Start searching after 2 characters
+      this.searchSubject.next(query);
+    } else {
+      this.filteredStations = [];
+      this.isSearching = false;
+    }
   }
 
   /**
    * Search stations using backend service
    */
-  // private searchStations(query: string): Observable<Station[]> {
-  //   if (!query || query.trim().length === 0) {
-  //     return of([]);
-  //   }
+  private searchStations(query: string): Observable<Station[]> {
+    if (!query || query.trim().length < 2) {
+      return of([]);
+    }
 
-  //   // Choose search method based on station type
-  //   switch (this.stationType) {
-  //     case 'bus':
-  //       return this.stationService.universalBusStationSearch(query).pipe(
-  //         map(stations => this.convertToStationInterface(stations, 'bus'))
-  //       );
-  //     case 'train':
-  //       return this.stationService.universalTrainStationSearch(query).pipe(
-  //         map(stations => this.convertToStationInterface(stations, 'train'))
-  //       );
-  //     case 'airport':
-  //       return this.stationService.searchAirports(query).pipe(
-  //         map(stations => this.convertToStationInterface(stations, 'airport'))
-  //       );
-  //     default:
-  //       return of([]);
-  //   }
-  // }
+    // For now, only airport search is implemented
+    switch (this.stationType) {
+      case 'airport':
+        return this.stationService.searchAirports(query).pipe(
+          map(airports => this.convertToStationInterface(airports, 'airport'))
+        );
+      case 'bus':
+        console.log('Bus station search not implemented yet');
+        return of([]);
+      case 'train':
+        console.log('Train station search not implemented yet');
+        return of([]);
+      default:
+        return of([]);
+    }
+  }
 
   /**
    * Convert backend data to simple Station interface
@@ -117,7 +122,15 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
   private convertToStationInterface(stations: any[], type: string): Station[] {
     return stations.map(station => {
       switch (type) {
+        case 'airport':
+          return {
+            id: station.id.toString(), // Convert number to string
+            fullName: station.airportFullName,
+            code: station.airportCode,
+            cityLocation: station.airportCityLocation
+          };
         case 'bus':
+          // TODO: Implement when bus stations are ready
           return {
             id: station.busStationId,
             fullName: station.busStationFullName,
@@ -125,18 +138,12 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
             cityLocation: station.busStationCityLocation
           };
         case 'train':
+          // TODO: Implement when train stations are ready
           return {
             id: station.trainStationId,
             fullName: station.trainStationFullName,
             code: station.trainStationCode,
             cityLocation: station.trainStationCityLocation
-          };
-        case 'airport':
-          return {
-            id: station.airportId,
-            fullName: station.airportFullName,
-            code: station.airportCode,
-            cityLocation: station.airportLocationCity
           };
         default:
           return station;
@@ -149,14 +156,17 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
    */
   selectStation(station: Station): void {
     this.selectedStation = station;
-    this.searchQuery = station.fullName;
+    this.searchQuery = `${station.code} - ${station.fullName}`;
     this.filteredStations = [];
     
-    // Update form value
+    // Update form value with the station ID
     this.onChange(station.id);
     this.onTouch();
 
-    console.log('Station selected:', station);
+    console.log('Station selected:', {
+      station: station,
+      stationType: this.stationType
+    });
   }
 
   /**
@@ -167,6 +177,7 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
     this.searchQuery = '';
     this.filteredStations = [];
     this.onChange(null);
+    console.log('Station selection cleared');
   }
 
   // Required ControlValueAccessor methods
@@ -174,6 +185,7 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
     if (!value) {
       this.clearSelection();
     }
+    // TODO: If value is provided, fetch and display the station
   }
 
   registerOnChange(fn: any): void {
@@ -182,5 +194,9 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
 
   registerOnTouched(fn: any): void {
     this.onTouch = fn;
+  }
+
+  setDisabledState?(isDisabled: boolean): void {
+    // Handle disabled state if needed
   }
 }
