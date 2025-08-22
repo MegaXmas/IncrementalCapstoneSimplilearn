@@ -1,4 +1,20 @@
 services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: travel-mysql
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=travel_db
+      - MYSQL_USER=travel_user
+      - MYSQL_PASSWORD=travel_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - travel-network
+
   # Backend Service
   backend:
     build:
@@ -9,6 +25,11 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/travel_db
+      - SPRING_DATASOURCE_USERNAME=travel_user
+      - SPRING_DATASOURCE_PASSWORD=travel_password
+    depends_on:
+      - mysql
     networks:
       - travel-network
 
@@ -29,3 +50,7 @@ services:
 networks:
   travel-network:
     driver: bridge
+
+# Persist database data
+volumes:
+  mysql_data:

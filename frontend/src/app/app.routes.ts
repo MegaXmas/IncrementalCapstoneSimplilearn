@@ -4,7 +4,7 @@ import { LoginComponent } from './components/login/login';
 // Define application routes
 export const routes: Routes = [
 
-    // { path: '', redirectTo: '/home', pathMatch: 'full' },
+    { path: '', redirectTo: '/home', pathMatch: 'full' },
 
-    // { path: 'login', component: LoginComponent }
+    { path: 'login', component: LoginComponent }
 ];
