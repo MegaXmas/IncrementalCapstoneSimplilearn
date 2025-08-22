@@ -47,11 +47,7 @@ public class AirportController {
     public ResponseEntity<Airport> getAirportById(@PathVariable Integer id) {
         try {
             Optional<Airport> airport = airportService.getAirportById(id);
-            if (airport.isPresent()) {
-                return ResponseEntity.ok(airport.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+            return airport.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
         } catch (Exception e) {
             System.out.println("✗ Controller Error: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
@@ -66,11 +62,7 @@ public class AirportController {
     public ResponseEntity<Airport> getAirportByCode(@PathVariable String airportCode) {
         try {
             Optional<Airport> airport = airportService.getAirportByCode(airportCode);
-            if (airport.isPresent()) {
-                return ResponseEntity.ok(airport.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+            return airport.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
         } catch (Exception e) {
             System.out.println("✗ Controller Error: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
