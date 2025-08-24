@@ -1,12 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 import { AirportService, Airport } from '../../services/airport-service';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+
 @Component({
   selector: 'app-admin-airport-form',
+  standalone: true,
   templateUrl: './admin-airport-form.html',
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpClientModule,
+    CommonModule
   ],
   styleUrls: ['./admin-airport-form.css', '../shared/form-styles.css']
 })
@@ -19,8 +24,7 @@ export class AdminAirportFormComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private airportService: AirportService,
-    private http: HttpClient
+    private airportService: AirportService
   ) {}
 
   ngOnInit(): void {
@@ -35,6 +39,15 @@ export class AdminAirportFormComponent implements OnInit {
       airportLocationCountry: ['', [Validators.required, Validators.minLength(2)]],
       airportTimezone: ['', [Validators.required]]
     });
+  }
+
+  /**
+   * Check if a form field is invalid and has been touched or is dirty
+   * This method is referenced in the HTML template
+   */
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.adminAirportForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
   onSubmit(): void {
@@ -57,7 +70,7 @@ export class AdminAirportFormComponent implements OnInit {
       this.airportService.addAirport(airportData).subscribe({
         next: (response) => {
           console.log('✓ Airport added successfully:', response);
-          this.submitMessage = response; // "Airport added successfully"
+          this.submitMessage = 'Airport added successfully!';
           this.submitSuccess = true;
           this.isSubmitting = false;
 
@@ -72,16 +85,10 @@ export class AdminAirportFormComponent implements OnInit {
         }
       });
     } else {
-      console.log('Form is invalid');
       // Mark all fields as touched to show validation errors
-      Object.keys(this.adminAirportForm.controls).forEach(key => {
-        this.adminAirportForm.get(key)?.markAsTouched();
-      });
+      this.adminAirportForm.markAllAsTouched();
+      this.submitMessage = 'Please fill in all required fields correctly.';
+      this.submitSuccess = false;
     }
-  }
-
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.adminAirportForm.get(fieldName);
-    return !!(field && field.invalid && (field.dirty || field.touched));
   }
 }
