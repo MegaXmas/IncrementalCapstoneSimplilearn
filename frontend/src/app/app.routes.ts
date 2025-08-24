@@ -8,22 +8,22 @@ import { AdminAirportFormComponent } from './components/admin-airport-form/admin
 
 // Define application routes
 export const routes: Routes = [
-  // Default route - redirects to login
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
+    // Default route - redirects to login
+    { path: '', redirectTo: '/login', pathMatch: 'full' },
 
-  // Main component routes
-  { path: 'login', component: LoginComponent },
-  { path: 'flight-form', component: FlightFormComponent },
-  { path: 'train-form', component: TrainFormComponent },
-  { path: 'bus-form', component: BusFormComponent },
-  { path: 'user-bus-booking', component: UserBusBookingComponent },
+    // Main component routes
+    { path: 'login', component: LoginComponent },
+    { path: 'flight-form', component: FlightFormComponent },
+    { path: 'train-form', component: TrainFormComponent },
+    { path: 'bus-form', component: BusFormComponent },
+    { path: 'user-bus-booking', component: UserBusBookingComponent },
 
-  // Admin routes
-  { path: 'admin/airport/add', component: AdminAirportFormComponent },
+    // Admin routes
+    { path: 'admin/airport/add', component: AdminAirportFormComponent },
+    
+    // Alternative route for backward compatibility
+    { path: 'admin-airport-form', component: AdminAirportFormComponent },
 
-  // Alternative route for backward compatibility
-  { path: 'admin-airport-form', component: AdminAirportFormComponent },
-
-  // Wildcard route - must be last
-  { path: '**', redirectTo: '/login' }
+    // Wildcard route - must be last
+    { path: '**', redirectTo: '/login' }
 ];

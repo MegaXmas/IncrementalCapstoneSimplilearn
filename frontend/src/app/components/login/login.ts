@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-login',
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrls: ['./login.css', '../shared/form-styles.css']
 })
 
 export class LoginComponent implements OnInit {
