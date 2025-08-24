@@ -7,6 +7,7 @@ import { TrainFormComponent } from "./components/train-form/train-form";
 import { BusFormComponent } from "./components/bus-form/bus-form";
 import { UserBusBookingComponent } from "./components/user-bus-booking/user-bus-booking";
 import { StationSearchComponent } from './components/shared/station-search/station-search';
+import {AdminAirportFormComponent} from './components/admin-airport-form/admin-airport-form';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +19,8 @@ import { StationSearchComponent } from './components/shared/station-search/stati
     TrainFormComponent,
     BusFormComponent,
     UserBusBookingComponent,
-    StationSearchComponent
+    StationSearchComponent,
+    AdminAirportFormComponent
 ],
   templateUrl: './app.html',
   styleUrl: './app.css'

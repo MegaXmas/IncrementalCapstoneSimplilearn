@@ -5,8 +5,8 @@ public class BusDetails {
     private Integer id;
     private String busNumber;
     private String busLine;
-    private String busDepartureStation;
-    private String busArrivalStation;
+    private BusStation busDepartureStation;
+    private BusStation busArrivalStation;
     private String busDepartureDate;
     private String busDepartureTime;
     private String busArrivalDate;
@@ -16,7 +16,7 @@ public class BusDetails {
 
     public BusDetails() {}
 
-    public BusDetails(Integer id, String busNumber, String busLine, String busDepartureStation, String busArrivalStation,
+    public BusDetails(Integer id, String busNumber, String busLine, BusStation busDepartureStation, BusStation busArrivalStation,
                            String busDepartureDate, String busDepartureTime, String busArrivalDate, String busArrivalTime,
                            String busRideDuration, String busRidePrice) {
         this.id = id;
@@ -56,19 +56,19 @@ public class BusDetails {
         this.busLine = busLine;
     }
 
-    public String getBusDepartureStation() {
+    public BusStation getBusDepartureStation() {
         return busDepartureStation;
     }
 
-    public void setBusDepartureStation(String busDepartureStation) {
+    public void setBusDepartureStation(BusStation busDepartureStation) {
         this.busDepartureStation = busDepartureStation;
     }
 
-    public String getBusArrivalStation() {
+    public BusStation getBusArrivalStation() {
         return busArrivalStation;
     }
 
-    public void setBusArrivalStation(String busArrivalStation) {
+    public void setBusArrivalStation(BusStation busArrivalStation) {
         this.busArrivalStation = busArrivalStation;
     }
 
@@ -126,8 +126,8 @@ public class BusDetails {
                 "id=" + id +
                 ", busNumber='" + busNumber + '\'' +
                 ", busLine='" + busLine + '\'' +
-                ", busDepartureStation='" + busDepartureStation + '\'' +
-                ", busArrivalStation='" + busArrivalStation + '\'' +
+                ", busDepartureStation=" + busDepartureStation +
+                ", busArrivalStation=" + busArrivalStation +
                 ", busDepartureDate='" + busDepartureDate + '\'' +
                 ", busDepartureTime='" + busDepartureTime + '\'' +
                 ", busArrivalDate='" + busArrivalDate + '\'' +

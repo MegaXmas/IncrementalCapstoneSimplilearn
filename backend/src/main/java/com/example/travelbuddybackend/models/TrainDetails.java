@@ -5,8 +5,8 @@ public class TrainDetails {
     private Integer id;
     private String trainNumber;
     private String trainLine;
-    private String trainDepartureStation;
-    private String trainArrivalStation;
+    private TrainStation trainDepartureStation;
+    private TrainStation trainArrivalStation;
     private String trainDepartureDate;
     private String trainDepartureTime;
     private String trainArrivalDate;
@@ -16,7 +16,7 @@ public class TrainDetails {
 
     public TrainDetails() {}
 
-    public TrainDetails(Integer id, String trainNumber, String trainLine, String trainDepartureStation, String trainArrivalStation,
+    public TrainDetails(Integer id, String trainNumber, String trainLine, TrainStation trainDepartureStation, TrainStation trainArrivalStation,
                         String trainDepartureDate, String trainDepartureTime, String trainArrivalDate,
                         String trainArrivalTime, String trainRideDuration, String trainRidePrice) {
         this.id = id;
@@ -56,19 +56,19 @@ public class TrainDetails {
         this.trainLine = trainLine;
     }
 
-    public String getTrainDepartureStation() {
+    public TrainStation getTrainDepartureStation() {
         return trainDepartureStation;
     }
 
-    public void setTrainDepartureStation(String trainDepartureStation) {
+    public void setTrainDepartureStation(TrainStation trainDepartureStation) {
         this.trainDepartureStation = trainDepartureStation;
     }
 
-    public String getTrainArrivalStation() {
+    public TrainStation getTrainArrivalStation() {
         return trainArrivalStation;
     }
 
-    public void setTrainArrivalStation(String trainArrivalStation) {
+    public void setTrainArrivalStation(TrainStation trainArrivalStation) {
         this.trainArrivalStation = trainArrivalStation;
     }
 
@@ -122,12 +122,12 @@ public class TrainDetails {
 
     @Override
     public String toString() {
-        return "trainDetailsModel{" +
+        return "TrainDetails{" +
                 "id=" + id +
                 ", trainNumber='" + trainNumber + '\'' +
                 ", trainLine='" + trainLine + '\'' +
-                ", trainDepartureStation='" + trainDepartureStation + '\'' +
-                ", trainArrivalStation='" + trainArrivalStation + '\'' +
+                ", trainDepartureStation=" + trainDepartureStation +
+                ", trainArrivalStation=" + trainArrivalStation +
                 ", trainDepartureDate='" + trainDepartureDate + '\'' +
                 ", trainDepartureTime='" + trainDepartureTime + '\'' +
                 ", trainArrivalDate='" + trainArrivalDate + '\'' +

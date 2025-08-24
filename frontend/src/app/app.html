@@ -1,15 +1,18 @@
 <!-- Main application template -->
 <app-header></app-header>
-<main>
-  <router-outlet></router-outlet>
-  <app-login></app-login>
-  <app-flight-form></app-flight-form>
-  <app-train-form></app-train-form>
-  <app-bus-form></app-bus-form>
-  <app-user-bus-booking></app-user-bus-booking>
-  <app-station-search 
-  [stationType]="'airport'"
-  [placeholder]="'Search airports...'"
-  [label]="'Departure Airport'">
-</app-station-search>
+<main class="container-fluid py-4">
+  <router-outlet>
+
+  </router-outlet>
+<!--  <app-login></app-login>-->
+<!--  <app-flight-form></app-flight-form>-->
+<!--  <app-train-form></app-train-form>-->
+<!--  <app-bus-form></app-bus-form>-->
+<!--  <app-user-bus-booking></app-user-bus-booking>-->
+<!--  <app-station-search-->
+<!--  [stationType]="'airport'"-->
+<!--  [placeholder]="'Search airports...'"-->
+<!--  [label]="'Departure Airport'">-->
+<!--  </app-station-search>-->
+<!--  <app-admin-airport-form> </app-admin-airport-form>-->
 </main>

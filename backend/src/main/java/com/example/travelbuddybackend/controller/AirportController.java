@@ -157,7 +157,6 @@ public class AirportController {
     }
 
     // ========== SEARCH ENDPOINTS ==========
-    // These work with your existing service methods and repository
 
     /**
      * GET /api/airports/search?searchTerm={searchTerm}
@@ -166,22 +165,7 @@ public class AirportController {
     @GetMapping("/search")
     public ResponseEntity<List<Airport>> searchAirports(@RequestParam String searchTerm) {
         try {
-            List<Airport> allAirports = airportService.getAllAirports();
-
-            if (searchTerm == null || searchTerm.trim().isEmpty()) {
-                return ResponseEntity.ok(new ArrayList<>());
-            }
-
-            String lowerSearchTerm = searchTerm.toLowerCase().trim();
-
-            // Filter airports based on search term
-            List<Airport> searchResults = allAirports.stream()
-                    .filter(airport ->
-                            airport.getAirportFullName().toLowerCase().contains(lowerSearchTerm) ||
-                                    airport.getAirportCode().toLowerCase().contains(lowerSearchTerm) ||
-                                    airport.getAirportCityLocation().toLowerCase().contains(lowerSearchTerm) ||
-                                    airport.getAirportCountryLocation().toLowerCase().contains(lowerSearchTerm))
-                    .collect(Collectors.toList());
+            var searchResults = airportService.searchAirports(searchTerm);
 
             System.out.println("✓ Controller: Airport search for '" + searchTerm + "' returned " + searchResults.size() + " results");
             return ResponseEntity.ok(searchResults);
@@ -191,20 +175,52 @@ public class AirportController {
         }
     }
 
-    /**
-     * GET /api/airports/city/{cityName}
-     * Find airports by exact city name using existing getAllAirports() method
-     */
-    @GetMapping("/city/{cityName}")
-    public ResponseEntity<List<Airport>> getAirportsByCity(@PathVariable String cityName) {
+    @GetMapping("/name/{searchTerm}")
+    public ResponseEntity<List<Airport>> searchAirportsByName(@PathVariable String searchTerm) {
         try {
-            List<Airport> allAirports = airportService.getAllAirports();
+            var searchResults = airportService.findAirportByPartialName(searchTerm);
 
-            List<Airport> cityAirports = allAirports.stream()
-                    .filter(airport -> airport.getAirportCityLocation().equalsIgnoreCase(cityName))
-                    .collect(Collectors.toList());
+            System.out.println("✓ Controller: Airport search for '" + searchTerm + "' returned " + searchResults.size() + " results");
+            return ResponseEntity.ok(searchResults);
+        } catch (Exception e) {
+            System.out.println("✗ Controller Error: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
-            return ResponseEntity.ok(cityAirports);
+    @GetMapping("/code/{searchTerm}")
+    public ResponseEntity<List<Airport>> searchAirportsByCode(@PathVariable String searchTerm) {
+        try {
+            var searchResults = airportService.findAirportByCode(searchTerm);
+
+            System.out.println("✓ Controller: Airport search for '" + searchTerm + "' returned " + searchResults.size() + " results");
+            return ResponseEntity.ok(searchResults);
+        } catch (Exception e) {
+            System.out.println("✗ Controller Error: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/city/{searchTerm}")
+    public ResponseEntity<List<Airport>> getAirportsByCity(@PathVariable String searchTerm) {
+        try {
+            var searchResults = airportService.findAirportByCityLocation(searchTerm);
+
+            System.out.println("✓ Controller: Airport search for '" + searchResults + "' returned " + searchResults.size() + " results");
+            return ResponseEntity.ok(searchResults);
+        } catch (Exception e) {
+            System.out.println("✗ Controller Error: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/country/{searchTerm}")
+    public ResponseEntity<List<Airport>> searchAirportsByCountry(@PathVariable String searchTerm) {
+        try {
+            var searchResults = airportService.findAirportByCountryLocation(searchTerm);
+
+            System.out.println("✓ Controller: Airport search for '" + searchTerm + "' returned " + searchResults.size() + " results");
+            return ResponseEntity.ok(searchResults);
         } catch (Exception e) {
             System.out.println("✗ Controller Error: " + e.getMessage());
             return ResponseEntity.internalServerError().build();

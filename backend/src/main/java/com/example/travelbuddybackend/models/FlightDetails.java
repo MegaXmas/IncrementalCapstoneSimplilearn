@@ -5,8 +5,8 @@ public class FlightDetails {
     private Integer id;
     private String flightNumber;
     private String flightAirline;
-    private String flightOrigin;
-    private String flightDestination;
+    private Airport flightOrigin;
+    private Airport flightDestination;
     private String flightDepartureDate;
     private String flightArrivalDate;
     private String flightDepartureTime;
@@ -16,7 +16,7 @@ public class FlightDetails {
 
     public FlightDetails() {}
 
-    public FlightDetails(Integer id, String flightNumber, String flightAirline, String flightOrigin, String flightDestination,
+    public FlightDetails(Integer id, String flightNumber, String flightAirline, Airport flightOrigin, Airport flightDestination,
                          String flightDepartureDate, String flightArrivalDate, String flightDepartureTime, String flightArrivalTime,
                          String flightTravelTime, String flightPrice) {
         this.id = id;
@@ -32,76 +32,12 @@ public class FlightDetails {
         this.flightPrice = flightPrice;
     }
 
-    public String getFlightPrice() {
-        return flightPrice;
+    public Integer getId() {
+        return id;
     }
 
-    public void setFlightPrice(String flightPrice) {
-        this.flightPrice = flightPrice;
-    }
-
-    public String getFlightTravelTime() {
-        return flightTravelTime;
-    }
-
-    public void setFlightTravelTime(String flightTravelTime) {
-        this.flightTravelTime = flightTravelTime;
-    }
-
-    public String getFlightArrivalTime() {
-        return flightArrivalTime;
-    }
-
-    public void setFlightArrivalTime(String flightArrivalTime) {
-        this.flightArrivalTime = flightArrivalTime;
-    }
-
-    public String getFlightDepartureTime() {
-        return flightDepartureTime;
-    }
-
-    public void setFlightDepartureTime(String flightDepartureTime) {
-        this.flightDepartureTime = flightDepartureTime;
-    }
-
-    public String getFlightArrivalDate() {
-        return flightArrivalDate;
-    }
-
-    public void setFlightArrivalDate(String flightArrivalDate) {
-        this.flightArrivalDate = flightArrivalDate;
-    }
-
-    public String getFlightDepartureDate() {
-        return flightDepartureDate;
-    }
-
-    public void setFlightDepartureDate(String flightDepartureDate) {
-        this.flightDepartureDate = flightDepartureDate;
-    }
-
-    public String getFlightDestination() {
-        return flightDestination;
-    }
-
-    public void setFlightDestination(String flightDestination) {
-        this.flightDestination = flightDestination;
-    }
-
-    public String getFlightOrigin() {
-        return flightOrigin;
-    }
-
-    public void setFlightOrigin(String flightOrigin) {
-        this.flightOrigin = flightOrigin;
-    }
-
-    public String getFlightAirline() {
-        return flightAirline;
-    }
-
-    public void setFlightAirline(String flightAirline) {
-        this.flightAirline = flightAirline;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getFlightNumber() {
@@ -112,22 +48,86 @@ public class FlightDetails {
         this.flightNumber = flightNumber;
     }
 
-    public Integer getId() {
-        return id;
+    public String getFlightAirline() {
+        return flightAirline;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setFlightAirline(String flightAirline) {
+        this.flightAirline = flightAirline;
+    }
+
+    public Airport getFlightOrigin() {
+        return flightOrigin;
+    }
+
+    public void setFlightOrigin(Airport flightOrigin) {
+        this.flightOrigin = flightOrigin;
+    }
+
+    public Airport getFlightDestination() {
+        return flightDestination;
+    }
+
+    public void setFlightDestination(Airport flightDestination) {
+        this.flightDestination = flightDestination;
+    }
+
+    public String getFlightDepartureDate() {
+        return flightDepartureDate;
+    }
+
+    public void setFlightDepartureDate(String flightDepartureDate) {
+        this.flightDepartureDate = flightDepartureDate;
+    }
+
+    public String getFlightArrivalDate() {
+        return flightArrivalDate;
+    }
+
+    public void setFlightArrivalDate(String flightArrivalDate) {
+        this.flightArrivalDate = flightArrivalDate;
+    }
+
+    public String getFlightDepartureTime() {
+        return flightDepartureTime;
+    }
+
+    public void setFlightDepartureTime(String flightDepartureTime) {
+        this.flightDepartureTime = flightDepartureTime;
+    }
+
+    public String getFlightArrivalTime() {
+        return flightArrivalTime;
+    }
+
+    public void setFlightArrivalTime(String flightArrivalTime) {
+        this.flightArrivalTime = flightArrivalTime;
+    }
+
+    public String getFlightTravelTime() {
+        return flightTravelTime;
+    }
+
+    public void setFlightTravelTime(String flightTravelTime) {
+        this.flightTravelTime = flightTravelTime;
+    }
+
+    public String getFlightPrice() {
+        return flightPrice;
+    }
+
+    public void setFlightPrice(String flightPrice) {
+        this.flightPrice = flightPrice;
     }
 
     @Override
     public String toString() {
-        return "flightDetailsModel{" +
+        return "FlightDetails{" +
                 "id=" + id +
                 ", flightNumber='" + flightNumber + '\'' +
                 ", flightAirline='" + flightAirline + '\'' +
-                ", flightOrigin='" + flightOrigin + '\'' +
-                ", flightDestination='" + flightDestination + '\'' +
+                ", flightOrigin=" + flightOrigin +
+                ", flightDestination=" + flightDestination +
                 ", flightDepartureDate='" + flightDepartureDate + '\'' +
                 ", flightArrivalDate='" + flightArrivalDate + '\'' +
                 ", flightDepartureTime='" + flightDepartureTime + '\'' +
