@@ -13,14 +13,14 @@ import {AdminAirportFormComponent} from './components/admin-airport-form/admin-a
   selector: 'app-root',
   imports: [
     RouterOutlet,
-    LoginComponent,
+    // LoginComponent,
     HeaderComponent,
-    FlightFormComponent,
-    TrainFormComponent,
-    BusFormComponent,
-    UserBusBookingComponent,
-    StationSearchComponent,
-    AdminAirportFormComponent
+    // FlightFormComponent,
+    // TrainFormComponent,
+    // BusFormComponent,
+    // UserBusBookingComponent,
+    // StationSearchComponent,
+    // AdminAirportFormComponent
 ],
   templateUrl: './app.html',
   styleUrl: './app.css'
