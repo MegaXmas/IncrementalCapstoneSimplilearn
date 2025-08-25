@@ -1,21 +1,40 @@
 package com.example.travelbuddybackend.models;
 
+import jakarta.validation.constraints.*;
+
 public class TrainStation {
 
     private Integer id;
+
+    @NotNull(message = "Train station name is required")
+    @NotBlank(message = "Train station name cannot be blank")
+    @Size(min = 2, max = 100, message = "Train station name must be between 2 and 100 characters")
     private String trainStationFullName;
+
+    @NotNull(message = "Train station code is required")
+    @NotBlank(message = "Train station code cannot be blank")
+    @Size(min = 2, max = 10, message = "Train station code must be between 2 and 10 characters")
+    @Pattern(regexp = "[A-Z0-9]{2,10}", message = "Train station code must be uppercase letters and/or numbers only")
     private String trainStationCode;
+
+    @NotNull(message = "City location is required")
+    @NotBlank(message = "City location cannot be blank")
+    @Size(min = 2, max = 50, message = "City location must be between 2 and 50 characters")
     private String trainStationCityLocation;
 
+    // Default constructor
     public TrainStation() {}
 
-    public TrainStation(Integer id, String trainStationFullName, String trainStationCode, String trainStationCityLocation) {
+    // Constructor with all fields
+    public TrainStation(Integer id, String trainStationFullName,
+                        String trainStationCode, String trainStationCityLocation) {
         this.id = id;
         this.trainStationFullName = trainStationFullName;
         this.trainStationCode = trainStationCode;
         this.trainStationCityLocation = trainStationCityLocation;
     }
 
+    // Getters and Setters
     public Integer getId() {
         return id;
     }
@@ -50,7 +69,7 @@ public class TrainStation {
 
     @Override
     public String toString() {
-        return "trainStationModel{" +
+        return "TrainStation{" +
                 "id=" + id +
                 ", trainStationFullName='" + trainStationFullName + '\'' +
                 ", trainStationCode='" + trainStationCode + '\'' +

@@ -1,12 +1,10 @@
 package com.example.travelbuddybackend.models;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 /**
- * Client model with authentication capabilities
+ * Client model with authentication capabilities and comprehensive validation
  *
  * This represents a customer in our travel booking system who can:
  * - Create an account and log in
@@ -27,34 +25,52 @@ public class Client {
     private Integer id;                    // Unique identifier for each client
 
     // Authentication credentials - these allow the client to log in
-    @NotBlank(message = "Username is required")
+    @NotNull(message = "Username is required")
+    @NotBlank(message = "Username cannot be blank")
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+    @Pattern(regexp = "^[a-zA-Z0-9_.-]+$", message = "Username can only contain letters, numbers, underscore, period, and dash")
     private String username;               // Unique username for login
 
-    @NotBlank(message = "Email is required")
+    @NotNull(message = "Email is required")
+    @NotBlank(message = "Email cannot be blank")
     @Email(message = "Please provide a valid email address")
+    @Size(max = 100, message = "Email must not exceed 100 characters")
     private String email;                  // Email address (also used for login)
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters long, contain a number, a capital letter, and a special character")
+    @NotNull(message = "Password is required")
+    @NotBlank(message = "Password cannot be blank")
+    @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$",
+            message = "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character")
     private String password;               // Encrypted password - never store plain text!
 
     // ============================================================================
     // PERSONAL INFORMATION FIELDS - Used for bookings and contact
     // ============================================================================
 
-    @NotBlank(message = "First name is required")
+    @NotNull(message = "First name is required")
+    @NotBlank(message = "First name cannot be blank")
+    @Size(min = 1, max = 50, message = "First name must be between 1 and 50 characters")
+    @Pattern(regexp = "^[a-zA-Z\\s'-]+$", message = "First name can only contain letters, spaces, apostrophes, and hyphens")
     private String firstName;              // Client's first name
 
-    @NotBlank(message = "Last name is required")
+    @NotNull(message = "Last name is required")
+    @NotBlank(message = "Last name cannot be blank")
+    @Size(min = 1, max = 50, message = "Last name must be between 1 and 50 characters")
+    @Pattern(regexp = "^[a-zA-Z\\s'-]+$", message = "Last name can only contain letters, spaces, apostrophes, and hyphens")
     private String lastName;               // Client's last name
 
-    @NotBlank(message = "Phone number is required")
+    @NotNull(message = "Phone number is required")
+    @NotBlank(message = "Phone number cannot be blank")
+    @Pattern(regexp = "^[+]?[1-9]\\d{1,14}$", message = "Phone number must be in valid international format (e.g., +1234567890)")
     private String phone;                  // Phone number for booking confirmations
 
-    @NotBlank(message = "Address is required")
+    @NotNull(message = "Address is required")
+    @NotBlank(message = "Address cannot be blank")
+    @Size(min = 10, max = 200, message = "Address must be between 10 and 200 characters")
     private String address;                // Address for billing and contact
 
+    @Pattern(regexp = "^\\d{13,19}$", message = "Credit card number must be 13-19 digits")
     private String credit_card;            // Credit card for payments (encrypted)
 
     // ============================================================================
@@ -223,150 +239,23 @@ public class Client {
     }
 
     // ============================================================================
-    // UTILITY METHODS - Helper functions for common operations
+    // UTILITY METHODS
     // ============================================================================
 
     /**
-     * Get the client's full name
-     * This combines first and last name into a single string for display purposes
-     *
-     * @return "FirstName LastName" format
-     */
-    public String getFullName() {
-        if (firstName != null && lastName != null) {
-            return firstName + " " + lastName;
-        } else if (firstName != null) {
-            return firstName;
-        } else if (lastName != null) {
-            return lastName;
-        }
-        return "";
-    }
-
-    /**
-     * Get a name field for backward compatibility
-     * Some parts of your system might expect a single 'name' field
-     *
-     * @return The full name as a single string
+     * Get the client's full name for display purposes
+     * @return Combined first and last name
      */
     public String getName() {
-        return getFullName();
+        return firstName + " " + lastName;
     }
 
     /**
-     * Set the full name by splitting it into first and last names
-     * This helps when you receive a full name and need to split it
-     *
-     * @param fullName Name in "First Last" format
+     * Check if the account is currently usable (enabled and not locked)
+     * @return true if client can log in and use the system
      */
-    public void setName(String fullName) {
-        if (fullName != null && fullName.trim().length() > 0) {
-            String[] nameParts = fullName.trim().split("\\s+", 2);
-            this.firstName = nameParts[0];
-            this.lastName = nameParts.length > 1 ? nameParts[1] : "";
-        }
-    }
-
-    /**
-     * Check if this client can log in to their account
-     *
-     * For a client to log in successfully, their account must be:
-     * - Enabled (not deactivated)
-     * - Not locked (not temporarily suspended)
-     *
-     * @return true if client can log in, false otherwise
-     */
-    public boolean canLogin() {
+    public boolean isAccountActive() {
         return enabled && !accountLocked;
-    }
-
-    /**
-     * Check if the client has complete booking information
-     *
-     * This verifies that the client has all the essential information
-     * needed to make travel bookings. This includes:
-     * - Email (for confirmations)
-     * - Name (for tickets)
-     * - Phone (for contact)
-     *
-     * @return true if profile is complete enough for booking, false otherwise
-     */
-    public boolean hasCompleteBookingProfile() {
-        return email != null && !email.trim().isEmpty() &&
-                firstName != null && !firstName.trim().isEmpty() &&
-                lastName != null && !lastName.trim().isEmpty() &&
-                phone != null && !phone.trim().isEmpty();
-    }
-
-    /**
-     * Check if the client has payment information
-     * This verifies that credit card information is available for bookings
-     *
-     * @return true if credit card is available, false otherwise
-     */
-    public boolean hasPaymentInfo() {
-        return credit_card != null && !credit_card.trim().isEmpty();
-    }
-
-    /**
-     * Get a safe version of this client object
-     *
-     * This creates a copy of the client with sensitive information removed.
-     * It's used when sending client data to the frontend - we never want to
-     * send passwords or full credit card numbers to the browser.
-     *
-     * @return Client object with sensitive fields removed
-     */
-    public Client getSafeClient() {
-        Client safeClient = new Client();
-        safeClient.setId(this.id);
-        safeClient.setUsername(this.username);
-        safeClient.setEmail(this.email);
-        safeClient.setFirstName(this.firstName);
-        safeClient.setLastName(this.lastName);
-        safeClient.setPhone(this.phone);
-        safeClient.setAddress(this.address);
-        safeClient.setEnabled(this.enabled);
-        safeClient.setAccountLocked(this.accountLocked);
-        safeClient.setCreatedAt(this.createdAt);
-        safeClient.setLastLogin(this.lastLogin);
-
-        // Sensitive fields are intentionally excluded:
-        // - password (never send to frontend)
-        // - credit_card (only send masked version if needed)
-
-        return safeClient;
-    }
-
-    /**
-     * Get a masked credit card number for display
-     * This shows only the last 4 digits for security
-     *
-     * @return Masked credit card like "****-****-****-1234" or null if no card
-     */
-    public String getMaskedCreditCard() {
-        if (credit_card == null || credit_card.length() < 4) {
-            return null;
-        }
-
-        String lastFour = credit_card.substring(credit_card.length() - 4);
-        return "****-****-****-" + lastFour;
-    }
-
-    /**
-     * Check if this client account was created recently
-     * This can be useful for new user onboarding or special promotions
-     *
-     * @param days Number of days to consider "recent"
-     * @return true if account was created within the specified days
-     */
-    public boolean isNewClient(int days) {
-        if (createdAt == null) {
-            return false;
-        }
-
-        LocalDateTime cutoff = LocalDateTime.now().minusDays(days);
-        return createdAt.isAfter(cutoff);
     }
 
     @Override
@@ -375,11 +264,13 @@ public class Client {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", fullName='" + getFullName() + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", phone='" + phone + '\'' +
                 ", enabled=" + enabled +
                 ", accountLocked=" + accountLocked +
-                ", phone='" + phone + '\'' +
                 ", createdAt=" + createdAt +
+                ", lastLogin=" + lastLogin +
                 '}';
     }
 }
