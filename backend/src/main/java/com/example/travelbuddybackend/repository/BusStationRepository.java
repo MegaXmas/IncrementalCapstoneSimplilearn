@@ -94,26 +94,8 @@ public class BusStationRepository {
     }
 
     public boolean createBusStation(BusStation busStation) {
-        if (busStation == null) {
-            System.out.println("✗ Repository: Error: Cannot create null bus station");
-            return false;
-        }
 
-        // Validate all required fields
-        if (busStation.getBusStationFullName() == null || busStation.getBusStationFullName().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus station full name is required");
-            return false;
-        }
-
-        if (busStation.getBusStationCode() == null || busStation.getBusStationCode().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus station code is required");
-            return false;
-        }
-
-        if (busStation.getBusStationCityLocation() == null || busStation.getBusStationCityLocation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus station city location is required");
-            return false;
-        }
+        isValidBusStation(busStation);
 
         try {
             int rowsAffected = jdbcTemplate.update(
@@ -134,31 +116,8 @@ public class BusStationRepository {
     }
 
     public boolean updateBusStation(BusStation busStation) {
-        if (busStation == null) {
-            System.out.println("✗ Repository: Error: Cannot update null bus station");
-            return false;
-        }
 
-        if (busStation.getId() <= 0) {
-            System.out.println("✗ Repository: Error: Invalid bus station ID " + busStation.getId());
-            return false;
-        }
-
-        // Validate all required fields
-        if (busStation.getBusStationFullName() == null || busStation.getBusStationFullName().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus station full name is required");
-            return false;
-        }
-
-        if (busStation.getBusStationCode() == null || busStation.getBusStationCode().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus station code is required");
-            return false;
-        }
-
-        if (busStation.getBusStationCityLocation() == null || busStation.getBusStationCityLocation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus station city location is required");
-            return false;
-        }
+        isValidBusStation(busStation);
 
         try {
             int rowsAffected = jdbcTemplate.update(
@@ -198,5 +157,37 @@ public class BusStationRepository {
             System.out.println("✗ Repository: Error deleting bus station: " + e.getMessage());
             return false;
         }
+    }
+
+    //=====================Validation====================
+
+    public void isValidBusStation(BusStation busStation) {
+        if (busStation == null) {
+            System.out.println("✗ Repository: Error: Cannot update null bus station");
+            return;
+        }
+
+        Optional<BusStation> busStationIdCheck = findById(busStation.getId());
+
+        if (busStationIdCheck = Optional.empty() {
+            System.out.println("✗ Repository: Error: Invalid bus station ID " + busStation.getId());
+            return;
+        }
+
+        // Validate all required fields
+        if (busStation.getBusStationFullName() == null || busStation.getBusStationFullName().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Bus station full name is required");
+            return;
+        }
+
+        if (busStation.getBusStationCode() == null || busStation.getBusStationCode().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Bus station code is required");
+            return;
+        }
+
+        if (busStation.getBusStationCityLocation() == null || busStation.getBusStationCityLocation().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Bus station city location is required");
+        }
+
     }
 }
