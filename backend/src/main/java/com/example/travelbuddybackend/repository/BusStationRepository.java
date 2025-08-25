@@ -95,7 +95,9 @@ public class BusStationRepository {
 
     public boolean createBusStation(BusStation busStation) {
 
-        isValidBusStation(busStation);
+        if (!isValidBusStation(busStation)) {
+            return false;
+        }
 
         try {
             int rowsAffected = jdbcTemplate.update(
@@ -116,16 +118,22 @@ public class BusStationRepository {
     }
 
     public boolean updateBusStation(BusStation busStation) {
-
-        isValidBusStation(busStation);
+        // Validate first - return early if validation fails
+        if (!isValidBusStation(busStation)) {
+            return false;
+        }
 
         try {
             int rowsAffected = jdbcTemplate.update(
                     "UPDATE bus_stations SET busStationFullName = ?, busStationCode = ?, busStationCityLocation = ? WHERE id = ?",
-                    busStation.getBusStationFullName(), busStation.getBusStationCode(), busStation.getBusStationCityLocation(), busStation.getId());
+                    busStation.getBusStationFullName(),
+                    busStation.getBusStationCode(),
+                    busStation.getBusStationCityLocation(),
+                    busStation.getId());
 
             if (rowsAffected > 0) {
-                System.out.println("✓ Repository: Bus station updated successfully: " + busStation.getBusStationFullName() + " (" + busStation.getBusStationCode() + ")");
+                System.out.println("✓ Repository: Bus station updated successfully: " +
+                        busStation.getBusStationFullName() + " (" + busStation.getBusStationCode() + ")");
                 return true;
             } else {
                 System.out.println("✗ Repository: Failed to update bus station " + busStation.getBusStationFullName());
@@ -161,33 +169,43 @@ public class BusStationRepository {
 
     //=====================Validation====================
 
-    public void isValidBusStation(BusStation busStation) {
+    public boolean isValidBusStation(BusStation busStation) {
+        // Null check first
         if (busStation == null) {
-            System.out.println("✗ Repository: Error: Cannot update null bus station");
-            return;
+            System.out.println("✗ Repository: Error: Cannot validate null bus station");
+            return false;
         }
 
-        Optional<BusStation> busStationIdCheck = findById(busStation.getId());
-
-        if (busStationIdCheck = Optional.empty() {
-            System.out.println("✗ Repository: Error: Invalid bus station ID " + busStation.getId());
-            return;
+        // ID validation - check if exists in database
+        if (busStation.getId() == null || busStation.getId() <= 0) {
+            System.out.println("✗ Repository: Error: Bus station must have a valid ID");
+            return false;
         }
 
-        // Validate all required fields
+        Optional<BusStation> existingStation = findById(busStation.getId());
+        if (existingStation.isEmpty()) {
+            System.out.println("✗ Repository: Error: Bus station with ID " + busStation.getId() + " does not exist in database");
+            return false;
+        }
+
+        // Field validation - only proceed if ID exists
         if (busStation.getBusStationFullName() == null || busStation.getBusStationFullName().trim().isEmpty()) {
             System.out.println("✗ Repository: Error: Bus station full name is required");
-            return;
+            return false;
         }
 
         if (busStation.getBusStationCode() == null || busStation.getBusStationCode().trim().isEmpty()) {
             System.out.println("✗ Repository: Error: Bus station code is required");
-            return;
+            return false;
         }
 
         if (busStation.getBusStationCityLocation() == null || busStation.getBusStationCityLocation().trim().isEmpty()) {
             System.out.println("✗ Repository: Error: Bus station city location is required");
+            return false;
         }
 
+        // All validation passed
+        System.out.println("✓ Repository: Bus station validation successful for ID " + busStation.getId());
+        return true;
     }
 }
