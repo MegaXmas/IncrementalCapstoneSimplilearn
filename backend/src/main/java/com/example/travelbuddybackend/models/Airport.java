@@ -1,44 +1,18 @@
 package com.example.travelbuddybackend.models;
 
-import jakarta.validation.constraints.*;
-
 public class Airport {
 
     private Integer id;
-
-    @NotNull(message = "Airport name is required")
-    @NotBlank(message = "Airport name cannot be blank")
-    @Size(min = 3, max = 100, message = "Airport name must be between 3 and 100 characters")
     private String airportFullName;
-
-    @NotNull(message = "Airport code is required")
-    @NotBlank(message = "Airport code cannot be blank")
-    @Size(min = 3, max = 4, message = "Airport code must be 3 or 4 characters")
-    @Pattern(regexp = "[A-Z]{3,4}", message = "Airport code must be uppercase letters only (e.g., LAX, KJFK)")
     private String airportCode;
-
-    @NotNull(message = "City location is required")
-    @NotBlank(message = "City location cannot be blank")
-    @Size(min = 2, max = 50, message = "City location must be between 2 and 50 characters")
     private String airportCityLocation;
-
-    @NotNull(message = "Country location is required")
-    @NotBlank(message = "Country location cannot be blank")
-    @Size(min = 2, max = 50, message = "Country location must be between 2 and 50 characters")
     private String airportCountryLocation;
-
-    @NotNull(message = "Timezone is required")
-    @NotBlank(message = "Timezone cannot be blank")
-    @Pattern(regexp = "[A-Z]{3,4}|UTC[+-]\\d{1,2}|[A-Za-z_/]+", message = "Timezone must be in valid format (e.g., EST, UTC-5, America/New_York)")
     private String airportTimezone;
 
-    // Default constructor
     public Airport() {}
 
-    // Constructor with all fields
-    public Airport(Integer id, String airportFullName, String airportCode,
-                   String airportCityLocation, String airportCountryLocation,
-                   String airportTimezone) {
+    public Airport(Integer id, String airportFullName, String airportCode, String airportCityLocation,
+                   String airportCountryLocation, String airportTimezone) {
         this.id = id;
         this.airportFullName = airportFullName;
         this.airportCode = airportCode;
@@ -47,7 +21,6 @@ public class Airport {
         this.airportTimezone = airportTimezone;
     }
 
-    // Getters and Setters
     public Integer getId() {
         return id;
     }
