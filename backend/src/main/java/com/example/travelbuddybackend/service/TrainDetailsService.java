@@ -1,7 +1,9 @@
 package com.example.travelbuddybackend.service;
 
 import com.example.travelbuddybackend.models.TrainDetails;
+import com.example.travelbuddybackend.models.TrainStation;
 import com.example.travelbuddybackend.repository.TrainDetailsRepository;
+import com.example.travelbuddybackend.service.ValidatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,38 +16,27 @@ import java.util.stream.Collectors;
 public class TrainDetailsService {
 
     private final TrainDetailsRepository trainDetailsRepository;
+    private final ValidatorService validatorService;
 
     @Autowired
-    public TrainDetailsService(TrainDetailsRepository trainDetailsRepository) {
+    public TrainDetailsService(TrainDetailsRepository trainDetailsRepository,
+                               ValidatorService validatorService) {
         this.trainDetailsRepository = trainDetailsRepository;
+        this.validatorService = validatorService;
     }
 
-    /**
-     * Get all train details from the database
-     * @return List of all train details (empty list if none found or error occurs)
-     */
     public List<TrainDetails> getAllTrainDetails() {
         return trainDetailsRepository.findAll();
     }
 
-    /**
-     * Get train details by their ID
-     * @param id The train details ID to search for
-     * @return Optional containing the train details if found, empty otherwise
-     */
     public Optional<TrainDetails> getTrainDetailsById(Integer id) {
-        if (id == null) {
-            System.out.println("✗ Service Error: Train details ID cannot be null");
+        if (id == null || id <= 0) {
+            System.out.println("✗ Service Error: Train details ID cannot be null or less than 1");
             return Optional.empty();
         }
         return trainDetailsRepository.findById(id);
     }
 
-    /**
-     * Get train details by train number
-     * @param trainNumber The train number to search for
-     * @return Optional containing the train details if found, empty otherwise
-     */
     public Optional<TrainDetails> getTrainDetailsByNumber(String trainNumber) {
         if (trainNumber == null || trainNumber.trim().isEmpty()) {
             System.out.println("✗ Service Error: Train number cannot be null or empty");
@@ -54,12 +45,6 @@ public class TrainDetailsService {
         return trainDetailsRepository.findByTrainNumber(trainNumber);
     }
 
-    /**
-     * Get train details by departure and arrival stations (uses repository method)
-     * @param departureStation The departure station
-     * @param arrivalStation The arrival station
-     * @return List of trains matching the route
-     */
     public List<TrainDetails> getTrainsByRoute(String departureStation, String arrivalStation) {
         if (departureStation == null || departureStation.trim().isEmpty() ||
                 arrivalStation == null || arrivalStation.trim().isEmpty()) {
@@ -69,81 +54,83 @@ public class TrainDetailsService {
         return trainDetailsRepository.findByStations(departureStation, arrivalStation);
     }
 
-    /**
-     * Add new train details to the database
-     * @param trainDetails The train details to add
-     * @return true if train details were successfully added, false otherwise
-     */
+    public List<TrainDetails> getTrainsByRoute(TrainStation departureStation, TrainStation arrivalStation) {
+        if (departureStation == null || arrivalStation == null) {
+            System.out.println("✗ Service Error: Both stations are required");
+            return new ArrayList<>();
+        }
+        return trainDetailsRepository.findByStations(departureStation, arrivalStation);
+    }
+
+    public List<TrainDetails> getTrainsByDepartureDate(String departureDate) {
+        if (departureDate == null || departureDate.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Departure date cannot be null or empty");
+            return new ArrayList<>();
+        }
+        return trainDetailsRepository.findByDepartureDate(departureDate);
+    }
+
     public boolean addTrainDetails(TrainDetails trainDetails) {
-        if (trainDetails == null) {
-            System.out.println("✗ Service Error: Cannot add null train details");
+        if (!isValidTrainDetailsForService(trainDetails)) {
             return false;
         }
 
         boolean success = trainDetailsRepository.createTrainDetails(trainDetails);
         if (success) {
-            System.out.println("✓ Service: Train details successfully added through service layer");
+            System.out.println("✓ Service: Train details added successfully");
         } else {
-            System.out.println("✗ Service: Failed to add train details through service layer");
+            System.out.println("✗ Service: Failed to add train details");
         }
         return success;
     }
 
-    /**
-     * Update existing train details in the database
-     * @param trainDetails The train details with updated information
-     * @return true if train details were successfully updated, false otherwise
-     */
     public boolean updateTrainDetails(TrainDetails trainDetails) {
-        if (trainDetails == null) {
-            System.out.println("✗ Service Error: Cannot update null train details");
+        if (!isValidTrainDetailsForService(trainDetails)) {
             return false;
         }
 
         if (trainDetails.getId() == null || trainDetails.getId() <= 0) {
-            System.out.println("✗ Service Error: Train details must have a valid ID for update");
+            System.out.println("✗ Service Error: Valid ID required for update");
+            return false;
+        }
+
+        // Check if train details exist before updating
+        if (!trainDetailsExists(trainDetails.getId())) {
+            System.out.println("✗ Service Error: Train details not found for update");
             return false;
         }
 
         boolean success = trainDetailsRepository.updateTrainDetails(trainDetails);
         if (success) {
-            System.out.println("✓ Service: Train details successfully updated through service layer");
+            System.out.println("✓ Service: Train details updated successfully");
         } else {
-            System.out.println("✗ Service: Failed to update train details through service layer");
+            System.out.println("✗ Service: Failed to update train details");
         }
         return success;
     }
 
-    /**
-     * Delete train details from the database
-     * @param id The ID of the train details to delete
-     * @return true if train details were successfully deleted, false otherwise
-     */
     public boolean deleteTrainDetails(Integer id) {
-        if (id == null) {
-            System.out.println("✗ Service Error: Train details ID cannot be null");
+        if (id == null || id <= 0) {
+            System.out.println("✗ Service Error: Invalid train details ID");
             return false;
         }
 
-        if (id <= 0) {
-            System.out.println("✗ Service Error: Invalid train details ID: " + id);
+        // Check if train details exist before deleting
+        if (!trainDetailsExists(id)) {
+            System.out.println("✗ Service Error: Train details not found for deletion");
             return false;
         }
 
         boolean success = trainDetailsRepository.deleteTrainDetails(id);
         if (success) {
-            System.out.println("✓ Service: Train details successfully deleted through service layer");
+            System.out.println("✓ Service: Train details deleted successfully");
         } else {
-            System.out.println("✗ Service: Failed to delete train details through service layer");
+            System.out.println("✗ Service: Failed to delete train details");
         }
         return success;
     }
 
-    /**
-     * Check if train details exist in the database by ID
-     * @param id The train details ID to check
-     * @return true if train details exist, false otherwise
-     */
+    // Business logic validation at service level
     public boolean trainDetailsExists(Integer id) {
         if (id == null || id <= 0) {
             return false;
@@ -151,11 +138,6 @@ public class TrainDetailsService {
         return getTrainDetailsById(id).isPresent();
     }
 
-    /**
-     * Check if train details exist in the database by train number
-     * @param trainNumber The train number to check
-     * @return true if train details exist, false otherwise
-     */
     public boolean trainDetailsExistsByNumber(String trainNumber) {
         if (trainNumber == null || trainNumber.trim().isEmpty()) {
             return false;
@@ -163,13 +145,8 @@ public class TrainDetailsService {
         return getTrainDetailsByNumber(trainNumber).isPresent();
     }
 
-    /**
-     * Get the total number of train details in the database
-     * @return The count of all train details
-     */
     public int getTrainDetailsCount() {
-        List<TrainDetails> trainDetailsList = getAllTrainDetails();
-        return trainDetailsList.size();
+        return getAllTrainDetails().size();
     }
 
     public List<TrainDetails> findTrainsByTrainNumber(String trainNumber) {
@@ -184,11 +161,6 @@ public class TrainDetailsService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Find trains by train line/company
-     * @param trainLine The train line to search for
-     * @return List of trains operated by the specified line
-     */
     public List<TrainDetails> findTrainsByLine(String trainLine) {
         if (trainLine == null || trainLine.trim().isEmpty()) {
             System.out.println("✗ Service Error: Train line cannot be null or empty");
@@ -201,129 +173,33 @@ public class TrainDetailsService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Find trains by departure station
-     * @param departureStation The departure station to search for
-     * @return List of trains departing from the specified station
-     */
-    public List<TrainDetails> findTrainsByDepartureStation(String departureStation) {
-        if (departureStation == null || departureStation.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Departure station cannot be null or empty");
+    public List<TrainDetails> searchTrains(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Search term cannot be null or empty");
             return new ArrayList<>();
         }
 
+        String lowerSearchTerm = searchTerm.toLowerCase();
         List<TrainDetails> allTrains = getAllTrainDetails();
-        return allTrains.stream()
-                .filter(train -> train.getTrainDepartureStation().equalsIgnoreCase(departureStation))
-                .collect(Collectors.toList());
-    }
 
-    /**
-     * Find trains by arrival station
-     * @param arrivalStation The arrival station to search for
-     * @return List of trains arriving at the specified station
-     */
-    public List<TrainDetails> findTrainsByArrivalStation(String arrivalStation) {
-        if (arrivalStation == null || arrivalStation.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Arrival station cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        List<TrainDetails> allTrains = getAllTrainDetails();
-        return allTrains.stream()
-                .filter(train -> train.getTrainArrivalStation().equalsIgnoreCase(arrivalStation))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Find trains by departure date
-     * @param departureDate The departure date to search for (format should match database)
-     * @return List of trains departing on the specified date
-     */
-    public List<TrainDetails> findTrainsByDepartureDate(String departureDate) {
-        if (departureDate == null || departureDate.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Departure date cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        List<TrainDetails> allTrains = getAllTrainDetails();
-        return allTrains.stream()
-                .filter(train -> train.getTrainDepartureDate().equals(departureDate))
-                .collect(Collectors.toList());
-    }
-
-    public List<TrainDetails> findTrainsByDepartureTime(String departureTime) {
-        if (departureTime == null || departureTime.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Departure time cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        List<TrainDetails> allTrains = getAllTrainDetails();
-        return allTrains.stream()
-                .filter(train -> train.getTrainDepartureTime().equals(departureTime))
-                .collect(Collectors.toList());
-    }
-
-    public List<TrainDetails> findTrainsByArrivalDate(String arrivalDate) {
-        if (arrivalDate == null || arrivalDate.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Arrival date cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        List<TrainDetails> allTrains = getAllTrainDetails();
-        return allTrains.stream()
-                .filter(train -> train.getTrainArrivalDate().equals(arrivalDate))
-                .collect(Collectors.toList());
-    }
-
-    public List<TrainDetails> findTrainsByArrivalTime(String arrivalTime) {
-        if (arrivalTime == null || arrivalTime.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Departure time cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        List<TrainDetails> allTrains = getAllTrainDetails();
-        return allTrains.stream()
-                .filter(train -> train.getTrainArrivalTime().equals(arrivalTime))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Find trains by ride duration range (useful for time-conscious travelers)
-     * @param maxDurationHours Maximum duration in hours
-     * @return List of trains with duration less than or equal to specified hours
-     */
-    public List<TrainDetails> findTrainsByMaxDuration(int maxDurationHours) {
-        if (maxDurationHours <= 0) {
-            System.out.println("✗ Service Error: Duration must be positive");
-            return new ArrayList<>();
-        }
-
-        List<TrainDetails> allTrains = getAllTrainDetails();
         return allTrains.stream()
                 .filter(train -> {
-                    String duration = train.getTrainRideDuration();
-                    if (duration != null && duration.contains("h")) {
-                        try {
-                            // Extract hours from duration string (assumes format like "2h 30m" or "2h")
-                            String[] parts = duration.split("h");
-                            int hours = Integer.parseInt(parts[0].trim());
-                            return hours <= maxDurationHours;
-                        } catch (NumberFormatException e) {
-                            return false;
-                        }
-                    }
-                    return false;
+                    // Safe null checking for train station names
+                    String departureName = train.getTrainDepartureStation() != null ?
+                            train.getTrainDepartureStation().getTrainStationFullName() : "";
+                    String arrivalName = train.getTrainArrivalStation() != null ?
+                            train.getTrainArrivalStation().getTrainStationFullName() : "";
+
+                    return train.getTrainNumber().toLowerCase().contains(lowerSearchTerm) ||
+                            train.getTrainLine().toLowerCase().contains(lowerSearchTerm) ||
+                            departureName.toLowerCase().contains(lowerSearchTerm) ||
+                            arrivalName.toLowerCase().contains(lowerSearchTerm) ||
+                            train.getTrainDepartureDate().toLowerCase().contains(lowerSearchTerm) ||
+                            train.getTrainRidePrice().toLowerCase().contains(lowerSearchTerm);
                 })
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Find trains within a price range
-     * @param minPrice The minimum price (as string to match model)
-     * @param maxPrice The maximum price (as string to match model)
-     * @return List of trains within the specified price range
-     */
     public List<TrainDetails> findTrainsByPriceRange(String minPrice, String maxPrice) {
         if (minPrice == null || minPrice.trim().isEmpty() ||
                 maxPrice == null || maxPrice.trim().isEmpty()) {
@@ -334,6 +210,11 @@ public class TrainDetailsService {
         try {
             double min = Double.parseDouble(minPrice);
             double max = Double.parseDouble(maxPrice);
+
+            if (min < 0 || max < 0 || min > max) {
+                System.out.println("✗ Service Error: Invalid price range");
+                return new ArrayList<>();
+            }
 
             List<TrainDetails> allTrains = getAllTrainDetails();
             return allTrains.stream()
@@ -352,61 +233,16 @@ public class TrainDetailsService {
         }
     }
 
-    /**
-     * Search trains by multiple criteria (for advanced search functionality)
-     * @param searchTerm The search term to match against train number, line, departure station, or arrival station
-     * @return List of trains matching the search term
-     */
-    public List<TrainDetails> searchTrains(String searchTerm) {
-        if (searchTerm == null || searchTerm.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Search term cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        String lowerSearchTerm = searchTerm.toLowerCase();
-        List<TrainDetails> allTrains = getAllTrainDetails();
-
-        return allTrains.stream()
-                .filter(train ->
-                        train.getTrainNumber().toLowerCase().contains(lowerSearchTerm) ||
-                        train.getTrainLine().toLowerCase().contains(lowerSearchTerm) ||
-                        train.getTrainDepartureStation().toLowerCase().contains(lowerSearchTerm) ||
-                        train.getTrainArrivalStation().toLowerCase().contains(lowerSearchTerm)  ||
-                        train.getTrainDepartureDate().toLowerCase().contains(lowerSearchTerm)  ||
-                        train.getTrainDepartureTime().toLowerCase().contains(lowerSearchTerm)  ||
-                        train.getTrainArrivalDate().toLowerCase().contains(lowerSearchTerm)  ||
-                        train.getTrainArrivalTime().toLowerCase().contains(lowerSearchTerm)  ||
-                        train.getTrainRideDuration().toLowerCase().contains(lowerSearchTerm)  ||
-                        train.getTrainRidePrice().toLowerCase().contains(lowerSearchTerm))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Validate train number format (basic validation)
-     * @param trainNumber The train number to validate
-     * @return true if valid format, false otherwise
-     */
-    public boolean isValidTrainNumber(String trainNumber) {
-        if (trainNumber == null || trainNumber.trim().isEmpty()) {
-            return false;
-        }
-        // Basic validation: not empty and contains at least 2 characters
-        return trainNumber.trim().length() >= 2;
-    }
-
-    /**
-     * Validate train details before creating/updating
-     * @param trainDetails The train details to validate
-     * @return true if valid, false otherwise
-     */
-    public boolean isValidTrainDetails(TrainDetails trainDetails) {
+    // Service-level validation (includes business rules)
+    private boolean isValidTrainDetailsForService(TrainDetails trainDetails) {
         if (trainDetails == null) {
             System.out.println("✗ Service Error: Train details cannot be null");
             return false;
         }
 
-        if (!isValidTrainNumber(trainDetails.getTrainNumber())) {
-            System.out.println("✗ Service Error: Invalid train number format");
+        // Basic field validation
+        if (trainDetails.getTrainNumber() == null || trainDetails.getTrainNumber().trim().isEmpty()) {
+            System.out.println("✗ Service Error: Train number is required");
             return false;
         }
 
@@ -415,31 +251,45 @@ public class TrainDetailsService {
             return false;
         }
 
-        if (trainDetails.getTrainDepartureStation() == null || trainDetails.getTrainDepartureStation().trim().isEmpty()) {
-            System.out.println("✗ Service Error: Train departure station is required");
+        if (trainDetails.getTrainDepartureStation() == null || trainDetails.getTrainArrivalStation() == null) {
+            System.out.println("✗ Service Error: Both departure and arrival stations are required");
             return false;
         }
 
-        if (trainDetails.getTrainArrivalStation() == null || trainDetails.getTrainArrivalStation().trim().isEmpty()) {
-            System.out.println("✗ Service Error: Train arrival station is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainDepartureStation().equalsIgnoreCase(trainDetails.getTrainArrivalStation())) {
+        // Business logic validation
+        if (trainDetails.getTrainDepartureStation().getId().equals(trainDetails.getTrainArrivalStation().getId())) {
             System.out.println("✗ Service Error: Departure and arrival stations cannot be the same");
             return false;
         }
 
-        if (trainDetails.getTrainRidePrice() == null || trainDetails.getTrainRidePrice().trim().isEmpty()) {
-            System.out.println("✗ Service Error: Train ride price is required");
+        // Date validation
+        if (!validatorService.isValidDate(trainDetails.getTrainDepartureDate()) ||
+                !validatorService.isValidDate(trainDetails.getTrainArrivalDate())) {
+            System.out.println("✗ Service Error: Invalid date format");
             return false;
         }
 
-        // Validate price is numeric
+        // Time validation
+        if (!validatorService.isValidTime(trainDetails.getTrainDepartureTime()) ||
+                !validatorService.isValidTime(trainDetails.getTrainArrivalTime())) {
+            System.out.println("✗ Service Error: Invalid time format");
+            return false;
+        }
+
+        // Price validation
+        if (trainDetails.getTrainRidePrice() == null || trainDetails.getTrainRidePrice().trim().isEmpty()) {
+            System.out.println("✗ Service Error: Price is required");
+            return false;
+        }
+
         try {
-            Double.parseDouble(trainDetails.getTrainRidePrice());
+            double price = Double.parseDouble(trainDetails.getTrainRidePrice());
+            if (price < 0) {
+                System.out.println("✗ Service Error: Price cannot be negative");
+                return false;
+            }
         } catch (NumberFormatException e) {
-            System.out.println("✗ Service Error: Train ride price must be a valid number");
+            System.out.println("✗ Service Error: Price must be a valid number");
             return false;
         }
 
