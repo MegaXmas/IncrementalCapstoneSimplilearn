@@ -97,35 +97,10 @@ public class AirportRepository {
     }
 
     public boolean newAirport(Airport airport) {
-        if (airport == null) {
-            System.out.println("✗ Repository: Error: Cannot create null airport");
-            return false;
-        }
 
-        if (airport.getAirportFullName() == null || airport.getAirportFullName().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: airportName is required");
-            return false;
-        }
-
-        if (airport.getAirportCode() == null || airport.getAirportCode().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: airportCode is required");
-            return false;
-        }
-
-        if (airport.getAirportCityLocation() == null || airport.getAirportCityLocation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: airportCityLocation is required");
-            return false;
-        }
-
-        if (airport.getAirportCountryLocation() == null || airport.getAirportCountryLocation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: airportCountryLocation is required");
-            return false;
-        }
-
-        if (airport.getAirportTimezone() == null || airport.getAirportTimezone().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: airportTimezone is required");
-            return false;
-        }
+        if (!isValidAirport(airport)) {
+            return  false;
+        };
 
         try {
             int rowsAffected = jdbcTemplate.update(
@@ -151,40 +126,10 @@ public class AirportRepository {
     }
 
     public boolean updateAirport(Airport airport) {
-        if (airport == null) {
-            System.out.println("✗ Repository: Error: Cannot update null airport");
-            return false;
-        }
 
-        if (airport.getId() <= 0) {
-            System.out.println("✗ Repository: Error: Invalid airport ID " + airport.getId());
-            return false;
-        }
-
-        if (airport.getAirportFullName() == null || airport.getAirportFullName().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: airportName is required");
-            return false;
-        }
-
-        if (airport.getAirportCode() == null || airport.getAirportCode().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: airportCode is required");
-            return false;
-        }
-
-        if (airport.getAirportCityLocation() == null || airport.getAirportCityLocation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: airportCityLocation is required");
-            return false;
-        }
-
-        if (airport.getAirportCountryLocation() == null || airport.getAirportCountryLocation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: airportCountryLocation is required");
-            return false;
-        }
-
-        if (airport.getAirportTimezone() == null || airport.getAirportTimezone().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: airportTimezone is required");
-            return false;
-        }
+        if (!isValidAirport(airport)) {
+            return  false;
+        };
 
         try {
             int rowsAffected = jdbcTemplate.update(
@@ -236,5 +181,40 @@ public class AirportRepository {
             System.out.println("✗ Repository: Error deleting airport: " + e.getMessage());
             return false;
         }
+    }
+
+    //=========================Validation===========================
+
+    public boolean isValidAirport(Airport airport) {
+        if (airport == null) {
+            System.out.println("✗ Repository: Error: Cannot create null airport");
+            return false;
+        }
+
+        if (airport.getAirportFullName() == null || airport.getAirportFullName().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: airportName is required");
+            return false;
+        }
+
+        if (airport.getAirportCode() == null || airport.getAirportCode().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: airportCode is required");
+            return false;
+        }
+
+        if (airport.getAirportCityLocation() == null || airport.getAirportCityLocation().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: airportCityLocation is required");
+            return false;
+        }
+
+        if (airport.getAirportCountryLocation() == null || airport.getAirportCountryLocation().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: airportCountryLocation is required");
+            return false;
+        }
+
+        if (airport.getAirportTimezone() == null || airport.getAirportTimezone().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: airportTimezone is required");
+            return false;
+        }
+        return true;
     }
 }

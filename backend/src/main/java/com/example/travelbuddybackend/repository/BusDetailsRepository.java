@@ -1,6 +1,8 @@
 package com.example.travelbuddybackend.repository;
 
 import com.example.travelbuddybackend.models.BusDetails;
+import com.example.travelbuddybackend.models.BusStation;
+import com.example.travelbuddybackend.service.BusStationService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -15,20 +17,35 @@ import java.util.Optional;
 public class BusDetailsRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final BusStationService busStationService;
+    private final BusStationRepository busStationRepository;
 
-    public BusDetailsRepository(JdbcTemplate jdbcTemplate) {
+    public BusDetailsRepository(JdbcTemplate jdbcTemplate, BusStationService busStationService, BusStationRepository busStationRepository) {
         this.jdbcTemplate = jdbcTemplate;
+        this.busStationService = busStationService;
+        this.busStationRepository = busStationRepository;
     }
 
-    private static class BusDetailsRowMapper implements RowMapper<BusDetails> {
+    // Make RowMapper non-static so it can access busStationService
+    private class BusDetailsRowMapper implements RowMapper<BusDetails> {
         @Override
         public BusDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
             BusDetails busDetails = new BusDetails();
             busDetails.setId(rs.getInt("id"));
             busDetails.setBusNumber(rs.getString("busNumber"));
             busDetails.setBusLine(rs.getString("busLine"));
-            busDetails.setBusDepartureStation(rs.getString("busDepartureStation"));
-            busDetails.setBusArrivalStation(rs.getString("busArrivalStation"));
+
+            // Get bus station IDs from database
+            Integer departureStationId = rs.getInt("busDepartureStation");
+            Integer arrivalStationId = rs.getInt("busArrivalStation");
+
+            // Fetch complete BusStation objects using the service
+            Optional<BusStation> departureStation = busStationService.getBusStationById(departureStationId);
+            Optional<BusStation> arrivalStation = busStationService.getBusStationById(arrivalStationId);
+
+            busDetails.setBusDepartureStation(departureStation.orElse(null));
+            busDetails.setBusArrivalStation(arrivalStation.orElse(null));
+
             busDetails.setBusDepartureDate(rs.getString("busDepartureDate"));
             busDetails.setBusDepartureTime(rs.getString("busDepartureTime"));
             busDetails.setBusArrivalDate(rs.getString("busArrivalDate"));
@@ -45,7 +62,7 @@ public class BusDetailsRepository {
                     "SELECT id, busNumber, busLine, busDepartureStation, busArrivalStation, " +
                             "busDepartureDate, busDepartureTime, busArrivalDate, busArrivalTime, " +
                             "busRideDuration, busRidePrice FROM bus_details",
-                    new BusDetailsRowMapper());
+                    new BusDetailsRowMapper()); // No parameter needed now
             System.out.println("✓ Repository: Successfully retrieved " + busDetails.size() + " bus details");
             return busDetails;
         } catch (Exception e) {
@@ -107,70 +124,31 @@ public class BusDetailsRepository {
     }
 
     public boolean createBusDetails(BusDetails busDetails) {
-        if (busDetails == null) {
-            System.out.println("✗ Repository: Error: Cannot create null bus details");
-            return false;
-        }
 
-        // Validate all required fields
-        if (busDetails.getBusNumber() == null || busDetails.getBusNumber().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus number is required");
-            return false;
-        }
-
-        if (busDetails.getBusLine() == null || busDetails.getBusLine().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus line is required");
-            return false;
-        }
-
-        if (busDetails.getBusDepartureStation() == null || busDetails.getBusDepartureStation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus departure station is required");
-            return false;
-        }
-
-        if (busDetails.getBusArrivalStation() == null || busDetails.getBusArrivalStation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus arrival station is required");
-            return false;
-        }
-
-        if (busDetails.getBusDepartureDate() == null || busDetails.getBusDepartureDate().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus departure date is required");
-            return false;
-        }
-
-        if (busDetails.getBusDepartureTime() == null || busDetails.getBusDepartureTime().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus departure time is required");
-            return false;
-        }
-
-        if (busDetails.getBusArrivalDate() == null || busDetails.getBusArrivalDate().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus arrival date is required");
-            return false;
-        }
-
-        if (busDetails.getBusArrivalTime() == null || busDetails.getBusArrivalTime().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus arrival time is required");
-            return false;
-        }
-
-        if (busDetails.getBusRideDuration() == null || busDetails.getBusRideDuration().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus ride duration is required");
-            return false;
-        }
-
-        if (busDetails.getBusRidePrice() == null || busDetails.getBusRidePrice().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus ride price is required");
+        if (!isValidBusDetails(busDetails)) {
             return false;
         }
 
         try {
+            // Extract station IDs for database storage
+            Integer departureStationId = busDetails.getBusDepartureStation() != null ?
+                    busDetails.getBusDepartureStation().getId() : null;
+            Integer arrivalStationId = busDetails.getBusArrivalStation() != null ?
+                    busDetails.getBusArrivalStation().getId() : null;
+
             int rowsAffected = jdbcTemplate.update(
                     "INSERT INTO bus_details (busNumber, busLine, busDepartureStation, busArrivalStation, " +
                             "busDepartureDate, busDepartureTime, busArrivalDate, busArrivalTime, " +
                             "busRideDuration, busRidePrice) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    busDetails.getBusNumber(), busDetails.getBusLine(), busDetails.getBusDepartureStation(),
-                    busDetails.getBusArrivalStation(), busDetails.getBusDepartureDate(), busDetails.getBusDepartureTime(),
-                    busDetails.getBusArrivalDate(), busDetails.getBusArrivalTime(), busDetails.getBusRideDuration(),
+                    busDetails.getBusNumber(),
+                    busDetails.getBusLine(),
+                    departureStationId,  // Use station ID instead of BusStation object
+                    arrivalStationId,    // Use station ID instead of BusStation object
+                    busDetails.getBusDepartureDate(),
+                    busDetails.getBusDepartureTime(),
+                    busDetails.getBusArrivalDate(),
+                    busDetails.getBusArrivalTime(),
+                    busDetails.getBusRideDuration(),
                     busDetails.getBusRidePrice());
 
             if (rowsAffected > 0) {
@@ -187,77 +165,34 @@ public class BusDetailsRepository {
     }
 
     public boolean updateBusDetails(BusDetails busDetails) {
-        if (busDetails == null) {
-            System.out.println("✗ Repository: Error: Cannot update null bus details");
-            return false;
-        }
 
-        if (busDetails.getId() <= 0) {
-            System.out.println("✗ Repository: Error: Invalid bus details ID " + busDetails.getId());
-            return false;
-        }
-
-        // Validate all required fields
-        if (busDetails.getBusNumber() == null || busDetails.getBusNumber().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus number is required");
-            return false;
-        }
-
-        if (busDetails.getBusLine() == null || busDetails.getBusLine().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus line is required");
-            return false;
-        }
-
-        if (busDetails.getBusDepartureStation() == null || busDetails.getBusDepartureStation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus departure station is required");
-            return false;
-        }
-
-        if (busDetails.getBusArrivalStation() == null || busDetails.getBusArrivalStation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus arrival station is required");
-            return false;
-        }
-
-        if (busDetails.getBusDepartureDate() == null || busDetails.getBusDepartureDate().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus departure date is required");
-            return false;
-        }
-
-        if (busDetails.getBusDepartureTime() == null || busDetails.getBusDepartureTime().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus departure time is required");
-            return false;
-        }
-
-        if (busDetails.getBusArrivalDate() == null || busDetails.getBusArrivalDate().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus arrival date is required");
-            return false;
-        }
-
-        if (busDetails.getBusArrivalTime() == null || busDetails.getBusArrivalTime().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus arrival time is required");
-            return false;
-        }
-
-        if (busDetails.getBusRideDuration() == null || busDetails.getBusRideDuration().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus ride duration is required");
-            return false;
-        }
-
-        if (busDetails.getBusRidePrice() == null || busDetails.getBusRidePrice().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus ride price is required");
+        if (!isValidBusDetails(busDetails)) {
             return false;
         }
 
         try {
+            // Extract station IDs for database storage
+            Integer departureStationId = busDetails.getBusDepartureStation() != null ?
+                    busDetails.getBusDepartureStation().getId() : null;
+            Integer arrivalStationId = busDetails.getBusArrivalStation() != null ?
+                    busDetails.getBusArrivalStation().getId() : null;
+
             int rowsAffected = jdbcTemplate.update(
                     "UPDATE bus_details SET busNumber = ?, busLine = ?, busDepartureStation = ?, " +
                             "busArrivalStation = ?, busDepartureDate = ?, busDepartureTime = ?, " +
                             "busArrivalDate = ?, busArrivalTime = ?, busRideDuration = ?, busRidePrice = ? " +
                             "WHERE id = ?",
-                    busDetails.getBusNumber(), busDetails.getBusLine(), busDetails.getBusDepartureStation(),
-                    busDetails.getBusArrivalStation(), busDetails.getBusDepartureDate(), busDetails.getBusDepartureTime(),
-                    busDetails.getBusArrivalDate(), busDetails.getBusArrivalTime(), busDetails.getBusRideDuration(),
-                    busDetails.getBusRidePrice(), busDetails.getId());
+                    busDetails.getBusNumber(),
+                    busDetails.getBusLine(),
+                    departureStationId,  // Use station ID instead of BusStation object
+                    arrivalStationId,    // Use station ID instead of BusStation object
+                    busDetails.getBusDepartureDate(),
+                    busDetails.getBusDepartureTime(),
+                    busDetails.getBusArrivalDate(),
+                    busDetails.getBusArrivalTime(),
+                    busDetails.getBusRideDuration(),
+                    busDetails.getBusRidePrice(),
+                    busDetails.getId());
 
             if (rowsAffected > 0) {
                 System.out.println("✓ Repository: Bus details updated successfully: " + busDetails.getBusNumber());
@@ -292,5 +227,70 @@ public class BusDetailsRepository {
             System.out.println("✗ Repository: Error deleting bus details: " + e.getMessage());
             return false;
         }
+    }
+
+    //=========================Validation=========================
+
+    public boolean isValidBusDetails(BusDetails busDetails) {
+        if (busDetails == null) {
+            System.out.println("✗ Repository: Error: Cannot create null bus details");
+            return false;
+        }
+
+        // Validate all required fields
+        if (busDetails.getBusNumber() == null || busDetails.getBusNumber().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Bus number is required");
+            return false;
+        }
+
+        if (busDetails.getBusLine() == null || busDetails.getBusLine().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Bus line is required");
+            return false;
+        }
+
+        // FIX: Update validation to work with BusStation objects
+        if (busDetails.getBusDepartureStation() == null ||
+                !busStationRepository.isValidBusStation(busDetails.getBusDepartureStation())) {
+            System.out.println("✗ Repository: Error: Bus departure station is required or invalid");
+            return false;
+        }
+
+        if (busDetails.getBusArrivalStation() == null ||
+                !busStationRepository.isValidBusStation(busDetails.getBusArrivalStation())) {
+            System.out.println("✗ Repository: Error: Bus arrival station is required or invalid");
+            return false;
+        }
+
+        if (busDetails.getBusDepartureDate() == null || busDetails.getBusDepartureDate().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Bus departure date is required");
+            return false;
+        }
+
+        if (busDetails.getBusDepartureTime() == null || busDetails.getBusDepartureTime().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Bus departure time is required");
+            return false;
+        }
+
+        if (busDetails.getBusArrivalDate() == null || busDetails.getBusArrivalDate().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Bus arrival date is required");
+            return false;
+        }
+
+        if (busDetails.getBusArrivalTime() == null || busDetails.getBusArrivalTime().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Bus arrival time is required");
+            return false;
+        }
+
+        if (busDetails.getBusRideDuration() == null || busDetails.getBusRideDuration().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Bus ride duration is required");
+            return false;
+        }
+
+        if (busDetails.getBusRidePrice() == null || busDetails.getBusRidePrice().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Bus ride price is required");
+            return false;
+        }
+
+        return true;
     }
 }

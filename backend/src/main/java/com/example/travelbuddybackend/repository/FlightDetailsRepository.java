@@ -272,12 +272,14 @@ public class FlightDetailsRepository {
             return false;
         }
 
-        if (flightDetails.getFlightOrigin() == null || airportService.isValidAirport(flightDetails.getFlightOrigin())) {
+        if (flightDetails.getFlightOrigin() == null ||
+                !airportService.isValidAirport(flightDetails.getFlightOrigin())) {
             System.out.println("✗ Repository: Error: Flight origin is required");
             return false;
         }
 
-        if (flightDetails.getFlightDestination() == null || airportService.isValidAirport(flightDetails.getFlightDestination())) {
+        if (flightDetails.getFlightDestination() == null ||
+                !airportService.isValidAirport(flightDetails.getFlightDestination())) {
             System.out.println("✗ Repository: Error: Flight destination is required");
             return false;
         }

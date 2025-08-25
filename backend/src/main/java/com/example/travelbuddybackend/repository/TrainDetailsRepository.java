@@ -2,6 +2,7 @@ package com.example.travelbuddybackend.repository;
 
 import com.example.travelbuddybackend.models.TrainDetails;
 import com.example.travelbuddybackend.models.TrainStation;
+import com.example.travelbuddybackend.service.TrainStationService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -17,16 +18,15 @@ import java.util.Optional;
 public class TrainDetailsRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final TrainStationService trainStationService;
 
-    public TrainDetailsRepository(JdbcTemplate jdbcTemplate,  TrainStationRepository trainStationRepository) {
+    public TrainDetailsRepository(JdbcTemplate jdbcTemplate, TrainStationService trainStationService) {
         this.jdbcTemplate = jdbcTemplate;
+        this.trainStationService = trainStationService;
     }
 
-    private static class TrainDetailsRowMapper implements RowMapper<TrainDetails> {
-
-        TrainDetailsRowMapper(TrainStationRepository trainStationRepository) {
-        }
-
+    // Make RowMapper non-static so it can access trainStationService
+    private class TrainDetailsRowMapper implements RowMapper<TrainDetails> {
         @Override
         public TrainDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
             TrainDetails trainDetails = new TrainDetails();
@@ -34,12 +34,16 @@ public class TrainDetailsRepository {
             trainDetails.setTrainNumber(rs.getString("trainNumber"));
             trainDetails.setTrainLine(rs.getString("trainLine"));
 
-            Integer trainDepartureId = rs.getInt("trainDepartureStation");
-            Integer trainArrivalId = rs.getInt("trainArrivalStation");
+            // Get train station IDs from database
+            Integer departureStationId = rs.getInt("trainDepartureStation");
+            Integer arrivalStationId = rs.getInt("trainArrivalStation");
 
-            Optional<TrainStation> trainDeparture = trainStationRepository.findById(trainDepartureId);
-            Optional<TrainStation> trainArrival = trainStationRepository.getAirportById(trainArrivalId);
+            // Fetch complete TrainStation objects using the service
+            Optional<TrainStation> departureStation = trainStationService.getTrainStationById(departureStationId);
+            Optional<TrainStation> arrivalStation = trainStationService.getTrainStationById(arrivalStationId);
 
+            trainDetails.setTrainDepartureStation(departureStation.orElse(null));
+            trainDetails.setTrainArrivalStation(arrivalStation.orElse(null));
 
             trainDetails.setTrainDepartureDate(rs.getString("trainDepartureDate"));
             trainDetails.setTrainDepartureTime(rs.getString("trainDepartureTime"));
@@ -57,64 +61,12 @@ public class TrainDetailsRepository {
                     "SELECT id, trainNumber, trainLine, trainDepartureStation, trainArrivalStation, " +
                             "trainDepartureDate, trainDepartureTime, trainArrivalDate, trainArrivalTime, " +
                             "trainRideDuration, trainRidePrice FROM train_details",
-                    new TrainDetailsRowMapper());
+                    new TrainDetailsRowMapper()); // No parameter needed now
             System.out.println("✓ Repository: Successfully retrieved " + trainDetails.size() + " train details");
             return trainDetails;
         } catch (Exception e) {
             System.out.println("✗ Repository: Error retrieving train details: " + e.getMessage());
             return new ArrayList<>();
-        }
-    }
-
-    public Optional<TrainDetails> findById(int id) {
-        if (id <= 0) {
-            System.out.println("✗ Repository: Error: Invalid train details ID: " + id);
-            return Optional.empty();
-        }
-
-        try {
-            List<TrainDetails> trainDetails = jdbcTemplate.query(
-                    "SELECT id, trainNumber, trainLine, trainDepartureStation, trainArrivalStation, " +
-                            "trainDepartureDate, trainDepartureTime, trainArrivalDate, trainArrivalTime, " +
-                            "trainRideDuration, trainRidePrice FROM train_details WHERE id = ?",
-                    new TrainDetailsRowMapper(), id);
-
-            if (trainDetails.isEmpty()) {
-                System.out.println("✗ Repository: Train details with ID " + id + " not found");
-                return Optional.empty();
-            } else {
-                System.out.println("✓ Repository: Found train details with ID " + id);
-                return Optional.of(trainDetails.get(0));
-            }
-        } catch (Exception e) {
-            System.out.println("✗ Repository: Error finding train details with ID: " + id + ": " + e.getMessage());
-            return Optional.empty();
-        }
-    }
-
-    public Optional<TrainDetails> findByTrainNumber(String trainNumber) {
-        if (trainNumber == null || trainNumber.trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Invalid train number: " + trainNumber);
-            return Optional.empty();
-        }
-
-        try {
-            List<TrainDetails> trainDetails = jdbcTemplate.query(
-                    "SELECT id, trainNumber, trainLine, trainDepartureStation, trainArrivalStation, " +
-                            "trainDepartureDate, trainDepartureTime, trainArrivalDate, trainArrivalTime, " +
-                            "trainRideDuration, trainRidePrice FROM train_details WHERE trainNumber = ?",
-                    new TrainDetailsRowMapper(), trainNumber);
-
-            if (trainDetails.isEmpty()) {
-                System.out.println("✗ Repository: Train details with number " + trainNumber + " not found");
-                return Optional.empty();
-            } else {
-                System.out.println("✓ Repository: Found train details with number " + trainNumber);
-                return Optional.of(trainDetails.get(0));
-            }
-        } catch (Exception e) {
-            System.out.println("✗ Repository: Error finding train details with number: " + trainNumber + ": " + e.getMessage());
-            return Optional.empty();
         }
     }
 
@@ -126,11 +78,25 @@ public class TrainDetailsRepository {
         }
 
         try {
+            // This method now needs to be updated to work with station names/codes
+            // You could search for stations by name first, then use their IDs
+            List<TrainStation> departureStations = trainStationService.findTrainStationsByPartialName(departureStation);
+            List<TrainStation> arrivalStations = trainStationService.findTrainStationsByPartialName(arrivalStation);
+
+            if (departureStations.isEmpty() || arrivalStations.isEmpty()) {
+                System.out.println("✗ Repository: No matching stations found");
+                return new ArrayList<>();
+            }
+
+            // For simplicity, let's take the first matching station for each
+            Integer departureStationId = departureStations.get(0).getId();
+            Integer arrivalStationId = arrivalStations.get(0).getId();
+
             List<TrainDetails> trainDetails = jdbcTemplate.query(
                     "SELECT id, trainNumber, trainLine, trainDepartureStation, trainArrivalStation, " +
                             "trainDepartureDate, trainDepartureTime, trainArrivalDate, trainArrivalTime, " +
                             "trainRideDuration, trainRidePrice FROM train_details WHERE trainDepartureStation = ? AND trainArrivalStation = ?",
-                    new TrainDetailsRowMapper(), departureStation, arrivalStation);
+                    new TrainDetailsRowMapper(), departureStationId, arrivalStationId);
 
             System.out.println("✓ Repository: Found " + trainDetails.size() + " trains from " + departureStation + " to " + arrivalStation);
             return trainDetails;
@@ -141,70 +107,30 @@ public class TrainDetailsRepository {
     }
 
     public boolean createTrainDetails(TrainDetails trainDetails) {
-        if (trainDetails == null) {
-            System.out.println("✗ Repository: Error: Cannot create null train details");
-            return false;
-        }
-
-        // Validate all required fields
-        if (trainDetails.getTrainNumber() == null || trainDetails.getTrainNumber().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train number is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainLine() == null || trainDetails.getTrainLine().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train line is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainDepartureStation() == null || trainDetails.getTrainDepartureStation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train departure station is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainArrivalStation() == null || trainDetails.getTrainArrivalStation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train arrival station is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainDepartureDate() == null || trainDetails.getTrainDepartureDate().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train departure date is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainDepartureTime() == null || trainDetails.getTrainDepartureTime().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train departure time is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainArrivalDate() == null || trainDetails.getTrainArrivalDate().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train arrival date is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainArrivalTime() == null || trainDetails.getTrainArrivalTime().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train arrival time is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainRideDuration() == null || trainDetails.getTrainRideDuration().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train ride duration is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainRidePrice() == null || trainDetails.getTrainRidePrice().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train ride price is required");
+        if (!isValidTrainDetails(trainDetails)) {
             return false;
         }
 
         try {
+            // Extract station IDs for database storage
+            Integer departureStationId = trainDetails.getTrainDepartureStation() != null ?
+                    trainDetails.getTrainDepartureStation().getId() : null;
+            Integer arrivalStationId = trainDetails.getTrainArrivalStation() != null ?
+                    trainDetails.getTrainArrivalStation().getId() : null;
+
             int rowsAffected = jdbcTemplate.update(
                     "INSERT INTO train_details (trainNumber, trainLine, trainDepartureStation, trainArrivalStation, " +
                             "trainDepartureDate, trainDepartureTime, trainArrivalDate, trainArrivalTime, " +
                             "trainRideDuration, trainRidePrice) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    trainDetails.getTrainNumber(), trainDetails.getTrainLine(), trainDetails.getTrainDepartureStation(),
-                    trainDetails.getTrainArrivalStation(), trainDetails.getTrainDepartureDate(), trainDetails.getTrainDepartureTime(),
-                    trainDetails.getTrainArrivalDate(), trainDetails.getTrainArrivalTime(), trainDetails.getTrainRideDuration(),
+                    trainDetails.getTrainNumber(),
+                    trainDetails.getTrainLine(),
+                    departureStationId,  // Use station ID instead of TrainStation object
+                    arrivalStationId,    // Use station ID instead of TrainStation object
+                    trainDetails.getTrainDepartureDate(),
+                    trainDetails.getTrainDepartureTime(),
+                    trainDetails.getTrainArrivalDate(),
+                    trainDetails.getTrainArrivalTime(),
+                    trainDetails.getTrainRideDuration(),
                     trainDetails.getTrainRidePrice());
 
             if (rowsAffected > 0) {
@@ -221,77 +147,33 @@ public class TrainDetailsRepository {
     }
 
     public boolean updateTrainDetails(TrainDetails trainDetails) {
-        if (trainDetails == null) {
-            System.out.println("✗ Repository: Error: Cannot update null train details");
-            return false;
-        }
-
-        if (trainDetails.getId() <= 0) {
-            System.out.println("✗ Repository: Error: Invalid train details ID " + trainDetails.getId());
-            return false;
-        }
-
-        // Validate all required fields
-        if (trainDetails.getTrainNumber() == null || trainDetails.getTrainNumber().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train number is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainLine() == null || trainDetails.getTrainLine().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train line is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainDepartureStation() == null || trainDetails.getTrainDepartureStation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train departure station is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainArrivalStation() == null || trainDetails.getTrainArrivalStation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train arrival station is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainDepartureDate() == null || trainDetails.getTrainDepartureDate().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train departure date is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainDepartureTime() == null || trainDetails.getTrainDepartureTime().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train departure time is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainArrivalDate() == null || trainDetails.getTrainArrivalDate().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train arrival date is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainArrivalTime() == null || trainDetails.getTrainArrivalTime().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train arrival time is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainRideDuration() == null || trainDetails.getTrainRideDuration().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train ride duration is required");
-            return false;
-        }
-
-        if (trainDetails.getTrainRidePrice() == null || trainDetails.getTrainRidePrice().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train ride price is required");
+        if (!isValidTrainDetails(trainDetails)) {
             return false;
         }
 
         try {
+            // Extract station IDs for database storage
+            Integer departureStationId = trainDetails.getTrainDepartureStation() != null ?
+                    trainDetails.getTrainDepartureStation().getId() : null;
+            Integer arrivalStationId = trainDetails.getTrainArrivalStation() != null ?
+                    trainDetails.getTrainArrivalStation().getId() : null;
+
             int rowsAffected = jdbcTemplate.update(
                     "UPDATE train_details SET trainNumber = ?, trainLine = ?, trainDepartureStation = ?, " +
                             "trainArrivalStation = ?, trainDepartureDate = ?, trainDepartureTime = ?, " +
                             "trainArrivalDate = ?, trainArrivalTime = ?, trainRideDuration = ?, trainRidePrice = ? " +
-                            "WHERE  id = ?",
-                    trainDetails.getTrainNumber(), trainDetails.getTrainLine(), trainDetails.getTrainDepartureStation(),
-                    trainDetails.getTrainArrivalStation(), trainDetails.getTrainDepartureDate(), trainDetails.getTrainDepartureTime(),
-                    trainDetails.getTrainArrivalDate(), trainDetails.getTrainArrivalTime(), trainDetails.getTrainRideDuration(),
-                    trainDetails.getTrainRidePrice());
+                            "WHERE id = ?",
+                    trainDetails.getTrainNumber(),
+                    trainDetails.getTrainLine(),
+                    departureStationId,  // Use station ID instead of TrainStation object
+                    arrivalStationId,    // Use station ID instead of TrainStation object
+                    trainDetails.getTrainDepartureDate(),
+                    trainDetails.getTrainDepartureTime(),
+                    trainDetails.getTrainArrivalDate(),
+                    trainDetails.getTrainArrivalTime(),
+                    trainDetails.getTrainRideDuration(),
+                    trainDetails.getTrainRidePrice(),
+                    trainDetails.getId());  // ADD this missing parameter
 
             if (rowsAffected > 0) {
                 System.out.println("✓ Repository: Train details updated successfully: " + trainDetails.getTrainNumber());
@@ -328,5 +210,68 @@ public class TrainDetailsRepository {
             System.out.println("✗ Repository: Error deleting train details: " + e.getMessage());
             return false;
         }
+    }
+
+    //==========================Validation=======================
+
+    public boolean isValidTrainDetails(TrainDetails trainDetails) {
+        if (trainDetails == null) {
+            System.out.println("✗ Repository: Error: Cannot create null train details");
+            return false;
+        }
+
+        // Validate all required fields
+        if (trainDetails.getTrainNumber() == null || trainDetails.getTrainNumber().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Train number is required");
+            return false;
+        }
+
+        if (trainDetails.getTrainLine() == null || trainDetails.getTrainLine().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Train line is required");
+            return false;
+        }
+
+        if (trainDetails.getTrainDepartureStation() == null ||
+                !trainStationService.isValidTrainStation(trainDetails.getTrainDepartureStation())) {
+            System.out.println("✗ Repository: Error: Train departure station is required or invalid");
+            return false;
+        }
+
+        if (trainDetails.getTrainArrivalStation() == null ||
+                !trainStationService.isValidTrainStation(trainDetails.getTrainArrivalStation())) {
+            System.out.println("✗ Repository: Error: Train arrival station is required or invalid");
+            return false;
+        }
+
+        if (trainDetails.getTrainDepartureDate() == null || trainDetails.getTrainDepartureDate().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Train departure date is required");
+            return false;
+        }
+
+        if (trainDetails.getTrainDepartureTime() == null || trainDetails.getTrainDepartureTime().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Train departure time is required");
+            return false;
+        }
+
+        if (trainDetails.getTrainArrivalDate() == null || trainDetails.getTrainArrivalDate().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Train arrival date is required");
+            return false;
+        }
+
+        if (trainDetails.getTrainArrivalTime() == null || trainDetails.getTrainArrivalTime().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Train arrival time is required");
+            return false;
+        }
+
+        if (trainDetails.getTrainRideDuration() == null || trainDetails.getTrainRideDuration().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Train ride duration is required");
+            return false;
+        }
+
+        if (trainDetails.getTrainRidePrice() == null || trainDetails.getTrainRidePrice().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Train ride price is required");
+            return false;
+        }
+        return true;
     }
 }
