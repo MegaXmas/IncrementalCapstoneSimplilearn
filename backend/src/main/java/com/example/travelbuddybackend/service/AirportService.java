@@ -17,6 +17,7 @@ public class AirportService {
 
     private final AirportRepository airportRepository;
 
+
     @Autowired
     public AirportService(AirportRepository airportRepository) {
         this.airportRepository = airportRepository;
@@ -152,6 +153,47 @@ public class AirportService {
     public int getAirportCount() {
         List<Airport> airports = getAllAirports();
         return airports.size();
+    }
+
+    public boolean isValidStationCode(String airportCode) {
+        if (airportCode == null || airportCode.trim().isEmpty()) {
+            return false;
+        }
+        // Basic validation: not empty and reasonable length (2-10 characters)
+        return airportCode.trim().length() >= 3 && airportCode.trim().length() <= 4;
+    }
+
+    public boolean isValidAirport(Airport airport) {
+        if (airport == null) {
+            System.out.println("✗ Service Error: airport cannot be null");
+            return false;
+        }
+
+        if (airport.getAirportFullName() == null || airport.getAirportFullName().trim().isEmpty()) {
+            System.out.println("✗ Service Error: airport full name is required");
+            return false;
+        }
+
+        if (!isValidStationCode(airport.getAirportCode())) {
+            System.out.println("✗ Service Error: Invalid airport code format");
+            return false;
+        }
+
+        if (airport.getAirportCityLocation() == null || airport.getAirportCityLocation().trim().isEmpty()) {
+            System.out.println("✗ Service Error: airport station city location is required");
+            return false;
+        }
+
+        if (airport.getAirportCountryLocation() == null || airport.getAirportCountryLocation().trim().isEmpty()) {
+            System.out.println("✗ Service Error: airport country location is required");
+            return false;
+        }
+
+        if (airport.getAirportTimezone() == null || airport.getAirportTimezone().trim().isEmpty()) {
+            System.out.println("✗ Service Error: airport timezone is required");
+        }
+
+        return true;
     }
 
     public List<Airport> findAirportByPartialName(String partialName) {

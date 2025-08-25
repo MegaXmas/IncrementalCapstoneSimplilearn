@@ -1,6 +1,7 @@
 package com.example.travelbuddybackend.repository;
 
 import com.example.travelbuddybackend.models.Airport;
+import com.example.travelbuddybackend.service.AirportService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
