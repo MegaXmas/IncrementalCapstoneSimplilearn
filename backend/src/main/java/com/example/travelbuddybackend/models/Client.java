@@ -1,5 +1,6 @@
 package com.example.travelbuddybackend.models;
 
+import jakarta.validation.constraints.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -7,6 +8,19 @@ import java.time.LocalDateTime;
 
 /**
  * Client model with authentication capabilities
+ *
+ * This represents a customer in our travel booking system who can:
+ * - Create an account and log in
+ * - Book travel tickets
+ * - Manage their personal information
+ *
+ * Think of this as a complete customer profile that includes both
+ * personal information (for bookings) and login credentials (for security).
+ *
+ * Note: Admins are handled separately through the AdminUser model.
+ */
+/**
+ * Client model with authentication capabilities and comprehensive validation
  *
  * This represents a customer in our travel booking system who can:
  * - Create an account and log in
@@ -27,35 +41,54 @@ public class Client {
     private Integer id;                    // Unique identifier for each client
 
     // Authentication credentials - these allow the client to log in
-    @NotBlank(message = "Username is required")
+    @NotNull(message = "Username is required")
+    @NotBlank(message = "Username cannot be blank")
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+    @Pattern(regexp = "^[a-zA-Z0-9_.-]+$", message = "Username can only contain letters, numbers, underscore, period, and dash")
     private String username;               // Unique username for login
 
-    @NotBlank(message = "Email is required")
+    @NotNull(message = "Email is required")
+    @NotBlank(message = "Email cannot be blank")
     @Email(message = "Please provide a valid email address")
+    @Size(max = 100, message = "Email must not exceed 100 characters")
     private String email;                  // Email address (also used for login)
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters long, contain a number, a capital letter, and a special character")
+    @NotNull(message = "Password is required")
+    @NotBlank(message = "Password cannot be blank")
+    @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$",
+            message = "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character")
     private String password;               // Encrypted password - never store plain text!
 
     // ============================================================================
     // PERSONAL INFORMATION FIELDS - Used for bookings and contact
     // ============================================================================
 
-    @NotBlank(message = "First name is required")
+    @NotNull(message = "First name is required")
+    @NotBlank(message = "First name cannot be blank")
+    @Size(min = 1, max = 50, message = "First name must be between 1 and 50 characters")
+    @Pattern(regexp = "^[a-zA-Z\\s'-]+$", message = "First name can only contain letters, spaces, apostrophes, and hyphens")
     private String firstName;              // Client's first name
 
-    @NotBlank(message = "Last name is required")
+    @NotNull(message = "Last name is required")
+    @NotBlank(message = "Last name cannot be blank")
+    @Size(min = 1, max = 50, message = "Last name must be between 1 and 50 characters")
+    @Pattern(regexp = "^[a-zA-Z\\s'-]+$", message = "Last name can only contain letters, spaces, apostrophes, and hyphens")
     private String lastName;               // Client's last name
 
-    @NotBlank(message = "Phone number is required")
+    @NotNull(message = "Phone number is required")
+    @NotBlank(message = "Phone number cannot be blank")
+    @Pattern(regexp = "^[+]?[1-9]\\d{1,14}$", message = "Phone number must be in valid international format (e.g., +1234567890)")
     private String phone;                  // Phone number for booking confirmations
 
-    @NotBlank(message = "Address is required")
+    @NotNull(message = "Address is required")
+    @NotBlank(message = "Address cannot be blank")
+    @Size(min = 10, max = 200, message = "Address must be between 10 and 200 characters")
     private String address;                // Address for billing and contact
 
+    @Pattern(regexp = "^\\d{13,19}$", message = "Credit card number must be 13-19 digits")
     private String credit_card;            // Credit card for payments (encrypted)
+
 
     // ============================================================================
     // ACCOUNT MANAGEMENT FIELDS - Control account access and track activity
@@ -88,13 +121,14 @@ public class Client {
      * @param firstName Client's first name
      * @param lastName Client's last name
      */
-    public Client(String username, String email, String password, String firstName, String lastName) {
+    public Client(String username, String email, String password, String firstName, String lastName, String phone) {
         this(); // Call default constructor to set createdAt
         this.username = username;
         this.email = email;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.phone = phone;
     }
 
     /**
