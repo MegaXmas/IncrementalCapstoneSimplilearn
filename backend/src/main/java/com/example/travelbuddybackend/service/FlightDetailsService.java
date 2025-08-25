@@ -1,10 +1,10 @@
 package com.example.travelbuddybackend.service;
 
 import com.example.travelbuddybackend.models.Airport;
-import com.example.travelbuddybackend.models.BusDetails;
 import com.example.travelbuddybackend.models.FlightDetails;
-import com.example.travelbuddybackend.service.AirportService;
 import com.example.travelbuddybackend.repository.FlightDetailsRepository;
+import com.example.travelbuddybackend.repository.AirportRepository;
+import com.example.travelbuddybackend.service.ValidatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,369 +13,217 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Flight Details Service - Business Logic Layer
+ *
+ * Following Spring Boot Best Practices:
+ * - Only depends on repositories (never other services for core operations)
+ * - Handles all business validation and logic
+ * - Coordinates multiple repository operations
+ * - No circular dependencies
+ */
 @Service
 public class FlightDetailsService {
 
     private final FlightDetailsRepository flightDetailsRepository;
-
-    private final AirportService airportService;
+    private final AirportRepository airportRepository;
+    private final ValidatorService validatorService;
 
     @Autowired
-    public FlightDetailsService(FlightDetailsRepository flightDetailsRepository,  AirportService airportService) {
+    public FlightDetailsService(FlightDetailsRepository flightDetailsRepository,
+                                AirportRepository airportRepository,
+                                ValidatorService validatorService) {
         this.flightDetailsRepository = flightDetailsRepository;
-        this.airportService = airportService;
+        this.airportRepository = airportRepository;
+        this.validatorService = validatorService;
     }
 
-    /**
-     * Get all flight details from the database
-     * @return List of all flight details (empty list if none found or error occurs)
-     */
+    // ============================================================================
+    // CORE BUSINESS OPERATIONS
+    // ============================================================================
+
     public List<FlightDetails> getAllFlightDetails() {
         return flightDetailsRepository.findAll();
     }
 
-    /**
-     * Get flight details by their ID
-     * @param id The flight details ID to search for
-     * @return Optional containing the flight details if found, empty otherwise
-     */
     public Optional<FlightDetails> getFlightDetailsById(Integer id) {
-        if (id == null) {
-            System.out.println("✗ Service Error: Flight details ID cannot be null");
+        if (id == null || id <= 0) {
+            System.out.println("✗ Service Error: Flight ID must be a positive integer");
             return Optional.empty();
         }
         return flightDetailsRepository.findById(id);
     }
 
-    /**
-     * Get flight details by flight number
-     * @param flightNumber The flight number to search for
-     * @return Optional containing the flight details if found, empty otherwise
-     */
     public Optional<FlightDetails> getFlightDetailsByNumber(String flightNumber) {
         if (flightNumber == null || flightNumber.trim().isEmpty()) {
             System.out.println("✗ Service Error: Flight number cannot be null or empty");
             return Optional.empty();
         }
-        return flightDetailsRepository.findByFlightNumber(flightNumber);
+        return flightDetailsRepository.findByFlightNumber(flightNumber.toUpperCase().trim());
     }
 
-    /**
-     * Get flight details by origin and destination (uses repository method)
-     * @param origin The origin airport/city
-     * @param destination The destination airport/city
-     * @return List of flights matching the route
-     */
-    public List<FlightDetails> getFlightsByRoute(String origin, String destination) {
-        if (origin == null || origin.trim().isEmpty() ||
-                destination == null || destination.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Both origin and destination are required");
+    public List<FlightDetails> getFlightsByRoute(String originCode, String destinationCode) {
+        if (originCode == null || originCode.trim().isEmpty() ||
+                destinationCode == null || destinationCode.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Both origin and destination airport codes are required");
             return new ArrayList<>();
         }
-        return flightDetailsRepository.findByOriginAndDestination(origin, destination);
+
+        // Find airports by codes using repository (not service)
+        Optional<Airport> origin = airportRepository.findByAirportCode(originCode.toUpperCase().trim());
+        Optional<Airport> destination = airportRepository.findByAirportCode(destinationCode.toUpperCase().trim());
+
+        if (origin.isEmpty()) {
+            System.out.println("✗ Service Error: Origin airport not found: " + originCode);
+            return new ArrayList<>();
+        }
+
+        if (destination.isEmpty()) {
+            System.out.println("✗ Service Error: Destination airport not found: " + destinationCode);
+            return new ArrayList<>();
+        }
+
+        return flightDetailsRepository.findByRoute(origin.get().getId(), destination.get().getId());
     }
 
-    /**
-     * Add new flight details to the database
-     * @param flightDetails The flight details to add
-     * @return true if flight details were successfully added, false otherwise
-     */
+    public List<FlightDetails> getFlightsByRoute(Airport origin, Airport destination) {
+        if (origin == null || destination == null) {
+            System.out.println("✗ Service Error: Both airports are required");
+            return new ArrayList<>();
+        }
+
+        if (origin.getId() == null || destination.getId() == null) {
+            System.out.println("✗ Service Error: Airport IDs are required");
+            return new ArrayList<>();
+        }
+
+        return flightDetailsRepository.findByRoute(origin.getId(), destination.getId());
+    }
+
+    public List<FlightDetails> getFlightsByDepartureDate(String departureDate) {
+        if (departureDate == null || departureDate.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Departure date cannot be null or empty");
+            return new ArrayList<>();
+        }
+
+        if (!validatorService.isValidDate(departureDate)) {
+            System.out.println("✗ Service Error: Invalid date format. Use YYYY-MM-DD");
+            return new ArrayList<>();
+        }
+
+        return flightDetailsRepository.findByDepartureDate(departureDate);
+    }
+
     public boolean addFlightDetails(FlightDetails flightDetails) {
-
-        flightDetailsRepository.updateFlightDetails(flightDetails);
-
-        boolean success = flightDetailsRepository.createFlightDetails(flightDetails);
-        if (success) {
-            System.out.println("✓ Service: Flight details successfully added through service layer");
-        } else {
-            System.out.println("✗ Service: Failed to add flight details through service layer");
-        }
-        return success;
-    }
-
-    /**
-     * Update existing flight details in the database
-     * @param flightDetails The flight details with updated information
-     * @return true if flight details were successfully updated, false otherwise
-     */
-    public boolean updateFlightDetails(FlightDetails flightDetails) {
-
-        flightDetailsRepository.updateFlightDetails(flightDetails);
-
-        boolean success = flightDetailsRepository.updateFlightDetails(flightDetails);
-        if (success) {
-            System.out.println("✓ Service: Flight details successfully updated through service layer");
-        } else {
-            System.out.println("✗ Service: Failed to update flight details through service layer");
-        }
-        return success;
-    }
-
-    /**
-     * Delete flight details from the database
-     * @param id The ID of the flight details to delete
-     * @return true if flight details were successfully deleted, false otherwise
-     */
-    public boolean deleteFlightDetails(Integer id) {
-        if (id == null) {
-            System.out.println("✗ Service Error: Flight details ID cannot be null");
+        if (!isValidForService(flightDetails)) {
             return false;
         }
 
-        if (id <= 0) {
-            System.out.println("✗ Service Error: Invalid flight details ID: " + id);
+        // Check for duplicate flight number
+        if (flightDetailsRepository.findByFlightNumber(flightDetails.getFlightNumber()).isPresent()) {
+            System.out.println("✗ Service Error: Flight number already exists: " + flightDetails.getFlightNumber());
+            return false;
+        }
+
+        boolean success = flightDetailsRepository.createFlightDetails(flightDetails);
+        if (success) {
+            System.out.println("✓ Service: Flight added successfully");
+        } else {
+            System.out.println("✗ Service: Failed to add flight");
+        }
+        return success;
+    }
+
+    public boolean updateFlightDetails(FlightDetails flightDetails) {
+        if (!isValidForService(flightDetails)) {
+            return false;
+        }
+
+        if (flightDetails.getId() == null || flightDetails.getId() <= 0) {
+            System.out.println("✗ Service Error: Valid flight ID required for update");
+            return false;
+        }
+
+        // Check if flight exists
+        if (flightDetailsRepository.findById(flightDetails.getId()).isEmpty()) {
+            System.out.println("✗ Service Error: Flight not found for update");
+            return false;
+        }
+
+        // Check for duplicate flight number (excluding current flight)
+        Optional<FlightDetails> existingFlight = flightDetailsRepository.findByFlightNumber(flightDetails.getFlightNumber());
+        if (existingFlight.isPresent() && !existingFlight.get().getId().equals(flightDetails.getId())) {
+            System.out.println("✗ Service Error: Flight number already exists: " + flightDetails.getFlightNumber());
+            return false;
+        }
+
+        boolean success = flightDetailsRepository.updateFlightDetails(flightDetails);
+        if (success) {
+            System.out.println("✓ Service: Flight updated successfully");
+        } else {
+            System.out.println("✗ Service: Failed to update flight");
+        }
+        return success;
+    }
+
+    public boolean deleteFlightDetails(Integer id) {
+        if (id == null || id <= 0) {
+            System.out.println("✗ Service Error: Valid flight ID required for deletion");
+            return false;
+        }
+
+        // Check if flight exists before deletion
+        if (flightDetailsRepository.findById(id).isEmpty()) {
+            System.out.println("✗ Service Error: Flight not found for deletion");
             return false;
         }
 
         boolean success = flightDetailsRepository.deleteFlightDetails(id);
         if (success) {
-            System.out.println("✓ Service: Flight details successfully deleted through service layer");
+            System.out.println("✓ Service: Flight deleted successfully");
         } else {
-            System.out.println("✗ Service: Failed to delete flight details through service layer");
+            System.out.println("✗ Service: Failed to delete flight");
         }
         return success;
     }
 
-    /**
-     * Check if flight details exist in the database by ID
-     * @param id The flight details ID to check
-     * @return true if flight details exist, false otherwise
-     */
-    public boolean flightDetailsExists(Integer id) {
+    // ============================================================================
+    // BUSINESS LOGIC METHODS
+    // ============================================================================
+
+    public boolean flightExists(Integer id) {
         if (id == null || id <= 0) {
             return false;
         }
-        return getFlightDetailsById(id).isPresent();
+        return flightDetailsRepository.findById(id).isPresent();
     }
 
-    /**
-     * Check if flight details exist in the database by flight number
-     * @param flightNumber The flight number to check
-     * @return true if flight details exist, false otherwise
-     */
-    public boolean flightDetailsExistsByNumber(String flightNumber) {
+    public boolean flightExistsByNumber(String flightNumber) {
         if (flightNumber == null || flightNumber.trim().isEmpty()) {
             return false;
         }
-        return getFlightDetailsByNumber(flightNumber).isPresent();
+        return flightDetailsRepository.findByFlightNumber(flightNumber.toUpperCase().trim()).isPresent();
     }
 
-    /**
-     * Get the total number of flight details in the database
-     * @return The count of all flight details
-     */
     public int getFlightDetailsCount() {
-        List<FlightDetails> flightDetailsList = getAllFlightDetails();
-        return flightDetailsList.size();
+        return flightDetailsRepository.findAll().size();
     }
 
-    public List<FlightDetails> findFlightsByFlightNumber(String flightNumber) {
-        if (flightNumber == null || flightNumber.trim().isEmpty()) {
-            System.out.println("✗ Service Error: flightNumber cannot be null or empty");
-            return new ArrayList<>();
-        }
+    // ============================================================================
+    // SEARCH AND FILTER METHODS
+    // ============================================================================
 
-        List<FlightDetails> allFlights = getAllFlightDetails();
-        return allFlights.stream()
-                .filter(flight -> flight.getFlightNumber().equalsIgnoreCase(flightNumber))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Find flights by airline
-     * @param airline The airline to search for
-     * @return List of flights operated by the specified airline
-     */
     public List<FlightDetails> findFlightsByAirline(String airline) {
         if (airline == null || airline.trim().isEmpty()) {
             System.out.println("✗ Service Error: Airline cannot be null or empty");
             return new ArrayList<>();
         }
 
-        List<FlightDetails> allFlights = getAllFlightDetails();
-        return allFlights.stream()
-                .filter(flight -> flight.getFlightAirline().equalsIgnoreCase(airline))
+        return getAllFlightDetails().stream()
+                .filter(flight -> flight.getFlightAirline().toLowerCase().contains(airline.toLowerCase().trim()))
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Find flights by origin airport/city
-     * @param origin The origin to search for
-     * @return List of flights departing from the specified origin
-     */
-    public List<FlightDetails> findFlightsByOrigin(String origin) {
-        if (origin == null || origin.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Origin cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        // Get matching airports from the search
-        List<Airport> matchingAirports = airportService.findAirportByPartialName(origin);
-
-        if (matchingAirports.isEmpty()) {
-            System.out.println("✗ Service Error: No airports found matching: " + origin);
-            return new ArrayList<>();
-        }
-
-        List<FlightDetails> allFlights = getAllFlightDetails();
-        return allFlights.stream()
-                .filter(flight -> {
-                    Airport flightOrigin = flight.getFlightOrigin();
-                    if (flightOrigin == null) {
-                        return false;
-                    }
-                    // Check if the flight's origin airport is in our matching airports list
-                    return matchingAirports.stream()
-                            .anyMatch(airport -> airport.getId().equals(flightOrigin.getId()));
-                })
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Find flights by destination airport/city
-     * @param destination The destination to search for
-     * @return List of flights arriving at the specified destination
-     */
-    public List<FlightDetails> findFlightsByDestination(String destination) {
-        if (destination == null || destination.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Destination cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        // Get matching airports from the search
-        List<Airport> matchingAirports = airportService.findAirportByPartialName(destination);
-
-        if (matchingAirports.isEmpty()) {
-            System.out.println("✗ Service Error: No airports found matching: " + destination);
-            return new ArrayList<>();
-        }
-
-        List<FlightDetails> allFlights = getAllFlightDetails();
-        return allFlights.stream()
-                .filter(flight -> {
-                    Airport flightOrigin = flight.getFlightOrigin();
-                    if (flightOrigin == null) {
-                        return false;
-                    }
-                    // Check if the flight's origin airport is in our matching airports list
-                    return matchingAirports.stream()
-                            .anyMatch(airport -> airport.getId().equals(flightOrigin.getId()));
-                })
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Find flight details by departure and arrival airports
-     * @param origin The departure airport to search for
-     * @param destination The arrival airport to search for
-     * @return List of flight details matching the route
-     */
-    public List<FlightDetails> findFlightDetailsByRoute(String origin, String destination) {
-        if (origin == null || origin.trim().isEmpty() ||
-                destination == null || destination.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Both departure and arrival airports are required");
-            return new ArrayList<>();
-        }
-
-        // Find matching airports for origin
-        List<Airport> originAirports = airportService.findAirportByPartialName(origin);
-        if (originAirports.isEmpty()) {
-            System.out.println("✗ Service Error: No airports found matching origin: " + origin);
-            return new ArrayList<>();
-        }
-
-        // Find matching airports for destination
-        List<Airport> destinationAirports = airportService.findAirportByPartialName(destination);
-        if (destinationAirports.isEmpty()) {
-            System.out.println("✗ Service Error: No airports found matching destination: " + destination);
-            return new ArrayList<>();
-        }
-
-        // Filter flights that match both origin and destination
-        List<FlightDetails> allFlights = getAllFlightDetails();
-        return allFlights.stream()
-                .filter(flight -> {
-                    Airport flightOrigin = flight.getFlightOrigin();
-                    Airport flightDestination = flight.getFlightDestination();
-
-                    // Check for null values
-                    if (flightOrigin == null || flightDestination == null) {
-                        return false;
-                    }
-
-                    // Check if flight's origin matches any of the searched origins
-                    boolean originMatches = originAirports.stream()
-                            .anyMatch(airport -> airport.getId().equals(flightOrigin.getId()));
-
-                    // Check if flight's destination matches any of the searched destinations
-                    boolean destinationMatches = destinationAirports.stream()
-                            .anyMatch(airport -> airport.getId().equals(flightDestination.getId()));
-
-                    // Both origin and destination must match
-                    return originMatches && destinationMatches;
-                })
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Find flights by departure date
-     * @param departureDate The departure date to search for (format should match database)
-     * @return List of flights departing on the specified date
-     */
-    public List<FlightDetails> findFlightsByDepartureDate(String departureDate) {
-        if (departureDate == null || departureDate.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Departure date cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        List<FlightDetails> allFlights = getAllFlightDetails();
-        return allFlights.stream()
-                .filter(flight -> flight.getFlightDepartureDate().equals(departureDate))
-                .collect(Collectors.toList());
-    }
-
-    public List<FlightDetails> findFlightsByArrivalDate(String arrival) {
-        if (arrival == null || arrival.trim().isEmpty()) {
-            System.out.println("✗ Service Error: arrival date cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        List<FlightDetails> allFlights = getAllFlightDetails();
-        return allFlights.stream()
-                .filter(flight -> flight.getFlightArrivalDate().equals(arrival))
-                .collect(Collectors.toList());
-    }
-
-    public List<FlightDetails> findFlightsByDepartureTime(String departureTime) {
-        if (departureTime == null || departureTime.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Departure time cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        List<FlightDetails> allFlights = getAllFlightDetails();
-        return allFlights.stream()
-                .filter(flight -> flight.getFlightDepartureTime().equals(departureTime))
-                .collect(Collectors.toList());
-    }
-
-    public List<FlightDetails> findFlightsByArrivalTime(String arrivalTime) {
-        if (arrivalTime == null || arrivalTime.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Arrival time cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        List<FlightDetails> allFlights = getAllFlightDetails();
-        return allFlights.stream()
-                .filter(flight -> flight.getFlightArrivalTime().equals(arrivalTime))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Find flights within a price range
-     * @param minPrice The minimum price (as string to match model)
-     * @param maxPrice The maximum price (as string to match model)
-     * @return List of flights within the specified price range
-     */
     public List<FlightDetails> findFlightsByPriceRange(String minPrice, String maxPrice) {
         if (minPrice == null || minPrice.trim().isEmpty() ||
                 maxPrice == null || maxPrice.trim().isEmpty()) {
@@ -384,11 +232,15 @@ public class FlightDetailsService {
         }
 
         try {
-            double min = Double.parseDouble(minPrice);
-            double max = Double.parseDouble(maxPrice);
+            double min = Double.parseDouble(minPrice.trim());
+            double max = Double.parseDouble(maxPrice.trim());
 
-            List<FlightDetails> allFlights = getAllFlightDetails();
-            return allFlights.stream()
+            if (min < 0 || max < 0 || min > max) {
+                System.out.println("✗ Service Error: Invalid price range");
+                return new ArrayList<>();
+            }
+
+            return getAllFlightDetails().stream()
                     .filter(flight -> {
                         try {
                             double price = Double.parseDouble(flight.getFlightPrice());
@@ -404,66 +256,109 @@ public class FlightDetailsService {
         }
     }
 
-    /**
-     * Search flights by multiple criteria (for advanced search functionality)
-     * @param searchTerm The search term to match against flight number, airline, origin, or destination
-     * @return List of flights matching the search term
-     */
     public List<FlightDetails> searchFlights(String searchTerm) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
             System.out.println("✗ Service Error: Search term cannot be null or empty");
             return new ArrayList<>();
         }
 
-        String lowerSearchTerm = searchTerm.toLowerCase();
-        List<FlightDetails> allFlights = getAllFlightDetails();
-
-        return allFlights.stream()
+        String lowerSearchTerm = searchTerm.toLowerCase().trim();
+        return getAllFlightDetails().stream()
                 .filter(flight -> {
-                    // Search in flight number and airline
-                    boolean basicFieldsMatch = flight.getFlightNumber().toLowerCase().contains(lowerSearchTerm) ||
+                    String originName = flight.getFlightOrigin() != null ?
+                            flight.getFlightOrigin().getAirportFullName().toLowerCase() : "";
+                    String originCode = flight.getFlightOrigin() != null ?
+                            flight.getFlightOrigin().getAirportCode().toLowerCase() : "";
+                    String destName = flight.getFlightDestination() != null ?
+                            flight.getFlightDestination().getAirportFullName().toLowerCase() : "";
+                    String destCode = flight.getFlightDestination() != null ?
+                            flight.getFlightDestination().getAirportCode().toLowerCase() : "";
+
+                    return flight.getFlightNumber().toLowerCase().contains(lowerSearchTerm) ||
                             flight.getFlightAirline().toLowerCase().contains(lowerSearchTerm) ||
-                            flight.getFlightDepartureDate().toLowerCase().contains(lowerSearchTerm) ||
-                            flight.getFlightArrivalDate().toLowerCase().contains(lowerSearchTerm) ||
-                            flight.getFlightDepartureTime().toLowerCase().contains(lowerSearchTerm) ||
-                            flight.getFlightArrivalTime().toLowerCase().contains(lowerSearchTerm) ||
-                            flight.getFlightPrice().toLowerCase().contains(lowerSearchTerm);
-
-                    // Search in origin airport details
-                    boolean originMatches = false;
-                    Airport origin = flight.getFlightOrigin();
-                    if (origin != null) {
-                        originMatches = origin.getAirportFullName().toLowerCase().contains(lowerSearchTerm) ||
-                                origin.getAirportCode().toLowerCase().contains(lowerSearchTerm) ||
-                                origin.getAirportCityLocation().toLowerCase().contains(lowerSearchTerm) ||
-                                origin.getAirportCountryLocation().toLowerCase().contains(lowerSearchTerm);
-                    }
-
-                    // Search in destination airport details
-                    boolean destinationMatches = false;
-                    Airport destination = flight.getFlightDestination();
-                    if (destination != null) {
-                        destinationMatches = destination.getAirportFullName().toLowerCase().contains(lowerSearchTerm) ||
-                                destination.getAirportCode().toLowerCase().contains(lowerSearchTerm) ||
-                                destination.getAirportCityLocation().toLowerCase().contains(lowerSearchTerm) ||
-                                destination.getAirportCountryLocation().toLowerCase().contains(lowerSearchTerm);
-                    }
-
-                    // Return true if any field matches
-                    return basicFieldsMatch || originMatches || destinationMatches;
+                            originName.contains(lowerSearchTerm) ||
+                            originCode.contains(lowerSearchTerm) ||
+                            destName.contains(lowerSearchTerm) ||
+                            destCode.contains(lowerSearchTerm) ||
+                            flight.getFlightDepartureDate().contains(lowerSearchTerm) ||
+                            flight.getFlightPrice().contains(lowerSearchTerm);
                 })
                 .collect(Collectors.toList());
     }
-    /**
-     * Validate flight number format (basic validation)
-     * @param flightNumber The flight number to validate
-     * @return true if valid format, false otherwise
-     */
-    public boolean isValidFlightNumber(String flightNumber) {
-        if (flightNumber == null || flightNumber.trim().isEmpty()) {
+
+    // ============================================================================
+    // BUSINESS VALIDATION
+    // ============================================================================
+
+    private boolean isValidForService(FlightDetails flightDetails) {
+        if (flightDetails == null) {
+            System.out.println("✗ Service Error: Flight details cannot be null");
             return false;
         }
-        // Basic validation: not empty and contains at least 2 characters
-        return flightNumber.trim().length() >= 2;
+
+        // Basic field validation
+        if (flightDetails.getFlightNumber() == null || flightDetails.getFlightNumber().trim().isEmpty()) {
+            System.out.println("✗ Service Error: Flight number is required");
+            return false;
+        }
+
+        if (flightDetails.getFlightAirline() == null || flightDetails.getFlightAirline().trim().isEmpty()) {
+            System.out.println("✗ Service Error: Airline is required");
+            return false;
+        }
+
+        if (flightDetails.getFlightOrigin() == null || flightDetails.getFlightDestination() == null) {
+            System.out.println("✗ Service Error: Both origin and destination airports are required");
+            return false;
+        }
+
+        // Business logic validation
+        if (flightDetails.getFlightOrigin().getId().equals(flightDetails.getFlightDestination().getId())) {
+            System.out.println("✗ Service Error: Origin and destination airports cannot be the same");
+            return false;
+        }
+
+        // Validate airports exist in database
+        if (airportRepository.findById(flightDetails.getFlightOrigin().getId()).isEmpty()) {
+            System.out.println("✗ Service Error: Origin airport not found in database");
+            return false;
+        }
+
+        if (airportRepository.findById(flightDetails.getFlightDestination().getId()).isEmpty()) {
+            System.out.println("✗ Service Error: Destination airport not found in database");
+            return false;
+        }
+
+        // Date and time validation
+        if (!validatorService.isValidDate(flightDetails.getFlightDepartureDate()) ||
+                !validatorService.isValidDate(flightDetails.getFlightArrivalDate())) {
+            System.out.println("✗ Service Error: Invalid date format. Use YYYY-MM-DD");
+            return false;
+        }
+
+        if (!validatorService.isValidTime(flightDetails.getFlightDepartureTime()) ||
+                !validatorService.isValidTime(flightDetails.getFlightArrivalTime())) {
+            System.out.println("✗ Service Error: Invalid time format. Use HH:MM");
+            return false;
+        }
+
+        // Price validation
+        if (flightDetails.getFlightPrice() == null || flightDetails.getFlightPrice().trim().isEmpty()) {
+            System.out.println("✗ Service Error: Flight price is required");
+            return false;
+        }
+
+        try {
+            double price = Double.parseDouble(flightDetails.getFlightPrice());
+            if (price <= 0) {
+                System.out.println("✗ Service Error: Flight price must be positive");
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("✗ Service Error: Flight price must be a valid number");
+            return false;
+        }
+
+        return true;
     }
 }

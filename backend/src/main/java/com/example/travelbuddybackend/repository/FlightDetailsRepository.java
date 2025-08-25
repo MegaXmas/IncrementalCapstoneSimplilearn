@@ -2,7 +2,6 @@ package com.example.travelbuddybackend.repository;
 
 import com.example.travelbuddybackend.models.Airport;
 import com.example.travelbuddybackend.models.FlightDetails;
-import com.example.travelbuddybackend.service.AirportService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -17,157 +16,313 @@ import java.util.Optional;
 public class FlightDetailsRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final AirportService airportService;
+    private final AirportRepository airportRepository;
 
-    public FlightDetailsRepository(JdbcTemplate jdbcTemplate, AirportService airportService) {
+    public FlightDetailsRepository(JdbcTemplate jdbcTemplate, AirportRepository airportRepository) {
         this.jdbcTemplate = jdbcTemplate;
-        this.airportService = airportService;
+        this.airportRepository = airportRepository;
     }
 
-    // Static class with constructor parameter
+    // Optimized RowMapper using JOINs - CORRECTED column names
     private static class FlightDetailsRowMapper implements RowMapper<FlightDetails> {
+        @Override
+        public FlightDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
+            FlightDetails flightDetails = new FlightDetails();
+            flightDetails.setId(rs.getInt("fd_id"));
+            flightDetails.setFlightNumber(rs.getString("fd_flightNumber"));
+            flightDetails.setFlightAirline(rs.getString("fd_flightAirline"));
+            flightDetails.setFlightDepartureDate(rs.getString("fd_flightDepartureDate"));
+            flightDetails.setFlightArrivalDate(rs.getString("fd_flightArrivalDate"));
+            flightDetails.setFlightDepartureTime(rs.getString("fd_flightDepartureTime"));
+            flightDetails.setFlightArrivalTime(rs.getString("fd_flightArrivalTime"));
+            flightDetails.setFlightTravelTime(rs.getString("fd_flightTravelTime"));
+            flightDetails.setFlightPrice(rs.getString("fd_flightPrice"));
 
-        private final AirportService airportService;
+            // Create Airport objects from JOIN data - no additional queries needed
+            Airport originAirport = new Airport();
+            originAirport.setId(rs.getInt("origin_id"));
+            originAirport.setAirportFullName(rs.getString("origin_full_name"));
+            originAirport.setAirportCode(rs.getString("origin_code"));
+            originAirport.setAirportCityLocation(rs.getString("origin_city"));
+            originAirport.setAirportCountryLocation(rs.getString("origin_country"));
+            originAirport.setAirportTimezone(rs.getString("origin_timezone"));
+            flightDetails.setFlightOrigin(originAirport);
 
-        public FlightDetailsRowMapper(AirportService airportService) {
-            this.airportService = airportService;
+            Airport destinationAirport = new Airport();
+            destinationAirport.setId(rs.getInt("destination_id"));
+            destinationAirport.setAirportFullName(rs.getString("destination_full_name"));
+            destinationAirport.setAirportCode(rs.getString("destination_code"));
+            destinationAirport.setAirportCityLocation(rs.getString("destination_city"));
+            destinationAirport.setAirportCountryLocation(rs.getString("destination_country"));
+            destinationAirport.setAirportTimezone(rs.getString("destination_timezone"));
+            flightDetails.setFlightDestination(destinationAirport);
+
+            return flightDetails;
         }
+    }
 
+    // Simple RowMapper for queries without airport details
+    private static class SimpleFlightDetailsRowMapper implements RowMapper<FlightDetails> {
         @Override
         public FlightDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
             FlightDetails flightDetails = new FlightDetails();
             flightDetails.setId(rs.getInt("id"));
             flightDetails.setFlightNumber(rs.getString("flightNumber"));
             flightDetails.setFlightAirline(rs.getString("flightAirline"));
-
-            // Get airport IDs from database
-            Integer originAirportId = rs.getInt("flightOrigin");
-            Integer destinationAirportId = rs.getInt("flightDestination");
-
-            // Fetch complete Airport objects using the injected service
-            Optional<Airport> originAirport = airportService.getAirportById(originAirportId);
-            Optional<Airport> destinationAirport = airportService.getAirportById(destinationAirportId);
-
-            flightDetails.setFlightOrigin(originAirport.orElse(null));
-            flightDetails.setFlightDestination(destinationAirport.orElse(null));
-
             flightDetails.setFlightDepartureDate(rs.getString("flightDepartureDate"));
             flightDetails.setFlightArrivalDate(rs.getString("flightArrivalDate"));
             flightDetails.setFlightDepartureTime(rs.getString("flightDepartureTime"));
             flightDetails.setFlightArrivalTime(rs.getString("flightArrivalTime"));
             flightDetails.setFlightTravelTime(rs.getString("flightTravelTime"));
             flightDetails.setFlightPrice(rs.getString("flightPrice"));
+
+            // Set airport IDs only - airports will be loaded by service if needed
+            Integer originId = rs.getInt("flightOrigin");
+            Integer destinationId = rs.getInt("flightDestination");
+
+            if (originId != 0) {
+                Airport origin = new Airport();
+                origin.setId(originId);
+                flightDetails.setFlightOrigin(origin);
+            }
+
+            if (destinationId != 0) {
+                Airport destination = new Airport();
+                destination.setId(destinationId);
+                flightDetails.setFlightDestination(destination);
+            }
+
             return flightDetails;
         }
     }
 
     public List<FlightDetails> findAll() {
         try {
-            List<FlightDetails> flightDetails = jdbcTemplate.query(
-                    "SELECT id, flightNumber, flightAirline, flightOrigin, flightDestination, " +
-                            "flightDepartureDate, flightArrivalDate, flightDepartureTime, flightArrivalTime, " +
-                            "flightTravelTime, flightPrice FROM flight_details",
-                    new FlightDetailsRowMapper(airportService)); // Pass airportService here
-            System.out.println("✓ Repository: Successfully retrieved " + flightDetails.size() + " flight details");
-            return flightDetails;
+            // CORRECTED SQL using your actual database column names
+            String sql = """
+                SELECT 
+                    fd.id as fd_id, 
+                    fd.flightNumber as fd_flightNumber, 
+                    fd.flightAirline as fd_flightAirline,
+                    fd.flightDepartureDate as fd_flightDepartureDate, 
+                    fd.flightArrivalDate as fd_flightArrivalDate,
+                    fd.flightDepartureTime as fd_flightDepartureTime, 
+                    fd.flightArrivalTime as fd_flightArrivalTime,
+                    fd.flightTravelTime as fd_flightTravelTime, 
+                    fd.flightPrice as fd_flightPrice,
+                    origin.id as origin_id, 
+                    origin.airportFullName as origin_full_name, 
+                    origin.airportCode as origin_code,
+                    origin.airportCityLocation as origin_city, 
+                    origin.airportCountryLocation as origin_country, 
+                    origin.airportTimezone as origin_timezone,
+                    dest.id as destination_id, 
+                    dest.airportFullName as destination_full_name, 
+                    dest.airportCode as destination_code,
+                    dest.airportCityLocation as destination_city, 
+                    dest.airportCountryLocation as destination_country,
+                    dest.airportTimezone as destination_timezone
+                FROM flight_details fd
+                LEFT JOIN airports origin ON fd.flightOrigin = origin.id
+                LEFT JOIN airports dest ON fd.flightDestination = dest.id
+                """;
+
+            List<FlightDetails> flights = jdbcTemplate.query(sql, new FlightDetailsRowMapper());
+            System.out.println("✓ Repository: Retrieved " + flights.size() + " flight details with airports");
+            return flights;
         } catch (Exception e) {
             System.out.println("✗ Repository: Error retrieving flight details: " + e.getMessage());
             return new ArrayList<>();
         }
     }
 
-    public Optional<FlightDetails> findById(int id) {
-        if (id <= 0) {
-            System.out.println("✗ Repository: Error: Invalid flight details ID: " + id);
+    public Optional<FlightDetails> findById(Integer id) {
+        if (id == null || id <= 0) {
+            System.out.println("✗ Repository: Invalid flight ID: " + id);
             return Optional.empty();
         }
 
         try {
-            List<FlightDetails> flightDetails = jdbcTemplate.query(
-                    "SELECT id, flightNumber, flightAirline, flightOrigin, flightDestination, " +
-                            "flightDepartureDate, flightArrivalDate, flightDepartureTime, flightArrivalTime, " +
-                            "flightTravelTime, flightPrice FROM flight_details WHERE id = ?",
-                    new FlightDetailsRowMapper(airportService), id);  // ADD airportService here
+            String sql = """
+                SELECT 
+                    fd.id as fd_id, 
+                    fd.flightNumber as fd_flightNumber, 
+                    fd.flightAirline as fd_flightAirline,
+                    fd.flightDepartureDate as fd_flightDepartureDate, 
+                    fd.flightArrivalDate as fd_flightArrivalDate,
+                    fd.flightDepartureTime as fd_flightDepartureTime, 
+                    fd.flightArrivalTime as fd_flightArrivalTime,
+                    fd.flightTravelTime as fd_flightTravelTime, 
+                    fd.flightPrice as fd_flightPrice,
+                    origin.id as origin_id, 
+                    origin.airportFullName as origin_full_name, 
+                    origin.airportCode as origin_code,
+                    origin.airportCityLocation as origin_city, 
+                    origin.airportCountryLocation as origin_country, 
+                    origin.airportTimezone as origin_timezone,
+                    dest.id as destination_id, 
+                    dest.airportFullName as destination_full_name, 
+                    dest.airportCode as destination_code,
+                    dest.airportCityLocation as destination_city, 
+                    dest.airportCountryLocation as destination_country,
+                    dest.airportTimezone as destination_timezone
+                FROM flight_details fd
+                LEFT JOIN airports origin ON fd.flightOrigin = origin.id
+                LEFT JOIN airports dest ON fd.flightDestination = dest.id
+                WHERE fd.id = ?
+                """;
 
-            if (flightDetails.isEmpty()) {
-                System.out.println("✗ Repository: Flight details with ID " + id + " not found");
+            List<FlightDetails> flights = jdbcTemplate.query(sql, new FlightDetailsRowMapper(), id);
+
+            if (flights.isEmpty()) {
+                System.out.println("✗ Repository: Flight with ID " + id + " not found");
                 return Optional.empty();
-            } else {
-                System.out.println("✓ Repository: Found flight details with ID " + id);
-                return Optional.of(flightDetails.get(0));
             }
+
+            System.out.println("✓ Repository: Found flight with ID " + id);
+            return Optional.of(flights.get(0));
         } catch (Exception e) {
-            System.out.println("✗ Repository: Error finding flight details with ID: " + id + ": " + e.getMessage());
+            System.out.println("✗ Repository: Error finding flight by ID " + id + ": " + e.getMessage());
             return Optional.empty();
         }
     }
 
     public Optional<FlightDetails> findByFlightNumber(String flightNumber) {
         if (flightNumber == null || flightNumber.trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Invalid flight number: " + flightNumber);
+            System.out.println("✗ Repository: Invalid flight number: " + flightNumber);
             return Optional.empty();
         }
 
         try {
-            List<FlightDetails> flightDetails = jdbcTemplate.query(
-                    "SELECT id, flightNumber, flightAirline, flightOrigin, flightDestination, " +
-                            "flightDepartureDate, flightArrivalDate, flightDepartureTime, flightArrivalTime, " +
-                            "flightTravelTime, flightPrice FROM flight_details WHERE flightNumber = ?",
-                    new FlightDetailsRowMapper(airportService), flightNumber);  // ADD airportService here
+            String sql = """
+                SELECT 
+                    fd.id as fd_id, 
+                    fd.flightNumber as fd_flightNumber, 
+                    fd.flightAirline as fd_flightAirline,
+                    fd.flightDepartureDate as fd_flightDepartureDate, 
+                    fd.flightArrivalDate as fd_flightArrivalDate,
+                    fd.flightDepartureTime as fd_flightDepartureTime, 
+                    fd.flightArrivalTime as fd_flightArrivalTime,
+                    fd.flightTravelTime as fd_flightTravelTime, 
+                    fd.flightPrice as fd_flightPrice,
+                    origin.id as origin_id, 
+                    origin.airportFullName as origin_full_name, 
+                    origin.airportCode as origin_code,
+                    origin.airportCityLocation as origin_city, 
+                    origin.airportCountryLocation as origin_country, 
+                    origin.airportTimezone as origin_timezone,
+                    dest.id as destination_id, 
+                    dest.airportFullName as destination_full_name, 
+                    dest.airportCode as destination_code,
+                    dest.airportCityLocation as destination_city, 
+                    dest.airportCountryLocation as destination_country,
+                    dest.airportTimezone as destination_timezone
+                FROM flight_details fd
+                LEFT JOIN airports origin ON fd.flightOrigin = origin.id
+                LEFT JOIN airports dest ON fd.flightDestination = dest.id
+                WHERE fd.flightNumber = ?
+                """;
 
-            if (flightDetails.isEmpty()) {
-                System.out.println("✗ Repository: Flight details with number " + flightNumber + " not found");
+            List<FlightDetails> flights = jdbcTemplate.query(sql, new FlightDetailsRowMapper(), flightNumber);
+
+            if (flights.isEmpty()) {
+                System.out.println("✗ Repository: Flight with number " + flightNumber + " not found");
                 return Optional.empty();
-            } else {
-                System.out.println("✓ Repository: Found flight details with number " + flightNumber);
-                return Optional.of(flightDetails.get(0));
             }
+
+            System.out.println("✓ Repository: Found flight with number " + flightNumber);
+            return Optional.of(flights.get(0));
         } catch (Exception e) {
-            System.out.println("✗ Repository: Error finding flight details with number: " + flightNumber + ": " + e.getMessage());
+            System.out.println("✗ Repository: Error finding flight by number: " + e.getMessage());
             return Optional.empty();
         }
     }
 
-    public List<FlightDetails> findByOriginAndDestination(String origin, String destination) {
-        if (origin == null || origin.trim().isEmpty() || destination == null || destination.trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Both origin and destination are required");
+    public List<FlightDetails> findByRoute(Integer originAirportId, Integer destinationAirportId) {
+        if (originAirportId == null || destinationAirportId == null ||
+                originAirportId <= 0 || destinationAirportId <= 0) {
+            System.out.println("✗ Repository: Invalid airport IDs");
             return new ArrayList<>();
         }
 
         try {
-            List<FlightDetails> flightDetails = jdbcTemplate.query(
+            String sql = """
+                SELECT 
+                    fd.id as fd_id, 
+                    fd.flightNumber as fd_flightNumber, 
+                    fd.flightAirline as fd_flightAirline,
+                    fd.flightDepartureDate as fd_flightDepartureDate, 
+                    fd.flightArrivalDate as fd_flightArrivalDate,
+                    fd.flightDepartureTime as fd_flightDepartureTime, 
+                    fd.flightArrivalTime as fd_flightArrivalTime,
+                    fd.flightTravelTime as fd_flightTravelTime, 
+                    fd.flightPrice as fd_flightPrice,
+                    origin.id as origin_id, 
+                    origin.airportFullName as origin_full_name, 
+                    origin.airportCode as origin_code,
+                    origin.airportCityLocation as origin_city, 
+                    origin.airportCountryLocation as origin_country, 
+                    origin.airportTimezone as origin_timezone,
+                    dest.id as destination_id, 
+                    dest.airportFullName as destination_full_name, 
+                    dest.airportCode as destination_code,
+                    dest.airportCityLocation as destination_city, 
+                    dest.airportCountryLocation as destination_country,
+                    dest.airportTimezone as destination_timezone
+                FROM flight_details fd
+                LEFT JOIN airports origin ON fd.flightOrigin = origin.id
+                LEFT JOIN airports dest ON fd.flightDestination = dest.id
+                WHERE fd.flightOrigin = ? AND fd.flightDestination = ?
+                """;
+
+            List<FlightDetails> flights = jdbcTemplate.query(sql, new FlightDetailsRowMapper(),
+                    originAirportId, destinationAirportId);
+
+            System.out.println("✓ Repository: Found " + flights.size() + " flights for route");
+            return flights;
+        } catch (Exception e) {
+            System.out.println("✗ Repository: Error finding flights by route: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    public List<FlightDetails> findByDepartureDate(String departureDate) {
+        if (departureDate == null || departureDate.trim().isEmpty()) {
+            System.out.println("✗ Repository: Invalid departure date");
+            return new ArrayList<>();
+        }
+
+        try {
+            // Using your exact database column names
+            List<FlightDetails> flights = jdbcTemplate.query(
                     "SELECT id, flightNumber, flightAirline, flightOrigin, flightDestination, " +
                             "flightDepartureDate, flightArrivalDate, flightDepartureTime, flightArrivalTime, " +
-                            "flightTravelTime, flightPrice FROM flight_details WHERE flightOrigin = ? AND flightDestination = ?",
-                    new FlightDetailsRowMapper(airportService), origin, destination);  // ADD airportService here
+                            "flightTravelTime, flightPrice FROM flight_details WHERE flightDepartureDate = ?",
+                    new SimpleFlightDetailsRowMapper(), departureDate);
 
-            System.out.println("✓ Repository: Found " + flightDetails.size() + " flights from " + origin + " to " + destination);
-            return flightDetails;
+            System.out.println("✓ Repository: Found " + flights.size() + " flights for date " + departureDate);
+            return flights;
         } catch (Exception e) {
-            System.out.println("✗ Repository: Error finding flights from " + origin + " to " + destination + ": " + e.getMessage());
+            System.out.println("✗ Repository: Error finding flights by date: " + e.getMessage());
             return new ArrayList<>();
         }
     }
 
     public boolean createFlightDetails(FlightDetails flightDetails) {
-        if (!isValidFlightDetails(flightDetails)) {
+        if (!isValidForRepository(flightDetails)) {
             return false;
-        };
-        try {
-            // Extract airport IDs for database storage
-            Integer originId = flightDetails.getFlightOrigin() != null ?
-                    flightDetails.getFlightOrigin().getId() : null;
-            Integer destinationId = flightDetails.getFlightDestination() != null ?
-                    flightDetails.getFlightDestination().getId() : null;
+        }
 
+        try {
+            // Using your exact database column names
             int rowsAffected = jdbcTemplate.update(
-                    "INSERT INTO flight_details (flightNumber, flightAirline, flightOrigin, " +
-                            "flightDestination, flightDepartureDate, flightArrivalDate, flightDepartureTime, " +
-                            "flightArrivalTime, flightTravelTime, flightPrice) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO flight_details (flightNumber, flightAirline, flightOrigin, flightDestination, " +
+                            "flightDepartureDate, flightArrivalDate, flightDepartureTime, flightArrivalTime, " +
+                            "flightTravelTime, flightPrice) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     flightDetails.getFlightNumber(),
                     flightDetails.getFlightAirline(),
-                    originId,  // Use airport ID instead of Airport object
-                    destinationId,  // Use airport ID instead of Airport object
+                    flightDetails.getFlightOrigin() != null ? flightDetails.getFlightOrigin().getId() : null,
+                    flightDetails.getFlightDestination() != null ? flightDetails.getFlightDestination().getId() : null,
                     flightDetails.getFlightDepartureDate(),
                     flightDetails.getFlightArrivalDate(),
                     flightDetails.getFlightDepartureTime(),
@@ -176,30 +331,25 @@ public class FlightDetailsRepository {
                     flightDetails.getFlightPrice());
 
             if (rowsAffected > 0) {
-                System.out.println("✓ Repository: New flight details created: " + flightDetails.getFlightNumber());
+                System.out.println("✓ Repository: Flight created: " + flightDetails.getFlightNumber());
                 return true;
             } else {
-                System.out.println("✗ Repository: Failed to create flight details");
+                System.out.println("✗ Repository: Failed to create flight");
                 return false;
             }
         } catch (Exception e) {
-            System.out.println("✗ Repository: Error creating flight details: " + e.getMessage());
+            System.out.println("✗ Repository: Error creating flight: " + e.getMessage());
             return false;
         }
     }
 
     public boolean updateFlightDetails(FlightDetails flightDetails) {
-        if (!isValidFlightDetails(flightDetails)) {
+        if (!isValidForRepository(flightDetails) || flightDetails.getId() == null) {
             return false;
-        };
+        }
 
         try {
-            // Extract airport IDs for database storage
-            Integer originId = flightDetails.getFlightOrigin() != null ?
-                    flightDetails.getFlightOrigin().getId() : null;
-            Integer destinationId = flightDetails.getFlightDestination() != null ?
-                    flightDetails.getFlightDestination().getId() : null;
-
+            // Using your exact database column names
             int rowsAffected = jdbcTemplate.update(
                     "UPDATE flight_details SET flightNumber = ?, flightAirline = ?, flightOrigin = ?, " +
                             "flightDestination = ?, flightDepartureDate = ?, flightArrivalDate = ?, " +
@@ -207,8 +357,8 @@ public class FlightDetailsRepository {
                             "WHERE id = ?",
                     flightDetails.getFlightNumber(),
                     flightDetails.getFlightAirline(),
-                    originId,  // Use airport ID instead of Airport object
-                    destinationId,  // Use airport ID instead of Airport object
+                    flightDetails.getFlightOrigin() != null ? flightDetails.getFlightOrigin().getId() : null,
+                    flightDetails.getFlightDestination() != null ? flightDetails.getFlightDestination().getId() : null,
                     flightDetails.getFlightDepartureDate(),
                     flightDetails.getFlightArrivalDate(),
                     flightDetails.getFlightDepartureTime(),
@@ -218,21 +368,21 @@ public class FlightDetailsRepository {
                     flightDetails.getId());
 
             if (rowsAffected > 0) {
-                System.out.println("✓ Repository: Flight details updated successfully: " + flightDetails.getFlightNumber());
+                System.out.println("✓ Repository: Flight updated: " + flightDetails.getFlightNumber());
                 return true;
             } else {
-                System.out.println("✗ Repository: Failed to update flight details " + flightDetails.getFlightNumber());
+                System.out.println("✗ Repository: Flight not found for update");
                 return false;
             }
         } catch (Exception e) {
-            System.out.println("✗ Repository: Error updating flight details: " + e.getMessage());
+            System.out.println("✗ Repository: Error updating flight: " + e.getMessage());
             return false;
         }
     }
 
-    public boolean deleteFlightDetails(int id) {
-        if (id <= 0) {
-            System.out.println("✗ Repository: Error: Invalid flight details ID: " + id);
+    public boolean deleteFlightDetails(Integer id) {
+        if (id == null || id <= 0) {
+            System.out.println("✗ Repository: Invalid flight ID for deletion: " + id);
             return false;
         }
 
@@ -240,74 +390,59 @@ public class FlightDetailsRepository {
             int rowsAffected = jdbcTemplate.update("DELETE FROM flight_details WHERE id = ?", id);
 
             if (rowsAffected > 0) {
-                System.out.println("✓ Repository: Flight details with ID " + id + " deleted successfully");
+                System.out.println("✓ Repository: Flight deleted successfully");
                 return true;
             } else {
-                System.out.println("✗ Repository: Flight details with ID " + id + " not found");
+                System.out.println("✗ Repository: Flight not found for deletion");
                 return false;
             }
         } catch (Exception e) {
-            System.out.println("✗ Repository: Error deleting flight details: " + e.getMessage());
+            System.out.println("✗ Repository: Error deleting flight: " + e.getMessage());
             return false;
         }
     }
 
-    //==============================Validation================================
-
-    public boolean isValidFlightDetails(FlightDetails flightDetails) {
-
+    // Repository-level validation (data constraints only)
+    private boolean isValidForRepository(FlightDetails flightDetails) {
         if (flightDetails == null) {
-            System.out.println("✗ Repository: Error: Cannot create null flight details");
+            System.out.println("✗ Repository: Flight details cannot be null");
             return false;
         }
 
-        // Validate required fields
         if (flightDetails.getFlightNumber() == null || flightDetails.getFlightNumber().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Flight number is required");
+            System.out.println("✗ Repository: Flight number is required");
             return false;
         }
 
         if (flightDetails.getFlightAirline() == null || flightDetails.getFlightAirline().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Flight airline is required");
+            System.out.println("✗ Repository: Flight airline is required");
             return false;
         }
 
-        if (flightDetails.getFlightOrigin() == null ||
-                !airportService.isValidAirport(flightDetails.getFlightOrigin())) {
-            System.out.println("✗ Repository: Error: Flight origin is required");
+        if (flightDetails.getFlightOrigin() == null || flightDetails.getFlightOrigin().getId() == null) {
+            System.out.println("✗ Repository: Origin airport is required");
             return false;
         }
 
-        if (flightDetails.getFlightDestination() == null ||
-                !airportService.isValidAirport(flightDetails.getFlightDestination())) {
-            System.out.println("✗ Repository: Error: Flight destination is required");
+        if (flightDetails.getFlightDestination() == null || flightDetails.getFlightDestination().getId() == null) {
+            System.out.println("✗ Repository: Destination airport is required");
             return false;
         }
 
-        if (flightDetails.getFlightDepartureDate() == null || flightDetails.getFlightDepartureDate().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Flight departure date is required");
+        // Verify airports exist in database
+        Optional<Airport> origin = airportRepository.findById(flightDetails.getFlightOrigin().getId());
+        Optional<Airport> destination = airportRepository.findById(flightDetails.getFlightDestination().getId());
+
+        if (origin.isEmpty()) {
+            System.out.println("✗ Repository: Origin airport not found in database");
             return false;
         }
 
-        if (flightDetails.getFlightArrivalDate() == null || flightDetails.getFlightArrivalDate().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Flight arrival date is required");
+        if (destination.isEmpty()) {
+            System.out.println("✗ Repository: Destination airport not found in database");
             return false;
         }
 
-        if (flightDetails.getFlightDepartureTime() == null || flightDetails.getFlightDepartureTime().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Flight departure time is required");
-            return false;
-        }
-
-        if (flightDetails.getFlightArrivalTime() == null || flightDetails.getFlightArrivalTime().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Flight arrival time is required");
-            return false;
-        }
-
-        if (flightDetails.getFlightPrice() == null || flightDetails.getFlightPrice().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Flight price is required");
-            return false;
-        }
         return true;
     }
 }

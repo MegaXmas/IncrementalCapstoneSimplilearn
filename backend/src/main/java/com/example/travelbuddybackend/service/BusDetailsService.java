@@ -1,9 +1,10 @@
 package com.example.travelbuddybackend.service;
 
-import com.example.travelbuddybackend.models.Airport;
 import com.example.travelbuddybackend.models.BusDetails;
-import com.example.travelbuddybackend.models.FlightDetails;
+import com.example.travelbuddybackend.models.BusStation;
 import com.example.travelbuddybackend.repository.BusDetailsRepository;
+import com.example.travelbuddybackend.repository.BusStationRepository;
+import com.example.travelbuddybackend.service.ValidatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,265 +13,218 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Bus Details Service - Business Logic Layer
+ *
+ * Fixed Architecture:
+ * - Only depends on repositories (no service-to-service dependencies)
+ * - Handles business validation and logic
+ * - Coordinates repository operations
+ * - No circular dependencies
+ */
 @Service
 public class BusDetailsService {
 
     private final BusDetailsRepository busDetailsRepository;
+    private final BusStationRepository busStationRepository;
+    private final ValidatorService validatorService;
 
     @Autowired
-    public BusDetailsService(BusDetailsRepository busDetailsRepository) {
+    public BusDetailsService(BusDetailsRepository busDetailsRepository,
+                             BusStationRepository busStationRepository,
+                             ValidatorService validatorService) {
         this.busDetailsRepository = busDetailsRepository;
+        this.busStationRepository = busStationRepository;
+        this.validatorService = validatorService;
     }
 
-    /**
-     * Get all bus details from the database
-     * @return List of all bus details (empty list if none found or error occurs)
-     */
+    // ============================================================================
+    // CORE BUSINESS OPERATIONS
+    // ============================================================================
+
     public List<BusDetails> getAllBusDetails() {
         return busDetailsRepository.findAll();
     }
 
-    /**
-     * Get bus details by their ID
-     * @param id The bus details ID to search for
-     * @return Optional containing the bus details if found, empty otherwise
-     */
     public Optional<BusDetails> getBusDetailsById(Integer id) {
-        if (id == null) {
-            System.out.println("✗ Service Error: Bus details ID cannot be null");
+        if (id == null || id <= 0) {
+            System.out.println("✗ Service Error: Bus ID must be a positive integer");
             return Optional.empty();
         }
         return busDetailsRepository.findById(id);
     }
 
-    /**
-     * Get bus details by bus number
-     * @param busNumber The bus number to search for
-     * @return Optional containing the bus details if found, empty otherwise
-     */
     public Optional<BusDetails> getBusDetailsByNumber(String busNumber) {
         if (busNumber == null || busNumber.trim().isEmpty()) {
             System.out.println("✗ Service Error: Bus number cannot be null or empty");
             return Optional.empty();
         }
-        return busDetailsRepository.findByBusNumber(busNumber);
+        return busDetailsRepository.findByBusNumber(busNumber.toUpperCase().trim());
     }
 
-    /**
-     * Add new bus details to the database
-     * @param busDetails The bus details to add
-     * @return true if bus details were successfully added, false otherwise
-     */
-    public boolean addBusDetails(BusDetails busDetails) {
-        if (busDetails == null) {
-            System.out.println("✗ Service Error: Cannot add null bus details");
-            return false;
-        }
-
-        boolean success = busDetailsRepository.createBusDetails(busDetails);
-        if (success) {
-            System.out.println("✓ Service: Bus details successfully added through service layer");
-        } else {
-            System.out.println("✗ Service: Failed to add bus details through service layer");
-        }
-        return success;
-    }
-
-    /**
-     * Update existing bus details in the database
-     * @param busDetails The bus details with updated information
-     * @return true if bus details were successfully updated, false otherwise
-     */
-    public boolean updateBusDetails(BusDetails busDetails) {
-        if (busDetails == null) {
-            System.out.println("✗ Service Error: Cannot update null bus details");
-            return false;
-        }
-
-        if (busDetails.getId() == null || busDetails.getId() <= 0) {
-            System.out.println("✗ Service Error: Bus details must have a valid ID for update");
-            return false;
-        }
-
-        boolean success = busDetailsRepository.updateBusDetails(busDetails);
-        if (success) {
-            System.out.println("✓ Service: Bus details successfully updated through service layer");
-        } else {
-            System.out.println("✗ Service: Failed to update bus details through service layer");
-        }
-        return success;
-    }
-
-    /**
-     * Delete bus details from the database
-     * @param id The ID of the bus details to delete
-     * @return true if bus details were successfully deleted, false otherwise
-     */
-    public boolean deleteBusDetails(Integer id) {
-        if (id == null) {
-            System.out.println("✗ Service Error: Bus details ID cannot be null");
-            return false;
-        }
-
-        if (id <= 0) {
-            System.out.println("✗ Service Error: Invalid bus details ID: " + id);
-            return false;
-        }
-
-        boolean success = busDetailsRepository.deleteBusDetails(id);
-        if (success) {
-            System.out.println("✓ Service: Bus details successfully deleted through service layer");
-        } else {
-            System.out.println("✗ Service: Failed to delete bus details through service layer");
-        }
-        return success;
-    }
-
-    /**
-     * Check if bus details exist in the database by ID
-     * @param id The bus details ID to check
-     * @return true if bus details exist, false otherwise
-     */
-    public boolean busDetailsExists(Integer id) {
-        if (id == null || id <= 0) {
-            return false;
-        }
-        return getBusDetailsById(id).isPresent();
-    }
-
-    /**
-     * Check if bus details exist in the database by bus number
-     * @param busNumber The bus number to check
-     * @return true if bus details exist, false otherwise
-     */
-    public boolean busDetailsExistsByNumber(String busNumber) {
-        if (busNumber == null || busNumber.trim().isEmpty()) {
-            return false;
-        }
-        return getBusDetailsByNumber(busNumber).isPresent();
-    }
-
-    /**
-     * Get the total number of bus details in the database
-     * @return The count of all bus details
-     */
-    public int getBusDetailsCount() {
-        List<BusDetails> busDetailsList = getAllBusDetails();
-        return busDetailsList.size();
-    }
-
-    /**
-     * Find bus details by departure and arrival stations
-     * @param departureStation The departure station to search for
-     * @param arrivalStation The arrival station to search for
-     * @return List of bus details matching the route
-     */
-    public List<BusDetails> findBusDetailsByRoute(String departureStation, String arrivalStation) {
-        if (departureStation == null || departureStation.trim().isEmpty() ||
-                arrivalStation == null || arrivalStation.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Both departure and arrival stations are required");
+    public List<BusDetails> getBusesByRoute(String departureStationCode, String arrivalStationCode) {
+        if (departureStationCode == null || departureStationCode.trim().isEmpty() ||
+                arrivalStationCode == null || arrivalStationCode.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Both departure and arrival station codes are required");
             return new ArrayList<>();
         }
 
-        List<BusDetails> allBusDetails = getAllBusDetails();
-        return allBusDetails.stream()
-                .filter(bus -> bus.getBusDepartureStation().equalsIgnoreCase(departureStation) &&
-                        bus.getBusArrivalStation().equalsIgnoreCase(arrivalStation))
-                .collect(Collectors.toList());
+        // Find stations by codes using repository
+        Optional<BusStation> departureStation = busStationRepository.findByStationCode(departureStationCode.toUpperCase().trim());
+        Optional<BusStation> arrivalStation = busStationRepository.findByStationCode(arrivalStationCode.toUpperCase().trim());
+
+        if (departureStation.isEmpty()) {
+            System.out.println("✗ Service Error: Departure station not found: " + departureStationCode);
+            return new ArrayList<>();
+        }
+
+        if (arrivalStation.isEmpty()) {
+            System.out.println("✗ Service Error: Arrival station not found: " + arrivalStationCode);
+            return new ArrayList<>();
+        }
+
+        return busDetailsRepository.findByRoute(departureStation.get().getId(), arrivalStation.get().getId());
     }
 
-    /**
-     * Find bus details by departure date
-     * @param departureDate The departure date to search for (format should match database)
-     * @return List of bus details departing on the specified date
-     */
-    public List<BusDetails> findBusDetailsByDepartureDate(String departureDate) {
+    public List<BusDetails> getBusesByRoute(BusStation departureStation, BusStation arrivalStation) {
+        if (departureStation == null || arrivalStation == null) {
+            System.out.println("✗ Service Error: Both stations are required");
+            return new ArrayList<>();
+        }
+
+        if (departureStation.getId() == null || arrivalStation.getId() == null) {
+            System.out.println("✗ Service Error: Station IDs are required");
+            return new ArrayList<>();
+        }
+
+        return busDetailsRepository.findByRoute(departureStation.getId(), arrivalStation.getId());
+    }
+
+    public List<BusDetails> getBusesByDepartureDate(String departureDate) {
         if (departureDate == null || departureDate.trim().isEmpty()) {
             System.out.println("✗ Service Error: Departure date cannot be null or empty");
             return new ArrayList<>();
         }
 
-        List<BusDetails> allBusDetails = getAllBusDetails();
-        return allBusDetails.stream()
-                .filter(bus -> bus.getBusDepartureDate().equals(departureDate))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Find bus details by arrival date
-     * @param arrivalDate The arrival date to search for (format should match database)
-     * @return List of bus details arriving at the specified date
-     */
-    public List<BusDetails> findBusDetailsByArrivalDate(String arrivalDate) {
-        if (arrivalDate == null || arrivalDate.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Arrival date cannot be null or empty");
+        if (!validatorService.isValidDate(departureDate)) {
+            System.out.println("✗ Service Error: Invalid date format. Use YYYY-MM-DD");
             return new ArrayList<>();
         }
 
-        List<BusDetails> allBusDetails = getAllBusDetails();
-        return allBusDetails.stream()
-                .filter(bus -> bus.getBusArrivalDate().equals(arrivalDate))
-                .collect(Collectors.toList());
+        return busDetailsRepository.findByDepartureDate(departureDate);
     }
 
-    /**
-     * Find bus details by departure time
-     * @param departureTime The departure time to search for (format should match database)
-     * @return List of bus details departing on the specified time
-     */
-    public List<BusDetails> findBusDetailsByDepartureTime(String departureTime) {
-        if (departureTime == null || departureTime.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Departure time cannot be null or empty");
+    public boolean addBusDetails(BusDetails busDetails) {
+        if (!isValidForService(busDetails)) {
+            return false;
+        }
+
+        // Check for duplicate bus number
+        if (busDetailsRepository.findByBusNumber(busDetails.getBusNumber()).isPresent()) {
+            System.out.println("✗ Service Error: Bus number already exists: " + busDetails.getBusNumber());
+            return false;
+        }
+
+        boolean success = busDetailsRepository.createBusDetails(busDetails);
+        if (success) {
+            System.out.println("✓ Service: Bus added successfully");
+        } else {
+            System.out.println("✗ Service: Failed to add bus");
+        }
+        return success;
+    }
+
+    public boolean updateBusDetails(BusDetails busDetails) {
+        if (!isValidForService(busDetails)) {
+            return false;
+        }
+
+        if (busDetails.getId() == null || busDetails.getId() <= 0) {
+            System.out.println("✗ Service Error: Valid bus ID required for update");
+            return false;
+        }
+
+        // Check if bus exists
+        if (busDetailsRepository.findById(busDetails.getId()).isEmpty()) {
+            System.out.println("✗ Service Error: Bus not found for update");
+            return false;
+        }
+
+        // Check for duplicate bus number (excluding current bus)
+        Optional<BusDetails> existingBus = busDetailsRepository.findByBusNumber(busDetails.getBusNumber());
+        if (existingBus.isPresent() && !existingBus.get().getId().equals(busDetails.getId())) {
+            System.out.println("✗ Service Error: Bus number already exists: " + busDetails.getBusNumber());
+            return false;
+        }
+
+        boolean success = busDetailsRepository.updateBusDetails(busDetails);
+        if (success) {
+            System.out.println("✓ Service: Bus updated successfully");
+        } else {
+            System.out.println("✗ Service: Failed to update bus");
+        }
+        return success;
+    }
+
+    public boolean deleteBusDetails(Integer id) {
+        if (id == null || id <= 0) {
+            System.out.println("✗ Service Error: Valid bus ID required for deletion");
+            return false;
+        }
+
+        // Check if bus exists before deletion
+        if (busDetailsRepository.findById(id).isEmpty()) {
+            System.out.println("✗ Service Error: Bus not found for deletion");
+            return false;
+        }
+
+        boolean success = busDetailsRepository.deleteBusDetails(id);
+        if (success) {
+            System.out.println("✓ Service: Bus deleted successfully");
+        } else {
+            System.out.println("✗ Service: Failed to delete bus");
+        }
+        return success;
+    }
+
+    // ============================================================================
+    // BUSINESS LOGIC METHODS
+    // ============================================================================
+
+    public boolean busExists(Integer id) {
+        if (id == null || id <= 0) {
+            return false;
+        }
+        return busDetailsRepository.findById(id).isPresent();
+    }
+
+    public boolean busExistsByNumber(String busNumber) {
+        if (busNumber == null || busNumber.trim().isEmpty()) {
+            return false;
+        }
+        return busDetailsRepository.findByBusNumber(busNumber.toUpperCase().trim()).isPresent();
+    }
+
+    public int getBusDetailsCount() {
+        return busDetailsRepository.findAll().size();
+    }
+
+    // ============================================================================
+    // SEARCH AND FILTER METHODS
+    // ============================================================================
+
+    public List<BusDetails> findBusesByLine(String busLine) {
+        if (busLine == null || busLine.trim().isEmpty()) {
+            System.out.println("✗ Service Error: Bus line cannot be null or empty");
             return new ArrayList<>();
         }
 
-        List<BusDetails> allBusDetails = getAllBusDetails();
-        return allBusDetails.stream()
-                .filter(bus -> bus.getBusDepartureTime().equals(departureTime))
+        return getAllBusDetails().stream()
+                .filter(bus -> bus.getBusLine().toLowerCase().contains(busLine.toLowerCase().trim()))
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Find bus details by arrival time
-     * @param arrivalTime The arrival time to search for (format should match database)
-     * @return List of bus details arriving at the specified time
-     */
-    public List<BusDetails> findBusDetailsByArrivalTime(String arrivalTime) {
-        if (arrivalTime == null || arrivalTime.trim().isEmpty()) {
-            System.out.println("✗ Service Error: arrival time cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        List<BusDetails> allBusDetails = getAllBusDetails();
-        return allBusDetails.stream()
-                .filter(bus -> bus.getBusArrivalTime().equals(arrivalTime))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Find bus details by ride duration
-     * @param rideDuration The ride duration to search for (format should match database)
-     * @return List of bus details based on the duration of the ride
-     */
-    public List<BusDetails> findBusDetailsByRideDuration(String rideDuration) {
-        if (rideDuration == null || rideDuration.trim().isEmpty()) {
-            System.out.println("✗ Service Error: duration cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        List<BusDetails> allBusDetails = getAllBusDetails();
-        return allBusDetails.stream()
-                .filter(bus -> bus.getBusRideDuration().equals(rideDuration))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Find bus details within a price range
-     * @param minPrice The minimum price (as string to match model)
-     * @param maxPrice The maximum price (as string to match model)
-     * @return List of bus details within the specified price range
-     */
-    public List<BusDetails> findBusDetailsByPriceRange(String minPrice, String maxPrice) {
+    public List<BusDetails> findBusesByPriceRange(String minPrice, String maxPrice) {
         if (minPrice == null || minPrice.trim().isEmpty() ||
                 maxPrice == null || maxPrice.trim().isEmpty()) {
             System.out.println("✗ Service Error: Both minimum and maximum prices are required");
@@ -278,14 +232,18 @@ public class BusDetailsService {
         }
 
         try {
-            double min = Double.parseDouble(minPrice);
-            double max = Double.parseDouble(maxPrice);
+            double min = Double.parseDouble(minPrice.trim());
+            double max = Double.parseDouble(maxPrice.trim());
 
-            List<BusDetails> allBusDetails = getAllBusDetails();
-            return allBusDetails.stream()
-                    .filter(flight -> {
+            if (min < 0 || max < 0 || min > max) {
+                System.out.println("✗ Service Error: Invalid price range");
+                return new ArrayList<>();
+            }
+
+            return getAllBusDetails().stream()
+                    .filter(bus -> {
                         try {
-                            double price = Double.parseDouble(flight.getBusRidePrice());
+                            double price = Double.parseDouble(bus.getBusRidePrice());
                             return price >= min && price <= max;
                         } catch (NumberFormatException e) {
                             return false;
@@ -298,31 +256,109 @@ public class BusDetailsService {
         }
     }
 
-    /**
-     * Search train stations by multiple criteria (for advanced search functionality)
-     * @param searchTerm The search term to match against station name, code, or city
-     * @return List of train stations matching the search term
-     */
-    public List<BusDetails> searchBusDetails(String searchTerm) {
+    public List<BusDetails> searchBuses(String searchTerm) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
             System.out.println("✗ Service Error: Search term cannot be null or empty");
             return new ArrayList<>();
         }
 
-        String lowerSearchTerm = searchTerm.toLowerCase();
-        List<BusDetails> allBusDetails = getAllBusDetails();
+        String lowerSearchTerm = searchTerm.toLowerCase().trim();
+        return getAllBusDetails().stream()
+                .filter(bus -> {
+                    String depName = bus.getBusDepartureStation() != null ?
+                            bus.getBusDepartureStation().getBusStationFullName().toLowerCase() : "";
+                    String depCode = bus.getBusDepartureStation() != null ?
+                            bus.getBusDepartureStation().getBusStationCode().toLowerCase() : "";
+                    String arrName = bus.getBusArrivalStation() != null ?
+                            bus.getBusArrivalStation().getBusStationFullName().toLowerCase() : "";
+                    String arrCode = bus.getBusArrivalStation() != null ?
+                            bus.getBusArrivalStation().getBusStationCode().toLowerCase() : "";
 
-        return allBusDetails.stream()
-                .filter(bus -> bus.getBusNumber().toLowerCase().contains(lowerSearchTerm) ||
-                        bus.getBusLine().toLowerCase().contains(lowerSearchTerm) ||
-                        bus.getBusDepartureStation().toLowerCase().contains(lowerSearchTerm) ||
-                        bus.getBusArrivalStation().toLowerCase().contains(lowerSearchTerm) ||
-                        bus.getBusDepartureDate().toLowerCase().contains(lowerSearchTerm) ||
-                        bus.getBusArrivalDate().toLowerCase().contains(lowerSearchTerm) ||
-                        bus.getBusDepartureTime().toLowerCase().contains(lowerSearchTerm) ||
-                        bus.getBusArrivalTime().toLowerCase().contains(lowerSearchTerm) ||
-                        bus.getBusRideDuration().toLowerCase().contains(lowerSearchTerm) ||
-                        bus.getBusRidePrice().toLowerCase().contains(lowerSearchTerm))
+                    return bus.getBusNumber().toLowerCase().contains(lowerSearchTerm) ||
+                            bus.getBusLine().toLowerCase().contains(lowerSearchTerm) ||
+                            depName.contains(lowerSearchTerm) ||
+                            depCode.contains(lowerSearchTerm) ||
+                            arrName.contains(lowerSearchTerm) ||
+                            arrCode.contains(lowerSearchTerm) ||
+                            bus.getBusDepartureDate().contains(lowerSearchTerm) ||
+                            bus.getBusRidePrice().contains(lowerSearchTerm);
+                })
                 .collect(Collectors.toList());
+    }
+
+    // ============================================================================
+    // BUSINESS VALIDATION
+    // ============================================================================
+
+    private boolean isValidForService(BusDetails busDetails) {
+        if (busDetails == null) {
+            System.out.println("✗ Service Error: Bus details cannot be null");
+            return false;
+        }
+
+        // Basic field validation
+        if (busDetails.getBusNumber() == null || busDetails.getBusNumber().trim().isEmpty()) {
+            System.out.println("✗ Service Error: Bus number is required");
+            return false;
+        }
+
+        if (busDetails.getBusLine() == null || busDetails.getBusLine().trim().isEmpty()) {
+            System.out.println("✗ Service Error: Bus line is required");
+            return false;
+        }
+
+        if (busDetails.getBusDepartureStation() == null || busDetails.getBusArrivalStation() == null) {
+            System.out.println("✗ Service Error: Both departure and arrival stations are required");
+            return false;
+        }
+
+        // Business logic validation
+        if (busDetails.getBusDepartureStation().getId().equals(busDetails.getBusArrivalStation().getId())) {
+            System.out.println("✗ Service Error: Departure and arrival stations cannot be the same");
+            return false;
+        }
+
+        // Validate stations exist in database
+        if (busStationRepository.findById(busDetails.getBusDepartureStation().getId()).isEmpty()) {
+            System.out.println("✗ Service Error: Departure station not found in database");
+            return false;
+        }
+
+        if (busStationRepository.findById(busDetails.getBusArrivalStation().getId()).isEmpty()) {
+            System.out.println("✗ Service Error: Arrival station not found in database");
+            return false;
+        }
+
+        // Date and time validation
+        if (!validatorService.isValidDate(busDetails.getBusDepartureDate()) ||
+                !validatorService.isValidDate(busDetails.getBusArrivalDate())) {
+            System.out.println("✗ Service Error: Invalid date format. Use YYYY-MM-DD");
+            return false;
+        }
+
+        if (!validatorService.isValidTime(busDetails.getBusDepartureTime()) ||
+                !validatorService.isValidTime(busDetails.getBusArrivalTime())) {
+            System.out.println("✗ Service Error: Invalid time format. Use HH:MM");
+            return false;
+        }
+
+        // Price validation
+        if (busDetails.getBusRidePrice() == null || busDetails.getBusRidePrice().trim().isEmpty()) {
+            System.out.println("✗ Service Error: Bus price is required");
+            return false;
+        }
+
+        try {
+            double price = Double.parseDouble(busDetails.getBusRidePrice());
+            if (price <= 0) {
+                System.out.println("✗ Service Error: Bus price must be positive");
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("✗ Service Error: Bus price must be a valid number");
+            return false;
+        }
+
+        return true;
     }
 }

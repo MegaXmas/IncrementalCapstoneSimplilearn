@@ -142,9 +142,9 @@ public class AirportController {
      * Delete an airport
      */
     @DeleteMapping
-    public ResponseEntity<String> deleteAirport(@RequestBody Airport airport) {
+    public ResponseEntity<String> deleteAirport(@RequestBody Integer id) {
         try {
-            boolean success = airportService.deleteAirport(airport);
+            boolean success = airportService.deleteAirport(id);
             if (success) {
                 return ResponseEntity.ok("Airport deleted successfully");
             } else {
@@ -191,7 +191,7 @@ public class AirportController {
     @GetMapping("/code/{searchTerm}")
     public ResponseEntity<List<Airport>> searchAirportsByCode(@PathVariable String searchTerm) {
         try {
-            var searchResults = airportService.findAirportByCode(searchTerm);
+            var searchResults = airportService.findAirportByCodePattern(searchTerm);
 
             System.out.println("✓ Controller: Airport search for '" + searchTerm + "' returned " + searchResults.size() + " results");
             return ResponseEntity.ok(searchResults);
