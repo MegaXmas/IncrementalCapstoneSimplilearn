@@ -150,8 +150,9 @@ public class FlightDetailsRepository {
     }
 
     public boolean createFlightDetails(FlightDetails flightDetails) {
-        isValidFlightDetails(flightDetails);
-
+        if (!isValidFlightDetails(flightDetails)) {
+            return false;
+        };
         try {
             // Extract airport IDs for database storage
             Integer originId = flightDetails.getFlightOrigin() != null ?
@@ -188,7 +189,9 @@ public class FlightDetailsRepository {
     }
 
     public boolean updateFlightDetails(FlightDetails flightDetails) {
-        isValidFlightDetails(flightDetails);
+        if (!isValidFlightDetails(flightDetails)) {
+            return false;
+        };
 
         try {
             // Extract airport IDs for database storage
@@ -251,56 +254,58 @@ public class FlightDetailsRepository {
 
     //==============================Validation================================
 
-    public void isValidFlightDetails(FlightDetails flightDetails) {
+    public boolean isValidFlightDetails(FlightDetails flightDetails) {
 
         if (flightDetails == null) {
             System.out.println("✗ Repository: Error: Cannot create null flight details");
-            return;
+            return false;
         }
 
         // Validate required fields
         if (flightDetails.getFlightNumber() == null || flightDetails.getFlightNumber().trim().isEmpty()) {
             System.out.println("✗ Repository: Error: Flight number is required");
-            return;
+            return false;
         }
 
         if (flightDetails.getFlightAirline() == null || flightDetails.getFlightAirline().trim().isEmpty()) {
             System.out.println("✗ Repository: Error: Flight airline is required");
-            return;
+            return false;
         }
 
         if (flightDetails.getFlightOrigin() == null || airportService.isValidAirport(flightDetails.getFlightOrigin())) {
             System.out.println("✗ Repository: Error: Flight origin is required");
-            return;
+            return false;
         }
 
         if (flightDetails.getFlightDestination() == null || airportService.isValidAirport(flightDetails.getFlightDestination())) {
             System.out.println("✗ Repository: Error: Flight destination is required");
-            return;
+            return false;
         }
 
         if (flightDetails.getFlightDepartureDate() == null || flightDetails.getFlightDepartureDate().trim().isEmpty()) {
             System.out.println("✗ Repository: Error: Flight departure date is required");
-            return;
+            return false;
         }
 
         if (flightDetails.getFlightArrivalDate() == null || flightDetails.getFlightArrivalDate().trim().isEmpty()) {
             System.out.println("✗ Repository: Error: Flight arrival date is required");
-            return;
+            return false;
         }
 
         if (flightDetails.getFlightDepartureTime() == null || flightDetails.getFlightDepartureTime().trim().isEmpty()) {
             System.out.println("✗ Repository: Error: Flight departure time is required");
-            return;
+            return false;
         }
 
         if (flightDetails.getFlightArrivalTime() == null || flightDetails.getFlightArrivalTime().trim().isEmpty()) {
             System.out.println("✗ Repository: Error: Flight arrival time is required");
-            return;
+            return false;
         }
 
         if (flightDetails.getFlightPrice() == null || flightDetails.getFlightPrice().trim().isEmpty()) {
             System.out.println("✗ Repository: Error: Flight price is required");
+            return false;
         }
+        return true;
     }
 }

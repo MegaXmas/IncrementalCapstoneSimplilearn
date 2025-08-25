@@ -1,9 +1,11 @@
 package com.example.travelbuddybackend.repository;
 
 import com.example.travelbuddybackend.models.TrainDetails;
+import com.example.travelbuddybackend.models.TrainStation;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import com.example.travelbuddybackend.repository.TrainStationRepository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,19 +18,29 @@ public class TrainDetailsRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public TrainDetailsRepository(JdbcTemplate jdbcTemplate) {
+    public TrainDetailsRepository(JdbcTemplate jdbcTemplate,  TrainStationRepository trainStationRepository) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     private static class TrainDetailsRowMapper implements RowMapper<TrainDetails> {
+
+        TrainDetailsRowMapper(TrainStationRepository trainStationRepository) {
+        }
+
         @Override
         public TrainDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
             TrainDetails trainDetails = new TrainDetails();
             trainDetails.setId(rs.getInt("id"));
             trainDetails.setTrainNumber(rs.getString("trainNumber"));
             trainDetails.setTrainLine(rs.getString("trainLine"));
-            trainDetails.setTrainDepartureStation(rs.getString("trainDepartureStation"));
-            trainDetails.setTrainArrivalStation(rs.getString("trainArrivalStation"));
+
+            Integer trainDepartureId = rs.getInt("trainDepartureStation");
+            Integer trainArrivalId = rs.getInt("trainArrivalStation");
+
+            Optional<TrainStation> trainDeparture = trainStationRepository.findById(trainDepartureId);
+            Optional<TrainStation> trainArrival = trainStationRepository.getAirportById(trainArrivalId);
+
+
             trainDetails.setTrainDepartureDate(rs.getString("trainDepartureDate"));
             trainDetails.setTrainDepartureTime(rs.getString("trainDepartureTime"));
             trainDetails.setTrainArrivalDate(rs.getString("trainArrivalDate"));

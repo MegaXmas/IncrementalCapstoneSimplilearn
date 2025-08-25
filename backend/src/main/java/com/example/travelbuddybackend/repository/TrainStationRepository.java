@@ -113,25 +113,10 @@ public class TrainStationRepository {
     }
 
     public boolean createTrainStation(TrainStation trainStation) {
-        if (trainStation == null) {
-            System.out.println("✗ Repository: Error: Cannot create null train station");
-            return false;
-        }
 
-        if (trainStation.getTrainStationFullName() == null || trainStation.getTrainStationFullName().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train station name is required");
+        if (!isValidTrainStation(trainStation)) {
             return false;
-        }
-
-        if (trainStation.getTrainStationCode() == null || trainStation.getTrainStationCode().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train station code is required");
-            return false;
-        }
-
-        if (trainStation.getTrainStationCityLocation() == null || trainStation.getTrainStationCityLocation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train station city location is required");
-            return false;
-        }
+        };
 
         try {
             int rowsAffected = jdbcTemplate.update(
@@ -152,30 +137,10 @@ public class TrainStationRepository {
     }
 
     public boolean updateTrainStation(TrainStation trainStation) {
-        if (trainStation == null) {
-            System.out.println("✗ Repository: Error: Cannot update null train station");
-            return false;
-        }
 
-        if (trainStation.getId() <= 0) {
-            System.out.println("✗ Repository: Error: Invalid train station ID " + trainStation.getId());
+        if (!isValidTrainStation(trainStation)) {
             return false;
-        }
-
-        if (trainStation.getTrainStationFullName() == null || trainStation.getTrainStationFullName().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train station name is required");
-            return false;
-        }
-
-        if (trainStation.getTrainStationCode() == null || trainStation.getTrainStationCode().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train station code is required");
-            return false;
-        }
-
-        if (trainStation.getTrainStationCityLocation() == null || trainStation.getTrainStationCityLocation().trim().isEmpty()) {
-            System.out.println("✗ Repository: Error: Train station city location is required");
-            return false;
-        }
+        };
 
         try {
             int rowsAffected = jdbcTemplate.update(
@@ -215,5 +180,33 @@ public class TrainStationRepository {
             System.out.println("✗ Repository: Error deleting train station: " + e.getMessage());
             return false;
         }
+    }
+
+    public boolean isValidTrainStation(TrainStation trainStation) {
+        if (trainStation == null) {
+            System.out.println("✗ Repository: Error: Cannot update null train station");
+            return false;
+        }
+
+        if (trainStation.getId() <= 0) {
+            System.out.println("✗ Repository: Error: Invalid train station ID " + trainStation.getId());
+            return false;
+        }
+
+        if (trainStation.getTrainStationFullName() == null || trainStation.getTrainStationFullName().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Train station name is required");
+            return false;
+        }
+
+        if (trainStation.getTrainStationCode() == null || trainStation.getTrainStationCode().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Train station code is required");
+            return false;
+        }
+
+        if (trainStation.getTrainStationCityLocation() == null || trainStation.getTrainStationCityLocation().trim().isEmpty()) {
+            System.out.println("✗ Repository: Error: Train station city location is required");
+            return false;
+        }
+        return true;
     }
 }
