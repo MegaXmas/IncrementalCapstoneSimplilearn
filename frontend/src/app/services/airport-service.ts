@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-// Airport interface matching your backend model
 export interface Airport {
   id?: number;
   airportFullName: string;
