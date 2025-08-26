@@ -4,11 +4,11 @@ import { Observable } from 'rxjs';
 
 // Airport interface matching your backend model
 export interface Airport {
-  airportId?: number;
+  id?: number;
   airportFullName: string;
   airportCode: string;
-  airportLocationCity: string;
-  airportLocationCountry: string;
+  airportCityLocation: string;
+  airportCountryLocation: string;
   airportTimezone: string;
 }
 

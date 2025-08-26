@@ -35,8 +35,8 @@ export class AdminAirportFormComponent implements OnInit {
     this.adminAirportForm = this.fb.group({
       airportFullName: ['', [Validators.required, Validators.minLength(3)]],
       airportCode: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(4)]],
-      airportLocationCity: ['', [Validators.required, Validators.minLength(2)]],
-      airportLocationCountry: ['', [Validators.required, Validators.minLength(2)]],
+      airportCityLocation: ['', [Validators.required, Validators.minLength(2)]],
+      airportCountryLocation: ['', [Validators.required, Validators.minLength(2)]],
       airportTimezone: ['', [Validators.required]]
     });
   }
@@ -59,8 +59,8 @@ export class AdminAirportFormComponent implements OnInit {
       const airportData: Airport = {
         airportFullName: this.adminAirportForm.value.airportFullName,
         airportCode: this.adminAirportForm.value.airportCode.toUpperCase(), // Airport codes are typically uppercase
-        airportLocationCity: this.adminAirportForm.value.airportLocationCity,
-        airportLocationCountry: this.adminAirportForm.value.airportLocationCountry,
+        airportCityLocation: this.adminAirportForm.value.airportCityLocation,
+        airportCountryLocation: this.adminAirportForm.value.airportCountryLocation,
         airportTimezone: this.adminAirportForm.value.airportTimezone
       };
 

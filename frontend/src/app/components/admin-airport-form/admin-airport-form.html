@@ -47,15 +47,15 @@
 
     <!-- Airport Location City field group -->
     <div class="form-group">
-      <label for="airportLocationCity">Airport Location City</label>
+      <label for="airportCityLocation">Airport City</label>
       <input type="text"
              class="form-control"
-             id="airportLocationCity"
-             name="airportLocationCity"
-             formControlName="airportLocationCity"
+             id="airportCityLocation"
+             name="airportCityLocation"
+             formControlName="airportCityLocation"
              required
-             [class.invalid]="adminAirportForm.get('airportLocationCity')?.invalid && (adminAirportForm.get('airportLocationCity')?.dirty || adminAirportForm.get('airportLocationCity')?.touched)">
-      @if (isFieldInvalid('airportLocationCity')) {
+             [class.invalid]="adminAirportForm.get('airportCityLocation')?.invalid && (adminAirportForm.get('airportCityLocation')?.dirty || adminAirportForm.get('airportCityLocation')?.touched)">
+      @if (isFieldInvalid('airportCityLocation')) {
         <div class="text-danger">
           Enter the city in which the airport is located
         </div>
@@ -64,15 +64,15 @@
 
     <!-- Airport Location Country field group -->
     <div class="form-group">
-      <label for="airportLocationCountry">Airport Location Country</label>
+      <label for="airportCountryLocation">Airport Country</label>
       <input type="text"
              class="form-control"
-             id="airportLocationCountry"
-             name="airportLocationCountry"
-             formControlName="airportLocationCountry"
+             id="airportCountryLocation"
+             name="airportCountryLocation"
+             formControlName="airportCountryLocation"
              required
-             [class.invalid]="adminAirportForm.get('airportLocationCountry')?.invalid && (adminAirportForm.get('airportLocationCountry')?.dirty || adminAirportForm.get('airportLocationCountry')?.touched)">
-      @if (isFieldInvalid('airportLocationCountry')) {
+             [class.invalid]="adminAirportForm.get('airportCountryLocation')?.invalid && (adminAirportForm.get('airportCountryLocation')?.dirty || adminAirportForm.get('airportCountryLocation')?.touched)">
+      @if (isFieldInvalid('airportCountryLocation')) {
         <div class="text-danger">
           Enter the country in which the airport is located
         </div>
