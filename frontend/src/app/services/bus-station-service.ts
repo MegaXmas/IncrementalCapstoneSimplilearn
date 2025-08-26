@@ -6,7 +6,7 @@ export interface BusStation {
   id?: number;
   busStationFullName: string;
   busStationCode: string;
-  busStationtCityLocation: string;
+  busStationCityLocation: string;
 }
 
 @Injectable({

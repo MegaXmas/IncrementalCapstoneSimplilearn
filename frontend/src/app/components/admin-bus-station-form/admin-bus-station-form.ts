@@ -50,7 +50,7 @@ export class AdminBusStationFormComponent implements OnInit {
       const busStationData: BusStation = {
         busStationFullName: this.adminBusStationForm.value.busStationFullName,
         busStationCode: this.adminBusStationForm.value.busStationCode.toUpperCase(),
-        busStationtCityLocation: this.adminBusStationForm.value.busStationCityLocation
+        busStationCityLocation: this.adminBusStationForm.value.busStationCityLocation
       };
 
       console.log('Submitting bus station data:', busStationData);
