@@ -6,6 +6,7 @@ import { BusFormComponent } from './components/bus-form/bus-form';
 import { UserBusBookingComponent } from './components/user-bus-booking/user-bus-booking';
 import { AdminAirportFormComponent } from './components/admin-airport-form/admin-airport-form';
 import { AdminBusStationFormComponent } from './components/admin-bus-station-form/admin-bus-station-form';
+import { AdminTrainStationFormComponent } from './components/admin-train-station-form/admin-train-station-form';
 
 // Define application routes
 export const routes: Routes = [
@@ -25,6 +26,9 @@ export const routes: Routes = [
 
     { path: 'admin/bus-station/add', component: AdminBusStationFormComponent },
     { path: 'admin-bus-station-form', component: AdminBusStationFormComponent },
+
+    { path: 'admin/train-station/add', component: AdminTrainStationFormComponent },
+    { path: 'admin-train-station-form', component: AdminTrainStationFormComponent },
     
     // Wildcard route - must be last
     { path: '**', redirectTo: '/login' }
