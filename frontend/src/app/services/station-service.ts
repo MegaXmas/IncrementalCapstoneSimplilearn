@@ -115,4 +115,42 @@ export class StationService {
         })
       );
   }
+
+  /**
+   * Search bus stations by any term (name, code, or city)
+   * Now implemented - connects to bus station controller
+   */
+  searchBusStations(query: string): Observable<BusStation[]> {
+    if (!query || query.trim().length === 0) {
+      return of([]);
+    }
+
+    // Use 'searchTerm' parameter to match your bus controller
+    const params = new HttpParams().set('searchTerm', query.trim());
+    
+    return this.http.get<BusStation[]>(`${this.baseUrl}/bus-stations/search`, { params })
+      .pipe(
+        map(stations => {
+          console.log(`Bus station search found ${stations.length} results for "${query}"`);
+          return stations;
+        }),
+        catchError(error => {
+          console.error('Bus station search error:', error);
+          return of([]);
+        })
+      );
+  }
+
+  /**
+   * Get a bus station by ID
+   */
+  getBusStationById(id: string): Observable<BusStation | null> {
+    return this.http.get<BusStation>(`${this.baseUrl}/bus-stations/${id}`)
+      .pipe(
+        catchError(error => {
+          console.error('Error fetching bus station:', error);
+          return of(null);
+        })
+      );
+  }
 }

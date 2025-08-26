@@ -91,23 +91,24 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
     }
   }
 
-  /**
-   * Search stations using backend service
-   */
+    /**
+     * Search stations using backend service
+     */
   private searchStations(query: string): Observable<Station[]> {
     if (!query || query.trim().length < 2) {
       return of([]);
     }
 
-    // For now, only airport search is implemented
+    // Now all three types are implemented!
     switch (this.stationType) {
       case 'airport':
         return this.stationService.searchAirports(query).pipe(
           map(airports => this.convertToStationInterface(airports, 'airport'))
         );
       case 'bus':
-        console.log('Bus station search not implemented yet');
-        return of([]);
+        return this.stationService.searchBusStations(query).pipe(
+          map(busStations => this.convertToStationInterface(busStations, 'bus'))
+        );
       case 'train':
         console.log('Train station search not implemented yet');
         return of([]);
@@ -115,6 +116,7 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
         return of([]);
     }
   }
+
 
   /**
    * Convert backend data to simple Station interface
@@ -124,15 +126,14 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
       switch (type) {
         case 'airport':
           return {
-            id: station.id.toString(), // Convert number to string
+            id: station.id.toString(),
             fullName: station.airportFullName,
             code: station.airportCode,
             cityLocation: station.airportCityLocation
           };
         case 'bus':
-          // TODO: Implement when bus stations are ready
           return {
-            id: station.busStationId,
+            id: station.busStationId.toString(),
             fullName: station.busStationFullName,
             code: station.busStationCode,
             cityLocation: station.busStationCityLocation
@@ -140,7 +141,7 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
         case 'train':
           // TODO: Implement when train stations are ready
           return {
-            id: station.trainStationId,
+            id: station.trainStationId.toString(),
             fullName: station.trainStationFullName,
             code: station.trainStationCode,
             cityLocation: station.trainStationCityLocation
