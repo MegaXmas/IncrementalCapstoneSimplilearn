@@ -1,26 +1,13 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { LoginComponent } from './components/login/login';
 import { HeaderComponent } from './components/header/header';
-import { FlightFormComponent } from "./components/flight-form/flight-form";
-import { TrainFormComponent } from "./components/train-form/train-form";
-import { BusFormComponent } from "./components/bus-form/bus-form";
-import { UserBusBookingComponent } from "./components/user-bus-booking/user-bus-booking";
-import { StationSearchComponent } from './components/shared/station-search/station-search';
-import {AdminAirportFormComponent} from './components/admin-airport-form/admin-airport-form';
+
 
 @Component({
   selector: 'app-root',
   imports: [
     RouterOutlet,
-    // LoginComponent,
     HeaderComponent,
-    // FlightFormComponent,
-    // TrainFormComponent,
-    // BusFormComponent,
-    // UserBusBookingComponent,
-    // StationSearchComponent,
-    // AdminAirportFormComponent
 ],
   templateUrl: './app.html',
   styleUrl: './app.css'

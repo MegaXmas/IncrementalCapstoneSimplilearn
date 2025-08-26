@@ -26,7 +26,7 @@ export class AdminBusStationFormComponent implements OnInit {
   ngOnInit(): void {
     this.adminBusStationForm = this.fb.group({
       busStationFullName: ['', Validators.required],
-      busStationCode: ['', [Validators.required, Validators.pattern(/^[A-Z]{3}$/)]],
+      busStationCode: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(6)]],
       busStationCityLocation: ['', Validators.required],
     });
 
@@ -49,10 +49,8 @@ export class AdminBusStationFormComponent implements OnInit {
     
       const busStationData: BusStation = {
         busStationFullName: this.adminBusStationForm.value.busStationFullName,
-        busStationCode: this.adminBusStationForm.value.busStationCode,
-        busStationtCityLocation: this.adminBusStationForm.value.busStationCityLocation,
-        busStationCountryLocation: this.adminBusStationForm.value.busStationCountryLocation || 'United States',
-        busStationTimezone: this.adminBusStationForm.value.busStationTimezone
+        busStationCode: this.adminBusStationForm.value.busStationCode.toUpperCase(),
+        busStationtCityLocation: this.adminBusStationForm.value.busStationCityLocation
       };
 
       console.log('Submitting bus station data:', busStationData);

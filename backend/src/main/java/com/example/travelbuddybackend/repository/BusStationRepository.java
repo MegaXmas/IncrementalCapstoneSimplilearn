@@ -176,19 +176,6 @@ public class BusStationRepository {
             return false;
         }
 
-        // ID validation - check if exists in database
-        if (busStation.getId() == null || busStation.getId() <= 0) {
-            System.out.println("✗ Repository: Error: Bus station must have a valid ID");
-            return false;
-        }
-
-        Optional<BusStation> existingStation = findById(busStation.getId());
-        if (existingStation.isEmpty()) {
-            System.out.println("✗ Repository: Error: Bus station with ID " + busStation.getId() + " does not exist in database");
-            return false;
-        }
-
-        // Field validation - only proceed if ID exists
         if (busStation.getBusStationFullName() == null || busStation.getBusStationFullName().trim().isEmpty()) {
             System.out.println("✗ Repository: Error: Bus station full name is required");
             return false;
