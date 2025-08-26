@@ -187,7 +187,7 @@ public class TrainStationRepository {
             System.out.println("✗ Repository: Error: Cannot update null train station");
             return false;
         }
-        
+
 
         if (trainStation.getTrainStationFullName() == null || trainStation.getTrainStationFullName().trim().isEmpty()) {
             System.out.println("✗ Repository: Error: Train station name is required");
