@@ -7,8 +7,6 @@ export interface BusStation {
   busStationFullName: string;
   busStationCode: string;
   busStationtCityLocation: string;
-  busStationCountryLocation: string;
-  busStationTimezone: string;
 }
 
 @Injectable({
