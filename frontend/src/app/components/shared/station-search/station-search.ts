@@ -33,7 +33,7 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
   @Input() label: string = 'Station';
   @Input() id: string = 'station-search';
   @Input() placeholder: string = 'Search for a station...';
-  @Input() stationType: 'bus' | 'train' | 'airport' = 'airport'; // Default to airport for now
+  @Input() stationType: 'bus' | 'train' | 'airport' = 'airport';
   
   // Basic component state
   searchQuery: string = '';
@@ -54,17 +54,19 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
       debounceTime(300),
       distinctUntilChanged(),
       switchMap(query => {
+        console.log('🔍 Starting search for:', query, 'Type:', this.stationType);
         this.isSearching = true;
         return this.searchStations(query);
       })
     ).subscribe(stations => {
+      console.log('🎯 Search results received:', stations.length, 'stations');
       this.filteredStations = stations;
       this.isSearching = false;
     });
   }
 
   ngOnInit(): void {
-    console.log('Station search component initialized for type:', this.stationType);
+    console.log('🚀 Station search component initialized for type:', this.stationType);
   }
 
   /**
@@ -74,54 +76,69 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
     const query = (event.target as HTMLInputElement).value;
     this.searchQuery = query;
 
-    // Log keyup for tracking as requested
-    console.log('Station search keyup:', {
+    // ENHANCED LOGGING
+    console.log('⌨️ KEYUP EVENT:', {
       key: event.key,
       query: query,
+      queryLength: query.length,
       stationType: this.stationType,
       timestamp: new Date().toLocaleTimeString()
     });
 
     // Trigger search
-    if (query.length >= 2) { // Start searching after 2 characters
+    if (query.length >= 2) {
+      console.log('✅ Query length >= 2, triggering search...');
       this.searchSubject.next(query);
     } else {
+      console.log('❌ Query too short, clearing results');
       this.filteredStations = [];
       this.isSearching = false;
     }
   }
 
-    /**
-     * Search stations using backend service
-     */
+  /**
+   * Search stations using backend service
+   */
   private searchStations(query: string): Observable<Station[]> {
     if (!query || query.trim().length < 2) {
       return of([]);
     }
 
-    // Now all three types are implemented!
+    console.log('🔎 searchStations called with:', query, 'for type:', this.stationType);
+
     switch (this.stationType) {
       case 'airport':
+        console.log('✈️ Searching airports...');
         return this.stationService.searchAirports(query).pipe(
           map(airports => this.convertToStationInterface(airports, 'airport'))
         );
+      
       case 'bus':
+        console.log('🚌 Searching bus stations...');
         return this.stationService.searchBusStations(query).pipe(
-          map(busStations => this.convertToStationInterface(busStations, 'bus'))
+          map(busStations => {
+            console.log('🚌 Raw bus stations from API:', busStations);
+            return this.convertToStationInterface(busStations, 'bus');
+          })
         );
+      
       case 'train':
-        console.log('Train station search not implemented yet');
+        console.log('🚂 Train station search not implemented yet');
         return of([]);
+      
       default:
+        console.log('❓ Unknown station type:', this.stationType);
         return of([]);
     }
   }
-
 
   /**
    * Convert backend data to simple Station interface
    */
   private convertToStationInterface(stations: any[], type: string): Station[] {
+    console.log(`🔄 Converting ${stations.length} ${type} stations to interface`);
+    console.log('🔄 First station structure:', stations[0]);
+    
     return stations.map(station => {
       switch (type) {
         case 'airport':
@@ -132,14 +149,16 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
             cityLocation: station.airportCityLocation
           };
         case 'bus':
-          return {
-            id: station.busStationId.toString(),
+          // Backend returns 'id' not 'busStationId'
+          const converted = {
+            id: station.id.toString(),                    // ✅ Use 'id' not 'busStationId'
             fullName: station.busStationFullName,
             code: station.busStationCode,
             cityLocation: station.busStationCityLocation
           };
+          console.log('🚌 Converted bus station:', station, '→', converted);
+          return converted;
         case 'train':
-          // TODO: Implement when train stations are ready
           return {
             id: station.trainStationId.toString(),
             fullName: station.trainStationFullName,
@@ -156,6 +175,7 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
    * Select a station from search results
    */
   selectStation(station: Station): void {
+    console.log('✅ Station selected:', station);
     this.selectedStation = station;
     this.searchQuery = `${station.code} - ${station.fullName}`;
     this.filteredStations = [];
@@ -163,22 +183,17 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
     // Update form value with the station ID
     this.onChange(station.id);
     this.onTouch();
-
-    console.log('Station selected:', {
-      station: station,
-      stationType: this.stationType
-    });
   }
 
   /**
    * Clear the current selection
    */
   clearSelection(): void {
+    console.log('🗑️ Station selection cleared');
     this.selectedStation = null;
     this.searchQuery = '';
     this.filteredStations = [];
     this.onChange(null);
-    console.log('Station selection cleared');
   }
 
   // Required ControlValueAccessor methods
@@ -186,7 +201,6 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
     if (!value) {
       this.clearSelection();
     }
-    // TODO: If value is provided, fetch and display the station
   }
 
   registerOnChange(fn: any): void {

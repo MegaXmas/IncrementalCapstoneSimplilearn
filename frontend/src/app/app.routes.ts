@@ -7,6 +7,7 @@ import { UserBusBookingComponent } from './components/user-bus-booking/user-bus-
 import { AdminAirportFormComponent } from './components/admin-airport-form/admin-airport-form';
 import { AdminBusStationFormComponent } from './components/admin-bus-station-form/admin-bus-station-form';
 import { AdminTrainStationFormComponent } from './components/admin-train-station-form/admin-train-station-form';
+import { StationSearchComponent } from './components/shared/station-search/station-search';
 
 // Define application routes
 export const routes: Routes = [
