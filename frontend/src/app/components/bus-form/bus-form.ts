@@ -80,6 +80,8 @@ export class BusFormComponent implements OnInit {
    * Fetch station objects by their IDs and create the BusDetails
    */
   private getStationObjects(departureStationId: string, arrivalStationId: string): void {
+    console.log('🔍 Fetching stations with IDs:', { departureStationId, arrivalStationId });
+
     // Fetch both stations in parallel
     const departure$ = this.stationService.getBusStationById(departureStationId);
     const arrival$ = this.stationService.getBusStationById(arrivalStationId);
@@ -90,6 +92,8 @@ export class BusFormComponent implements OnInit {
       arrivalStation: arrival$
     }).subscribe({
       next: (stations) => {
+        console.log('🚉 Fetched stations:', stations);
+
         if (!stations.departureStation || !stations.arrivalStation) {
           this.submitMessage = 'Error: Could not fetch station details. Please try again.';
           this.submitSuccess = false;
@@ -97,18 +101,18 @@ export class BusFormComponent implements OnInit {
           return;
         }
 
-        // Create the BusDetails object with full station data
+        // Create the BusDetails object with full station data (matches Java model)
         const busDetailsData: BusDetails = {
           busNumber: this.busForm.value.busNumber,
           busLine: this.busForm.value.busLine,
           busDepartureStation: {
-            id: parseInt(stations.departureStation.id),
+            id: stations.departureStation.id,                              
             busStationFullName: stations.departureStation.busStationFullName,
             busStationCode: stations.departureStation.busStationCode,
             busStationCityLocation: stations.departureStation.busStationCityLocation
           },
           busArrivalStation: {
-            id: parseInt(stations.arrivalStation.id),
+            id: stations.arrivalStation.id,                                
             busStationFullName: stations.arrivalStation.busStationFullName,
             busStationCode: stations.arrivalStation.busStationCode,
             busStationCityLocation: stations.arrivalStation.busStationCityLocation
@@ -118,21 +122,23 @@ export class BusFormComponent implements OnInit {
           busArrivalDate: this.busForm.value.busArrivalDate,
           busArrivalTime: this.busForm.value.busArrivalTime,
           busRideDuration: this.busForm.value.busRideDuration,
-          busRidePrice: parseFloat(this.busForm.value.busRidePrice)
+          busRidePrice: this.busForm.value.busRidePrice.toString()
         };
 
-        console.log('Submitting bus details data:', busDetailsData);
+        console.log('📤 Submitting bus details data:', busDetailsData);
+        console.log('🚉 Departure station:', stations.departureStation);
+        console.log('🚉 Arrival station:', stations.arrivalStation);
 
         this.busDetailsService.addBusDetails(busDetailsData).subscribe({
           next: (response) => {
-            console.log('Bus Details added successfully:', response);
+            console.log('✅ Bus Details added successfully:', response);
             this.submitMessage = response;
             this.submitSuccess = true;
             this.isSubmitting = false;
             this.busForm.reset();
           },
           error: (error) => {
-            console.error('Error adding bus Details:', error);
+            console.error('❌ Error adding bus Details:', error);
             this.submitMessage = 'Failed to add bus Details. Please try again.';
             this.submitSuccess = false;
             this.isSubmitting = false;
@@ -140,7 +146,7 @@ export class BusFormComponent implements OnInit {
         });
       },
       error: (error) => {
-        console.error('Error fetching stations:', error);
+        console.error('❌ Error fetching stations:', error);
         this.submitMessage = 'Error: Could not fetch station details. Please try again.';
         this.submitSuccess = false;
         this.isSubmitting = false;

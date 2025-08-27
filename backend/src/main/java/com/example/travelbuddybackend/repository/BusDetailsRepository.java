@@ -288,21 +288,24 @@ public class BusDetailsRepository {
         }
     }
 
+// Fix this method in your BusDetailsRepository.java
+
     public boolean createBusDetails(BusDetails busDetails) {
         if (!isValidForRepository(busDetails)) {
             return false;
         }
 
         try {
-            // Using your exact database column names
+            // Insert STATION CODES (not IDs) to match your database foreign key constraint
             int rowsAffected = jdbcTemplate.update(
                     "INSERT INTO bus_details (busNumber, busLine, busDepartureStation, busArrivalStation, " +
                             "busDepartureDate, busDepartureTime, busArrivalDate, busArrivalTime, " +
                             "busRideDuration, busRidePrice) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     busDetails.getBusNumber(),
                     busDetails.getBusLine(),
-                    busDetails.getBusDepartureStation() != null ? busDetails.getBusDepartureStation().getId() : null,
-                    busDetails.getBusArrivalStation() != null ? busDetails.getBusArrivalStation().getId() : null,
+                    // ✅ Use station CODES, not IDs
+                    busDetails.getBusDepartureStation() != null ? busDetails.getBusDepartureStation().getBusStationCode() : null,
+                    busDetails.getBusArrivalStation() != null ? busDetails.getBusArrivalStation().getBusStationCode() : null,
                     busDetails.getBusDepartureDate(),
                     busDetails.getBusDepartureTime(),
                     busDetails.getBusArrivalDate(),

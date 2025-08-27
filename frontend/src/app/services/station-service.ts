@@ -5,7 +5,7 @@ import { map, catchError } from 'rxjs/operators';
 
 // Backend data interfaces - matching your Java models
 export interface BusStation {
-  busStationId: string;
+  id: number;
   busStationFullName: string;
   busStationCode: string;
   busStationCityLocation: string;
@@ -13,7 +13,7 @@ export interface BusStation {
 }
 
 export interface TrainStation {
-  trainStationId: string;
+  id: number;
   trainStationFullName: string;
   trainStationCode: string;
   trainStationCityLocation: string;
@@ -118,13 +118,12 @@ export class StationService {
 
   /**
    * Search bus stations by any term (name, code, or city)
+   * Now implemented - connects to bus station controller
    */
   searchBusStations(query: string): Observable<BusStation[]> {
     if (!query || query.trim().length === 0) {
       return of([]);
     }
-
-    console.log('🌐 StationService: Making HTTP request for bus stations with query:', query);
 
     // Use 'searchTerm' parameter to match your bus controller
     const params = new HttpParams().set('searchTerm', query.trim());
@@ -132,12 +131,11 @@ export class StationService {
     return this.http.get<BusStation[]>(`${this.baseUrl}/bus-stations/search`, { params })
       .pipe(
         map(stations => {
-          console.log(`🌐 StationService: Bus station search found ${stations.length} results for "${query}"`);
-          console.log('🌐 StationService: Raw response:', stations);
+          console.log(`Bus station search found ${stations.length} results for "${query}"`);
           return stations;
         }),
         catchError(error => {
-          console.error('🚨 StationService: Bus station search error:', error);
+          console.error('Bus station search error:', error);
           return of([]);
         })
       );
@@ -147,16 +145,10 @@ export class StationService {
    * Get a bus station by ID
    */
   getBusStationById(id: string): Observable<BusStation | null> {
-    console.log('🌐 StationService: Fetching bus station by ID:', id);
-    
     return this.http.get<BusStation>(`${this.baseUrl}/bus-stations/${id}`)
       .pipe(
-        map(station => {
-          console.log('🌐 StationService: Fetched bus station:', station);
-          return station;
-        }),
         catchError(error => {
-          console.error('🚨 StationService: Error fetching bus station:', error);
+          console.error('Error fetching bus station:', error);
           return of(null);
         })
       );
