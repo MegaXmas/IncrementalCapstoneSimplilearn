@@ -69,7 +69,6 @@ public class BusDetailsService {
             return new ArrayList<>();
         }
 
-        // Find stations by codes using repository
         Optional<BusStation> departureStation = busStationRepository.findByStationCode(departureStationCode.toUpperCase().trim());
         Optional<BusStation> arrivalStation = busStationRepository.findByStationCode(arrivalStationCode.toUpperCase().trim());
 
@@ -83,7 +82,7 @@ public class BusDetailsService {
             return new ArrayList<>();
         }
 
-        return busDetailsRepository.findByRoute(departureStation.get().getId(), arrivalStation.get().getId());
+        return busDetailsRepository.findByRouteStationCodes(departureStation.get().getBusStationCode(), arrivalStation.get().getBusStationCode());
     }
 
     public List<BusDetails> getBusesByRoute(BusStation departureStation, BusStation arrivalStation) {
@@ -92,12 +91,12 @@ public class BusDetailsService {
             return new ArrayList<>();
         }
 
-        if (departureStation.getId() == null || arrivalStation.getId() == null) {
-            System.out.println("✗ Service Error: Station IDs are required");
+        if (departureStation.getBusStationCode() == null || arrivalStation.getBusStationCode() == null) {
+            System.out.println("✗ Service Error: Station codes are required");
             return new ArrayList<>();
         }
 
-        return busDetailsRepository.findByRoute(departureStation.getId(), arrivalStation.getId());
+        return busDetailsRepository.findByRouteStationCodes(departureStation.getBusStationCode(), arrivalStation.getBusStationCode());
     }
 
     public List<BusDetails> getBusesByDepartureDate(String departureDate) {
@@ -119,12 +118,6 @@ public class BusDetailsService {
             return false;
         }
 
-        // Check for duplicate bus number
-        if (busDetailsRepository.findByBusNumber(busDetails.getBusNumber()).isPresent()) {
-            System.out.println("✗ Service Error: Bus number already exists: " + busDetails.getBusNumber());
-            return false;
-        }
-
         boolean success = busDetailsRepository.createBusDetails(busDetails);
         if (success) {
             System.out.println("✓ Service: Bus added successfully");
@@ -140,20 +133,13 @@ public class BusDetailsService {
         }
 
         if (busDetails.getId() == null || busDetails.getId() <= 0) {
-            System.out.println("✗ Service Error: Valid bus ID required for update");
+            System.out.println("✗ Service Error: Valid id required for update");
             return false;
         }
 
         // Check if bus exists
         if (busDetailsRepository.findById(busDetails.getId()).isEmpty()) {
-            System.out.println("✗ Service Error: Bus not found for update");
-            return false;
-        }
-
-        // Check for duplicate bus number (excluding current bus)
-        Optional<BusDetails> existingBus = busDetailsRepository.findByBusNumber(busDetails.getBusNumber());
-        if (existingBus.isPresent() && !existingBus.get().getId().equals(busDetails.getId())) {
-            System.out.println("✗ Service Error: Bus number already exists: " + busDetails.getBusNumber());
+            System.out.println("✗ Service Error: Bus details not found for update");
             return false;
         }
 

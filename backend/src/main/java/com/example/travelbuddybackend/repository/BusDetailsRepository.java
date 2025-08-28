@@ -57,67 +57,31 @@ public class BusDetailsRepository {
         }
     }
 
-    // Simple RowMapper matching your exact database column names
-    private static class SimpleBusDetailsRowMapper implements RowMapper<BusDetails> {
-        @Override
-        public BusDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
-            BusDetails busDetails = new BusDetails();
-            busDetails.setId(rs.getInt("id"));
-            busDetails.setBusNumber(rs.getString("busNumber"));
-            busDetails.setBusLine(rs.getString("busLine"));
-            busDetails.setBusDepartureDate(rs.getString("busDepartureDate"));
-            busDetails.setBusDepartureTime(rs.getString("busDepartureTime"));
-            busDetails.setBusArrivalDate(rs.getString("busArrivalDate"));
-            busDetails.setBusArrivalTime(rs.getString("busArrivalTime"));
-            busDetails.setBusRideDuration(rs.getString("busRideDuration"));
-            busDetails.setBusRidePrice(rs.getString("busRidePrice"));
-
-            // Set station IDs only - stations loaded by service if needed
-            Integer depId = rs.getInt("busDepartureStation");
-            Integer arrId = rs.getInt("busArrivalStation");
-
-            if (depId != 0) {
-                BusStation dep = new BusStation();
-                dep.setId(depId);
-                busDetails.setBusDepartureStation(dep);
-            }
-
-            if (arrId != 0) {
-                BusStation arr = new BusStation();
-                arr.setId(arrId);
-                busDetails.setBusArrivalStation(arr);
-            }
-
-            return busDetails;
-        }
-    }
-
     public List<BusDetails> findAll() {
         try {
-            // CORRECTED SQL using your actual database column names
             String sql = """
-                SELECT 
-                    bd.id as bd_id, 
-                    bd.busNumber as bd_busNumber, 
-                    bd.busLine as bd_busLine,
-                    bd.busDepartureDate as bd_busDepartureDate,
-                    bd.busDepartureTime as bd_busDepartureTime,
-                    bd.busArrivalDate as bd_busArrivalDate,
-                    bd.busArrivalTime as bd_busArrivalTime,
-                    bd.busRideDuration as bd_busRideDuration,
-                    bd.busRidePrice as bd_busRidePrice,
-                    dep.id as dep_id, 
-                    dep.busStationFullName as dep_full_name,
-                    dep.busStationCode as dep_code, 
-                    dep.busStationCityLocation as dep_city,
-                    arr.id as arr_id, 
-                    arr.busStationFullName as arr_full_name,
-                    arr.busStationCode as arr_code, 
-                    arr.busStationCityLocation as arr_city
-                FROM bus_details bd
-                LEFT JOIN bus_stations dep ON bd.busDepartureStation = dep.id
-                LEFT JOIN bus_stations arr ON bd.busArrivalStation = arr.id
-                """;
+            SELECT 
+                bd.id as bd_id, 
+                bd.busNumber as bd_busNumber, 
+                bd.busLine as bd_busLine,
+                bd.busDepartureDate as bd_busDepartureDate,
+                bd.busDepartureTime as bd_busDepartureTime,
+                bd.busArrivalDate as bd_busArrivalDate,
+                bd.busArrivalTime as bd_busArrivalTime,
+                bd.busRideDuration as bd_busRideDuration,
+                bd.busRidePrice as bd_busRidePrice,
+                dep.id as dep_id, 
+                dep.busStationFullName as dep_full_name,
+                dep.busStationCode as dep_code, 
+                dep.busStationCityLocation as dep_city,
+                arr.id as arr_id, 
+                arr.busStationFullName as arr_full_name,
+                arr.busStationCode as arr_code, 
+                arr.busStationCityLocation as arr_city
+            FROM bus_details bd
+            LEFT JOIN bus_stations dep ON bd.busDepartureStation = dep.busStationCode
+            LEFT JOIN bus_stations arr ON bd.busArrivalStation = arr.busStationCode
+            """;
 
             List<BusDetails> buses = jdbcTemplate.query(sql, new BusDetailsRowMapper());
             System.out.println("✓ Repository: Retrieved " + buses.size() + " bus details");
@@ -155,8 +119,8 @@ public class BusDetailsRepository {
                     arr.busStationCode as arr_code, 
                     arr.busStationCityLocation as arr_city
                 FROM bus_details bd
-                LEFT JOIN bus_stations dep ON bd.busDepartureStation = dep.id
-                LEFT JOIN bus_stations arr ON bd.busArrivalStation = arr.id
+                LEFT JOIN bus_stations dep ON bd.busDepartureStation = dep.busStationCode
+                LEFT JOIN bus_stations arr ON bd.busArrivalStation = arr.busStationCode
                 WHERE bd.id = ?
                 """;
 
@@ -202,8 +166,8 @@ public class BusDetailsRepository {
                     arr.busStationCode as arr_code, 
                     arr.busStationCityLocation as arr_city
                 FROM bus_details bd
-                LEFT JOIN bus_stations dep ON bd.busDepartureStation = dep.id
-                LEFT JOIN bus_stations arr ON bd.busArrivalStation = arr.id
+                LEFT JOIN bus_stations dep ON bd.busDepartureStation = dep.busStationCode
+                LEFT JOIN bus_stations arr ON bd.busArrivalStation = arr.busStationCode
                 WHERE bd.busNumber = ?
                 """;
 
@@ -222,41 +186,41 @@ public class BusDetailsRepository {
         }
     }
 
-    public List<BusDetails> findByRoute(Integer departureStationId, Integer arrivalStationId) {
-        if (departureStationId == null || arrivalStationId == null ||
-                departureStationId <= 0 || arrivalStationId <= 0) {
-            System.out.println("✗ Repository: Invalid station IDs");
+    public List<BusDetails> findByRouteStationCodes(String departureStationCode, String arrivalStationCode) {
+        if (departureStationCode == null || departureStationCode.trim().isEmpty() ||
+                arrivalStationCode == null || arrivalStationCode.trim().isEmpty()) {
+            System.out.println("✗ Repository: Invalid station codes");
             return new ArrayList<>();
         }
 
         try {
             String sql = """
-                SELECT 
-                    bd.id as bd_id, 
-                    bd.busNumber as bd_busNumber, 
-                    bd.busLine as bd_busLine,
-                    bd.busDepartureDate as bd_busDepartureDate,
-                    bd.busDepartureTime as bd_busDepartureTime,
-                    bd.busArrivalDate as bd_busArrivalDate,
-                    bd.busArrivalTime as bd_busArrivalTime,
-                    bd.busRideDuration as bd_busRideDuration,
-                    bd.busRidePrice as bd_busRidePrice,
-                    dep.id as dep_id, 
-                    dep.busStationFullName as dep_full_name,
-                    dep.busStationCode as dep_code, 
-                    dep.busStationCityLocation as dep_city,
-                    arr.id as arr_id, 
-                    arr.busStationFullName as arr_full_name,
-                    arr.busStationCode as arr_code, 
-                    arr.busStationCityLocation as arr_city
-                FROM bus_details bd
-                LEFT JOIN bus_stations dep ON bd.busDepartureStation = dep.id
-                LEFT JOIN bus_stations arr ON bd.busArrivalStation = arr.id
-                WHERE bd.busDepartureStation = ? AND bd.busArrivalStation = ?
-                """;
+            SELECT 
+                bd.id as bd_id, 
+                bd.busNumber as bd_busNumber, 
+                bd.busLine as bd_busLine,
+                bd.busDepartureDate as bd_busDepartureDate,
+                bd.busDepartureTime as bd_busDepartureTime,
+                bd.busArrivalDate as bd_busArrivalDate,
+                bd.busArrivalTime as bd_busArrivalTime,
+                bd.busRideDuration as bd_busRideDuration,
+                bd.busRidePrice as bd_busRidePrice,
+                dep.id as dep_id, 
+                dep.busStationFullName as dep_full_name,
+                dep.busStationCode as dep_code, 
+                dep.busStationCityLocation as dep_city,
+                arr.id as arr_id, 
+                arr.busStationFullName as arr_full_name,
+                arr.busStationCode as arr_code, 
+                arr.busStationCityLocation as arr_city
+            FROM bus_details bd
+            LEFT JOIN bus_stations dep ON bd.busDepartureStation = dep.busStationCode
+            LEFT JOIN bus_stations arr ON bd.busArrivalStation = arr.busStationCode
+            WHERE bd.busDepartureStation = ? AND bd.busArrivalStation = ?
+            """;
 
             List<BusDetails> buses = jdbcTemplate.query(sql, new BusDetailsRowMapper(),
-                    departureStationId, arrivalStationId);
+                    departureStationCode, arrivalStationCode);
 
             System.out.println("✓ Repository: Found " + buses.size() + " buses for route");
             return buses;
@@ -273,13 +237,32 @@ public class BusDetailsRepository {
         }
 
         try {
-            // Using your exact database column names
-            List<BusDetails> buses = jdbcTemplate.query(
-                    "SELECT id, busNumber, busLine, busDepartureStation, busArrivalStation, " +
-                            "busDepartureDate, busDepartureTime, busArrivalDate, busArrivalTime, " +
-                            "busRideDuration, busRidePrice FROM bus_details WHERE busDepartureDate = ?",
-                    new SimpleBusDetailsRowMapper(), departureDate);
+            String sql = """
+            SELECT 
+                bd.id as bd_id, 
+                bd.busNumber as bd_busNumber, 
+                bd.busLine as bd_busLine,
+                bd.busDepartureDate as bd_busDepartureDate,
+                bd.busDepartureTime as bd_busDepartureTime,
+                bd.busArrivalDate as bd_busArrivalDate,
+                bd.busArrivalTime as bd_busArrivalTime,
+                bd.busRideDuration as bd_busRideDuration,
+                bd.busRidePrice as bd_busRidePrice,
+                dep.id as dep_id, 
+                dep.busStationFullName as dep_full_name,
+                dep.busStationCode as dep_code, 
+                dep.busStationCityLocation as dep_city,
+                arr.id as arr_id, 
+                arr.busStationFullName as arr_full_name,
+                arr.busStationCode as arr_code, 
+                arr.busStationCityLocation as arr_city
+            FROM bus_details bd
+            LEFT JOIN bus_stations dep ON bd.busDepartureStation = dep.busStationCode
+            LEFT JOIN bus_stations arr ON bd.busArrivalStation = arr.busStationCode
+            WHERE bd.busDepartureDate = ?
+            """;
 
+            List<BusDetails> buses = jdbcTemplate.query(sql, new BusDetailsRowMapper(), departureDate);
             System.out.println("✓ Repository: Found " + buses.size() + " buses for date " + departureDate);
             return buses;
         } catch (Exception e) {
@@ -340,8 +323,8 @@ public class BusDetailsRepository {
                             "WHERE id = ?",
                     busDetails.getBusNumber(),
                     busDetails.getBusLine(),
-                    busDetails.getBusDepartureStation() != null ? busDetails.getBusDepartureStation().getId() : null,
-                    busDetails.getBusArrivalStation() != null ? busDetails.getBusArrivalStation().getId() : null,
+                    busDetails.getBusDepartureStation() != null ? busDetails.getBusDepartureStation().getBusStationCode() : null,
+                    busDetails.getBusArrivalStation() != null ? busDetails.getBusArrivalStation().getBusStationCode() : null,
                     busDetails.getBusDepartureDate(),
                     busDetails.getBusDepartureTime(),
                     busDetails.getBusArrivalDate(),
@@ -351,14 +334,14 @@ public class BusDetailsRepository {
                     busDetails.getId());
 
             if (rowsAffected > 0) {
-                System.out.println("✓ Repository: Bus updated: " + busDetails.getBusNumber());
+                System.out.println("✓ Repository: Bus details updated: " + busDetails.getBusNumber());
                 return true;
             } else {
-                System.out.println("✗ Repository: Bus not found for update");
+                System.out.println("✗ Repository: Bus details not found for update");
                 return false;
             }
         } catch (Exception e) {
-            System.out.println("✗ Repository: Error updating bus: " + e.getMessage());
+            System.out.println("✗ Repository: Error updating bus details: " + e.getMessage());
             return false;
         }
     }
@@ -402,27 +385,35 @@ public class BusDetailsRepository {
             return false;
         }
 
-        if (busDetails.getBusDepartureStation() == null || busDetails.getBusDepartureStation().getId() == null) {
-            System.out.println("✗ Repository: Departure station is required");
+        if (busDetails.getBusDepartureStation() == null ||
+                busDetails.getBusDepartureStation().getBusStationCode() == null ||
+                busDetails.getBusDepartureStation().getBusStationCode().trim().isEmpty()) {
+            System.out.println("✗ Repository: Departure station code is required");
             return false;
         }
 
-        if (busDetails.getBusArrivalStation() == null || busDetails.getBusArrivalStation().getId() == null) {
-            System.out.println("✗ Repository: Arrival station is required");
+        if (busDetails.getBusArrivalStation() == null ||
+                busDetails.getBusArrivalStation().getBusStationCode() == null ||
+                busDetails.getBusArrivalStation().getBusStationCode().trim().isEmpty()) {
+            System.out.println("✗ Repository: Arrival station code is required");
             return false;
         }
 
-        // Verify stations exist in database
-        Optional<BusStation> depStation = busStationRepository.findById(busDetails.getBusDepartureStation().getId());
-        Optional<BusStation> arrStation = busStationRepository.findById(busDetails.getBusArrivalStation().getId());
+        // Verify stations exist in database by their codes
+        Optional<BusStation> depStation = busStationRepository.findByStationCode(
+                busDetails.getBusDepartureStation().getBusStationCode());
+        Optional<BusStation> arrStation = busStationRepository.findByStationCode(
+                busDetails.getBusArrivalStation().getBusStationCode());
 
         if (depStation.isEmpty()) {
-            System.out.println("✗ Repository: Departure station not found in database");
+            System.out.println("✗ Repository: Departure station code not found in database: " +
+                    busDetails.getBusDepartureStation().getBusStationCode());
             return false;
         }
 
         if (arrStation.isEmpty()) {
-            System.out.println("✗ Repository: Arrival station not found in database");
+            System.out.println("✗ Repository: Arrival station code not found in database: " +
+                    busDetails.getBusArrivalStation().getBusStationCode());
             return false;
         }
 

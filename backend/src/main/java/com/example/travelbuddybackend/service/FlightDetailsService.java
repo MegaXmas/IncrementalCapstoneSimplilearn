@@ -69,7 +69,6 @@ public class FlightDetailsService {
             return new ArrayList<>();
         }
 
-        // Find airports by codes using repository (not service)
         Optional<Airport> origin = airportRepository.findByAirportCode(originCode.toUpperCase().trim());
         Optional<Airport> destination = airportRepository.findByAirportCode(destinationCode.toUpperCase().trim());
 
@@ -83,7 +82,7 @@ public class FlightDetailsService {
             return new ArrayList<>();
         }
 
-        return flightDetailsRepository.findByRoute(origin.get().getId(), destination.get().getId());
+        return flightDetailsRepository.findByRoute(origin.get().getAirportCode(), destination.get().getAirportCode());
     }
 
     public List<FlightDetails> getFlightsByRoute(Airport origin, Airport destination) {
@@ -97,7 +96,7 @@ public class FlightDetailsService {
             return new ArrayList<>();
         }
 
-        return flightDetailsRepository.findByRoute(origin.getId(), destination.getId());
+        return flightDetailsRepository.findByRoute(origin.getAirportCode(), destination.getAirportCode());
     }
 
     public List<FlightDetails> getFlightsByDepartureDate(String departureDate) {
@@ -119,7 +118,6 @@ public class FlightDetailsService {
             return false;
         }
 
-        // Check for duplicate flight number
         if (flightDetailsRepository.findByFlightNumber(flightDetails.getFlightNumber()).isPresent()) {
             System.out.println("✗ Service Error: Flight number already exists: " + flightDetails.getFlightNumber());
             return false;
