@@ -1,17 +1,59 @@
 package com.example.travelbuddybackend.models;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+
 public class BusDetails {
 
     private Integer id;
+
+    @NotNull(message = "Bus number is required")
+    @NotBlank(message = "Bus number cannot be blank")
+    @Size(min = 2, max = 20, message = "Bus number must be between 2 and 20 characters")
     private String busNumber;
+
+    @NotNull(message = "Bus line is required")
+    @NotBlank(message = "Bus line cannot be blank")
+    @Size(min = 2, max = 50, message = "Bus line must be between 2 and 50 characters")
     private String busLine;
+
+    @NotNull(message = "Departure station is required")
+    @Valid
     private BusStation busDepartureStation;
+
+    @NotNull(message = "Arrival station is required")
+    @Valid
     private BusStation busArrivalStation;
+
+    @NotNull(message = "Departure date is required")
+    @NotBlank(message = "Departure date cannot be blank")
+    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "Departure date must be in format YYYY-MM-DD")
     private String busDepartureDate;
+
+    @NotNull(message = "Departure time is required")
+    @NotBlank(message = "Departure time cannot be blank")
+    @Pattern(regexp = "([01]?[0-9]|2[0-3]):[0-5][0-9]", message = "Departure time must be in format HH:MM (24-hour)")
     private String busDepartureTime;
+
+    @NotNull(message = "Arrival date is required")
+    @NotBlank(message = "Arrival date cannot be blank")
+    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "Arrival date must be in format YYYY-MM-DD")
     private String busArrivalDate;
+
+    @NotNull(message = "Arrival time is required")
+    @NotBlank(message = "Arrival time cannot be blank")
+    @Pattern(regexp = "([01]?[0-9]|2[0-3]):[0-5][0-9]", message = "Arrival time must be in format HH:MM (24-hour)")
     private String busArrivalTime;
+
+    @NotNull(message = "Ride duration is required")
+    @NotBlank(message = "Ride duration cannot be blank")
+    @Pattern(regexp = "\\d{1,2}h\\s?\\d{0,2}m?|\\d{1,2}h", message = "Duration must be in format like '2h 30m' or '2h'")
     private String busRideDuration;
+
+    @NotNull(message = "Ride price is required")
+    @NotBlank(message = "Ride price cannot be blank")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
+    @Pattern(regexp = "\\d+(\\.\\d{1,2})?", message = "Price must be a valid decimal number with max 2 decimal places")
     private String busRidePrice;
 
     public BusDetails() {}

@@ -1,17 +1,60 @@
 package com.example.travelbuddybackend.models;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+
 public class FlightDetails {
 
     private Integer id;
+
+    @NotNull(message = "Flight number is required")
+    @NotBlank(message = "Flight number cannot be blank")
+    @Size(min = 2, max = 15, message = "Flight number must be between 2 and 15 characters")
+    @Pattern(regexp = "[A-Z]{2}\\d{3,4}", message = "Flight number must follow format like 'AA1234' (airline code + digits)")
     private String flightNumber;
+
+    @NotNull(message = "Airline is required")
+    @NotBlank(message = "Airline cannot be blank")
+    @Size(min = 2, max = 50, message = "Airline name must be between 2 and 50 characters")
     private String flightAirline;
+
+    @NotNull(message = "Origin airport is required")
+    @Valid
     private Airport flightOrigin;
+
+    @NotNull(message = "Destination airport is required")
+    @Valid
     private Airport flightDestination;
+
+    @NotNull(message = "Departure date is required")
+    @NotBlank(message = "Departure date cannot be blank")
+    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "Departure date must be in format YYYY-MM-DD")
     private String flightDepartureDate;
+
+    @NotNull(message = "Arrival date is required")
+    @NotBlank(message = "Arrival date cannot be blank")
+    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "Arrival date must be in format YYYY-MM-DD")
     private String flightArrivalDate;
+
+    @NotNull(message = "Departure time is required")
+    @NotBlank(message = "Departure time cannot be blank")
+    @Pattern(regexp = "([01]?[0-9]|2[0-3]):[0-5][0-9]", message = "Departure time must be in format HH:MM (24-hour)")
     private String flightDepartureTime;
+
+    @NotNull(message = "Arrival time is required")
+    @NotBlank(message = "Arrival time cannot be blank")
+    @Pattern(regexp = "([01]?[0-9]|2[0-3]):[0-5][0-9]", message = "Arrival time must be in format HH:MM (24-hour)")
     private String flightArrivalTime;
+
+    @NotNull(message = "Travel time is required")
+    @NotBlank(message = "Travel time cannot be blank")
+    @Pattern(regexp = "\\d{1,2}h\\s?\\d{0,2}m?|\\d{1,2}h", message = "Travel time must be in format like '2h 30m' or '2h'")
     private String flightTravelTime;
+
+    @NotNull(message = "Flight price is required")
+    @NotBlank(message = "Flight price cannot be blank")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
+    @Pattern(regexp = "\\d+(\\.\\d{1,2})?", message = "Price must be a valid decimal number with max 2 decimal places")
     private String flightPrice;
 
     public FlightDetails() {}

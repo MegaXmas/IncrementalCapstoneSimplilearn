@@ -21,11 +21,11 @@ export interface TrainStation {
 }
 
 export interface Airport {
-  id: number; // Java model uses Integer id
+  id: number;
   airportFullName: string;
   airportCode: string;
-  airportCityLocation: string; // Match Java field name
-  airportCountryLocation: string; // Match Java field name
+  airportCityLocation: string; 
+  airportCountryLocation: string;
   airportTimezone: string;
 }
 
