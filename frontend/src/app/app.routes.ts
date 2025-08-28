@@ -4,6 +4,7 @@ import { FlightFormComponent } from './components/flight-form/flight-form';
 import { TrainFormComponent } from './components/train-form/train-form';
 import { BusFormComponent } from './components/bus-form/bus-form';
 import { UserBusBookingComponent } from './components/user-bus-booking/user-bus-booking';
+import { UserFlightBookingComponent } from './components/user-flight-booking/user-flight-booking';
 import { AdminAirportFormComponent } from './components/admin-airport-form/admin-airport-form';
 import { AdminBusStationFormComponent } from './components/admin-bus-station-form/admin-bus-station-form';
 import { AdminTrainStationFormComponent } from './components/admin-train-station-form/admin-train-station-form';
@@ -20,6 +21,8 @@ export const routes: Routes = [
     { path: 'train-form', component: TrainFormComponent },
     { path: 'bus-form', component: BusFormComponent },
     { path: 'user-bus-booking', component: UserBusBookingComponent },
+    { path: 'user-flight-booking', component: UserFlightBookingComponent },
+
 
     // Admin routes
     { path: 'admin/airport/add', component: AdminAirportFormComponent },
