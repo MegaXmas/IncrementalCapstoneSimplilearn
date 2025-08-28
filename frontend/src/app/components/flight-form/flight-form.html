@@ -13,7 +13,7 @@
                  [class.invalid]="isFieldInvalid('flightNumber')">
           @if (isFieldInvalid('flightNumber')) {
             <div class="text-danger">
-                Flight Number must be exactly 5 characters
+                Flight Number must be 5-10 characters
             </div>
           }
         </div><br>
@@ -35,33 +35,33 @@
         </div><br>
 
         <div class="form-group">
-          <label for="flightOrigin">Flight Origin Airport</label>
-          <input type="text" 
-                 class="form-control" 
-                 id="flightOrigin" 
-                 formControlName="flightOrigin" 
-                 required
-                 [class.invalid]="isFieldInvalid('flightOrigin')">
+          <app-station-search
+            label="Search and select Airport of Origin"
+            id="flightOrigin"
+            placeholder="Type to search for airport..."
+            stationType="airport"
+            formControlName="flightOrigin">
+          </app-station-search>
           @if (isFieldInvalid('flightOrigin')) {
             <div class="text-danger">
-                Enter this flight's airport of origin (minimum 2 characters)
+                Please select an origin airport
             </div>
           }
         </div><br>
 
         <div class="form-group">
-            <label for="flightDestination">Flight Destination Airport</label>
-            <input type="text" 
-                   class="form-control" 
-                   id="flightDestination" 
-                   formControlName="flightDestination" 
-                   required
-                   [class.invalid]="isFieldInvalid('flightDestination')">
-            @if (isFieldInvalid('flightDestination')) {
-              <div class="text-danger">
-                  Enter the destination airport (minimum 2 characters)
-              </div>
-            }
+          <app-station-search
+            label="Search and select Airport destination"
+            id="flightDestination"
+            placeholder="Type to search for airport..."
+            stationType="airport"
+            formControlName="flightDestination">
+          </app-station-search>
+          @if (isFieldInvalid('flightDestination')) {
+            <div class="text-danger">
+                Please select a destination airport
+            </div>
+          }
         </div><br>
 
         <!-- Date Dropdown Components - Simplified validation -->
