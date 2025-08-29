@@ -88,7 +88,7 @@ public class FlightDetails {
     }
 
     public void setFlightNumber(String flightNumber) {
-        this.flightNumber = flightNumber;
+        this.flightNumber = flightNumber != null ? flightNumber.toUpperCase() : null;
     }
 
     public String getFlightAirline() {
