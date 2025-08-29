@@ -74,7 +74,7 @@ export class StationService {
     }
 
     // Use 'term' parameter to match our airport controller
-    const params = new HttpParams().set('term', query.trim());
+    const params = new HttpParams().set('searchTerm', query.trim());
     
     return this.http.get<Airport[]>(`${this.baseUrl}/airports/search`, { params })
       .pipe(

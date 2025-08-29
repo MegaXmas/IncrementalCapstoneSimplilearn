@@ -13,7 +13,7 @@ export interface FlightDetails {
     flightDepartureTime: string; // ISO time string
     flightArrivalDate: string; // ISO date string
     flightArrivalTime: string; // ISO time string
-    flightDuration: string; // e.g., "2h 30m"
+    flightTravelTime: string; // e.g., "2h 30m"
     flightPrice: string; // Price in appropriate currency units
 }
 

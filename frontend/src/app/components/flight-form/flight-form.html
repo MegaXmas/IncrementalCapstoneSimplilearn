@@ -144,5 +144,14 @@
                 [disabled]="flightForm.invalid">
             Submit
         </button>
+
+        
+        @if (submitMessage) {
+          <div class="mt-3">
+            <div [class]="submitSuccess ? 'alert alert-success' : 'alert alert-danger'">
+              {{ submitMessage }}
+            </div>
+          </div>
+        }
       </form>
     </div>

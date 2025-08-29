@@ -8,6 +8,7 @@ import { AirportService } from '../../services/airport-service';
 import { forkJoin } from 'rxjs';
 import { StationService } from '../../services/station-service';
 import { FlightDetailsService, FlightDetails } from '../../services/flight-details-service';
+import { StationSearchComponent } from '../shared/station-search/station-search';
 
 @Component({
   selector: 'app-flight-form',
@@ -17,7 +18,8 @@ import { FlightDetailsService, FlightDetails } from '../../services/flight-detai
     ReactiveFormsModule, 
     DateDropdownComponent,
     TimeDropdownComponent, 
-    DurationDropdownComponent
+    DurationDropdownComponent,
+    StationSearchComponent
   ],
   templateUrl: './flight-form.html',
   styleUrls: ['./flight-form.css','../shared/form-styles.css'],
@@ -35,25 +37,26 @@ export class FlightFormComponent implements OnInit {
     private stationService: StationService) {}
 
   ngOnInit(): void {
-    this.flightForm = this.fb.group({
-      flightNumber: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(10)]],
-      flightAirline: ['', Validators.required],
-      flightOrigin: ['', Validators.required],
-      flightDestination: ['', [Validators.required, Validators.minLength(2)]],
-      flightDepartureDate: ['', Validators.required, Validators.pattern(/\d{4}-\d{2}-\d{2}$/)],
-      flightArrivalDate: ['', Validators.required, Validators.pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)],
-      flightDepartureTime: ['', Validators.required, Validators.pattern(/\d{4}-\d{2}-\d{2}$/)],
-      flightArrivalTime: ['', Validators.required, Validators.pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)],
-      flightTravelTime: ['', [Validators.required, Validators.pattern(/^\d{1,2}h\s?\d{0,2}m?|\d{1,2}h$/)]],
-      flightPrice: ['', [Validators.required, Validators.min(0), Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
-    });
+      this.flightForm = this.fb.group({
+        flightNumber: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(10)]],
+        flightAirline: ['', [Validators.required, Validators.minLength(2)]],
+        flightOrigin: ['', Validators.required],
+        flightDestination: ['', Validators.required],
+        // FIX: Put ALL synchronous validators in the same array
+        flightDepartureDate: ['', [Validators.required, Validators.pattern(/^\d{4}-\d{2}-\d{2}$/)]],
+        flightArrivalDate: ['', [Validators.required, Validators.pattern(/^\d{4}-\d{2}-\d{2}$/)]],
+        flightDepartureTime: ['', [Validators.required, Validators.pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)]],
+        flightArrivalTime: ['', [Validators.required, Validators.pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)]],
+        flightTravelTime: ['', [Validators.required, Validators.pattern(/^\d{1,2}h\s?\d{0,2}m?|\d{1,2}h$/)]],
+        flightPrice: ['', [Validators.required, Validators.min(0), Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
+      });
 
-    console.log('Initial form state:', {
-      dirty: this.flightForm.dirty,
-      pristine: this.flightForm.pristine,
-      valid: this.flightForm.valid
-    });
-  }
+      console.log('Initial form state:', {
+        dirty: this.flightForm.dirty,
+        pristine: this.flightForm.pristine,
+        valid: this.flightForm.valid
+      });
+    }
 
 isFieldInvalid(fieldName: string): boolean {
     const field = this.flightForm.get(fieldName);
@@ -128,7 +131,7 @@ isFieldInvalid(fieldName: string): boolean {
           flightDepartureTime: this.flightForm.value.flightDepartureTime,
           flightArrivalDate: this.flightForm.value.flightArrivalDate,
           flightArrivalTime: this.flightForm.value.flightArrivalTime,
-          flightDuration: this.flightForm.value.flightDuration,
+          flightTravelTime: this.flightForm.value.flightTravelTime,
           flightPrice: this.flightForm.value.flightPrice
         };
 
