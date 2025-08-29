@@ -119,12 +119,6 @@ public class TrainDetailsService {
             return false;
         }
 
-        // Check for duplicate train number
-        if (trainDetailsRepository.findByTrainNumber(trainDetails.getTrainNumber()).isPresent()) {
-            System.out.println("✗ Service Error: Train number already exists: " + trainDetails.getTrainNumber());
-            return false;
-        }
-
         boolean success = trainDetailsRepository.createTrainDetails(trainDetails);
         if (success) {
             System.out.println("✓ Service: Train added successfully");
@@ -146,14 +140,7 @@ public class TrainDetailsService {
 
         // Check if train exists
         if (trainDetailsRepository.findById(trainDetails.getId()).isEmpty()) {
-            System.out.println("✗ Service Error: Train not found for update");
-            return false;
-        }
-
-        // Check for duplicate train number (excluding current train)
-        Optional<TrainDetails> existingTrain = trainDetailsRepository.findByTrainNumber(trainDetails.getTrainNumber());
-        if (existingTrain.isPresent() && !existingTrain.get().getId().equals(trainDetails.getId())) {
-            System.out.println("✗ Service Error: Train number already exists: " + trainDetails.getTrainNumber());
+            System.out.println("✗ Service Error: Train details not found for update");
             return false;
         }
 

@@ -92,7 +92,7 @@ public class TrainDetails {
     }
 
     public void setTrainNumber(String trainNumber) {
-        this.trainNumber = trainNumber;
+        this.trainNumber = trainNumber != null ? trainNumber.toUpperCase() : null;
     }
 
     public String getTrainLine() {

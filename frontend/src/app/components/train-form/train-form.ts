@@ -38,7 +38,7 @@ export class TrainFormComponent implements OnInit {
  
   ngOnInit(): void {
     this.trainForm = this.fb.group({
-      trainNumber: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5)]],
+      trainNumber: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(10)]],
       trainLine: ['', [Validators.required, Validators.minLength(2)]],
       trainDepartureStation: ['', Validators.required],  // This matches the formControlName in template
       trainArrivalStation: ['', Validators.required],    // This matches the formControlName in template

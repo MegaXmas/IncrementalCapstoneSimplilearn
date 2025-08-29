@@ -124,8 +124,8 @@ public class TrainDetailsRepository {
                     arr.trainStationCode as arr_code, 
                     arr.trainStationCityLocation as arr_city
                 FROM train_details td
-                LEFT JOIN train_stations dep ON td.trainDepartureStation = dep.id
-                LEFT JOIN train_stations arr ON td.trainArrivalStation = arr.id
+                LEFT JOIN train_stations dep ON td.trainDepartureStation = dep.trainStationCode
+                LEFT JOIN train_stations arr ON td.trainArrivalStation = arr.trainStationCode
                 """;
 
             List<TrainDetails> trains = jdbcTemplate.query(sql, new TrainDetailsRowMapper());
@@ -164,8 +164,8 @@ public class TrainDetailsRepository {
                     arr.trainStationCode as arr_code, 
                     arr.trainStationCityLocation as arr_city
                 FROM train_details td
-                LEFT JOIN train_stations dep ON td.trainDepartureStation = dep.id
-                LEFT JOIN train_stations arr ON td.trainArrivalStation = arr.id
+                LEFT JOIN train_stations dep ON td.trainDepartureStation = dep.trainStationCode
+                LEFT JOIN train_stations arr ON td.trainArrivalStation = arr.trainStationCode
                 WHERE td.id = ?
                 """;
 
@@ -211,8 +211,8 @@ public class TrainDetailsRepository {
                     arr.trainStationCode as arr_code, 
                     arr.trainStationCityLocation as arr_city
                 FROM train_details td
-                LEFT JOIN train_stations dep ON td.trainDepartureStation = dep.id
-                LEFT JOIN train_stations arr ON td.trainArrivalStation = arr.id
+                LEFT JOIN train_stations dep ON td.trainDepartureStation = dep.trainStationCode
+                LEFT JOIN train_stations arr ON td.trainArrivalStation = arr.trainStationCode
                 WHERE td.trainNumber = ?
                 """;
 
@@ -259,8 +259,8 @@ public class TrainDetailsRepository {
                     arr.trainStationCode as arr_code, 
                     arr.trainStationCityLocation as arr_city
                 FROM train_details td
-                LEFT JOIN train_stations dep ON td.trainDepartureStation = dep.id
-                LEFT JOIN train_stations arr ON td.trainArrivalStation = arr.id
+                LEFT JOIN train_stations dep ON td.trainDepartureStation = dep.trainStationCode
+                LEFT JOIN train_stations arr ON td.trainArrivalStation = arr.trainStationCode
                 WHERE td.trainDepartureStation = ? AND td.trainArrivalStation = ?
                 """;
 
@@ -310,8 +310,8 @@ public class TrainDetailsRepository {
                             "trainRideDuration, trainRidePrice) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     trainDetails.getTrainNumber(),
                     trainDetails.getTrainLine(),
-                    trainDetails.getTrainDepartureStation() != null ? trainDetails.getTrainDepartureStation().getId() : null,
-                    trainDetails.getTrainArrivalStation() != null ? trainDetails.getTrainArrivalStation().getId() : null,
+                    trainDetails.getTrainDepartureStation() != null ? trainDetails.getTrainDepartureStation().getTrainStationCode() : null,
+                    trainDetails.getTrainArrivalStation() != null ? trainDetails.getTrainArrivalStation().getTrainStationCode() : null,
                     trainDetails.getTrainDepartureDate(),
                     trainDetails.getTrainDepartureTime(),
                     trainDetails.getTrainArrivalDate(),

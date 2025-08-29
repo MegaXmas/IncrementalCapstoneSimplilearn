@@ -123,8 +123,14 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
         );
       
       case 'train':
-        console.log('🚂 Train station search not implemented yet');
-        return of([]);
+        console.log('🚌 Searching train stations...');
+        return this.stationService.searchTrainStations(query).pipe(
+          map(trainStations => {
+            console.log('🚌 Raw train stations from API:', trainStations);
+            return this.convertToStationInterface(trainStations, 'train');
+          })
+        );
+      
       
       default:
         console.log('❓ Unknown station type:', this.stationType);
@@ -149,9 +155,8 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
             cityLocation: station.airportCityLocation
           };
         case 'bus':
-          // Backend returns 'id' not 'busStationId'
           const converted = {
-            id: station.id.toString(),                    // ✅ Use 'id' not 'busStationId'
+            id: station.id.toString(),
             fullName: station.busStationFullName,
             code: station.busStationCode,
             cityLocation: station.busStationCityLocation
@@ -160,7 +165,7 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
           return converted;
         case 'train':
           return {
-            id: station.trainStationId.toString(),
+            id: station.id.toString(),
             fullName: station.trainStationFullName,
             code: station.trainStationCode,
             cityLocation: station.trainStationCityLocation
