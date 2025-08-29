@@ -1,6 +1,6 @@
 package com.example.travelbuddybackend.service;
 
-import com.example.travelbuddybackend.models.BusStation;
+import com.example.travelbuddybackend.service.JwtService;
 import com.example.travelbuddybackend.models.Client;
 import com.example.travelbuddybackend.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -218,6 +218,128 @@ public class ClientService {
         }
 
         return updated;
+    }
+
+    /**
+     * Validate a JWT token and return the associated client
+     *
+     * This method is essential for protecting endpoints that require authentication.
+     * It verifies the token is valid and returns the client it belongs to.
+     *
+     * @param token The JWT token from the request header
+     * @return Optional containing the client if token is valid, empty otherwise
+     */
+    public Optional<Client> validateTokenAndGetClient(String token) {
+        try {
+            // First check if the token is structurally valid
+            if (!jwtService.isTokenValid(token)) {
+                System.out.println("✗ Service: Invalid JWT token structure");
+                return Optional.empty();
+            }
+
+            // Extract the username from the token
+            String username = jwtService.extractUsername(token);
+            if (username == null) {
+                System.out.println("✗ Service: No username found in token");
+                return Optional.empty();
+            }
+
+            // Find the client in the database
+            Optional<Client> clientOptional = clientRepository.findByUsername(username);
+            if (clientOptional.isEmpty()) {
+                System.out.println("✗ Service: Client not found for token username: " + username);
+                return Optional.empty();
+            }
+
+            Client client = clientOptional.get();
+
+            // Validate the token against this specific client
+            if (!jwtService.validateToken(token, client)) {
+                System.out.println("✗ Service: Token validation failed for client: " + username);
+                return Optional.empty();
+            }
+
+            System.out.println("✓ Service: Token validated successfully for client: " + username);
+            return Optional.of(client);
+
+        } catch (Exception e) {
+            System.out.println("✗ Service: Error validating token: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Refresh a JWT token
+     *
+     * This allows clients to get a new token before their current one expires,
+     * providing seamless authentication without requiring re-login.
+     *
+     * @param oldToken The current token to refresh
+     * @return New token if successful, null if failed
+     */
+    public String refreshToken(String oldToken) {
+        try {
+            // Validate the current client from the old token
+            Optional<Client> clientOptional = validateTokenAndGetClient(oldToken);
+
+            if (clientOptional.isEmpty()) {
+                System.out.println("✗ Service: Cannot refresh invalid token");
+                return null;
+            }
+
+            // Generate a new token for the same client
+            Client client = clientOptional.get();
+            String newToken = jwtService.generateToken(client);
+
+            System.out.println("✓ Service: Token refreshed successfully for client: " + client.getUsername());
+            return newToken;
+
+        } catch (Exception e) {
+            System.out.println("✗ Service: Error refreshing token: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Get client information from a JWT token without full validation
+     *
+     * This is useful when you need to display user information but don't need
+     * to perform security-critical operations. It's faster than database lookup.
+     *
+     * @param token The JWT token to extract information from
+     * @return Client information embedded in the token, or null if extraction fails
+     */
+    public Client getClientFromToken(String token) {
+        try {
+            // Extract basic information from the token
+            String username = jwtService.extractUsername(token);
+            String email = jwtService.extractEmail(token);
+            String fullName = jwtService.extractFullName(token);
+            Integer clientId = jwtService.extractUserId(token);
+
+            if (username == null || clientId == null) {
+                return null;
+            }
+
+            // Create a basic client object with token information
+            Client client = new Client();
+            client.setId(clientId);
+            client.setUsername(username);
+            client.setEmail(email);
+
+            // Split full name back into first and last name if available
+            if (fullName != null && fullName.contains(" ")) {
+                String[] nameParts = fullName.split(" ", 2);
+                client.setFirstName(nameParts[0]);
+                client.setLastName(nameParts[1]);
+            }
+
+            return client;
+
+        } catch (Exception e) {
+            System.out.println("✗ Service: Error extracting client from token: " + e.getMessage());
+            return null;
+        }
     }
 
     // ============================================================================

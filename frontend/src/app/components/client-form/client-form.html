@@ -1,6 +1,413 @@
 <!-- src/app/components/client/client.component.html -->
 
 <div class="client-container">
+  
+  <!-- Success/Error Messages -->
+  @if (successMessage) {
+    <div class="alert alert-success">
+      {{ successMessage }}
+    </div>
+  }
+  
+  @if (errorMessage) {
+    <div class="alert alert-error">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- Show different content based on login status -->
+  @if (!currentClient) {
+    <!-- Registration/Login Forms (when not logged in) -->
+    
+    <div class="auth-tabs">
+      <button 
+        class="tab-button" 
+        [class.active]="!isLoginMode"
+        (click)="isLoginMode = false">
+        Register
+      </button>
+      <button 
+        class="tab-button" 
+        [class.active]="isLoginMode"
+        (click)="isLoginMode = true">
+        Login
+      </button>
+    </div>
+
+    <!-- Registration Form -->
+    @if (!isLoginMode) {
+      <div class="client-header">
+        <h2>Create Account</h2>
+      </div>
+
+      <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="client-form">
+        
+        <!-- Username Field -->
+        <div class="form-group">
+          <label for="username">Username *</label>
+          <input
+            type="text"
+            id="username"
+            formControlName="username"
+            class="form-control"
+            [class.error]="hasFieldError('username')"
+            placeholder="Enter your username">
+          @if (hasFieldError('username')) {
+            <div class="error-message">
+              {{ getFieldError('username') }}
+            </div>
+          }
+        </div>
+
+        <!-- Email Field -->
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            class="form-control"
+            [class.error]="hasFieldError('email')"
+            placeholder="Enter your email">
+          @if (hasFieldError('email')) {
+            <div class="error-message">
+              {{ getFieldError('email') }}
+            </div>
+          }
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <label for="password">Password *</label>
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            class="form-control"
+            [class.error]="hasFieldError('password')"
+            placeholder="Enter your password">
+          @if (hasFieldError('password')) {
+            <div class="error-message">
+              {{ getFieldError('password') }}
+            </div>
+          }
+          <small class="field-hint">
+            Must contain uppercase, lowercase, number, and special character
+          </small>
+        </div>
+
+        <!-- Name Fields Row -->
+        <div class="form-row">
+          <div class="form-group half-width">
+            <label for="firstName">First Name *</label>
+            <input
+              type="text"
+              id="firstName"
+              formControlName="firstName"
+              class="form-control"
+              [class.error]="hasFieldError('firstName')"
+              placeholder="First name">
+            @if (hasFieldError('firstName')) {
+              <div class="error-message">
+                {{ getFieldError('firstName') }}
+              </div>
+            }
+          </div>
+
+          <div class="form-group half-width">
+            <label for="lastName">Last Name *</label>
+            <input
+              type="text"
+              id="lastName"
+              formControlName="lastName"
+              class="form-control"
+              [class.error]="hasFieldError('lastName')"
+              placeholder="Last name">
+            @if (hasFieldError('lastName')) {
+              <div class="error-message">
+                {{ getFieldError('lastName') }}
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Phone Field -->
+        <div class="form-group">
+          <label for="phone">Phone Number *</label>
+          <input
+            type="tel"
+            id="phone"
+            formControlName="phone"
+            class="form-control"
+            [class.error]="hasFieldError('phone')"
+            placeholder="+1234567890">
+          @if (hasFieldError('phone')) {
+            <div class="error-message">
+              {{ getFieldError('phone') }}
+            </div>
+          }
+        </div>
+
+        <!-- Address Field -->
+        <div class="form-group">
+          <label for="address">Address</label>
+          <textarea
+            id="address"
+            formControlName="address"
+            class="form-control"
+            [class.error]="hasFieldError('address')"
+            placeholder="Enter your address"
+            rows="3">
+          </textarea>
+          @if (hasFieldError('address')) {
+            <div class="error-message">
+              {{ getFieldError('address') }}
+            </div>
+          }
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isLoading">
+            @if (isLoading) {
+              <span class="loading-spinner"></span>
+            }
+            {{ isLoading ? 'Creating Account...' : 'Create Account' }}
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="resetForm()"
+            [disabled]="isLoading">
+            Clear Form
+          </button>
+        </div>
+      </form>
+    }
+
+    <!-- Login Form -->
+    @if (isLoginMode) {
+      <div class="client-header">
+        <h2>Login</h2>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()" class="client-form">
+        <div class="form-group">
+          <label for="loginUsername">Username or Email *</label>
+          <input
+            type="text"
+            id="loginUsername"
+            formControlName="usernameOrEmail"
+            class="form-control"
+            placeholder="Enter username or email">
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Password *</label>
+          <input
+            type="password"
+            id="loginPassword"
+            formControlName="password"
+            class="form-control"
+            placeholder="Enter your password">
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isLoading || loginForm.invalid">
+            @if (isLoading) {
+              <span class="loading-spinner"></span>
+            }
+            {{ isLoading ? 'Logging in...' : 'Login' }}
+          </button>
+        </div>
+      </form>
+    }
+  }
+
+  <!-- User Profile Display (when logged in) -->
+  @if (currentClient && !isEditMode) {
+    <div class="client-info">
+      <div class="profile-header">
+        <h3>Welcome, {{ currentClient.firstName }}!</h3>
+        <button class="btn btn-secondary logout-btn" (click)="onLogout()">
+          Logout
+        </button>
+      </div>
+      
+      <div class="info-grid">
+        <div class="info-item">
+          <strong>Name:</strong>
+          <span>{{ currentClient.firstName }} {{ currentClient.lastName }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Username:</strong>
+          <span>{{ currentClient.username }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Email:</strong>
+          <span>{{ currentClient.email }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Phone:</strong>
+          <span>{{ currentClient.phone }}</span>
+        </div>
+        @if (currentClient.address) {
+          <div class="info-item">
+            <strong>Address:</strong>
+            <span>{{ currentClient.address }}</span>
+          </div>
+        }
+        @if (currentClient.createdAt) {
+          <div class="info-item">
+            <strong>Member Since:</strong>
+            <span>{{ currentClient.createdAt | date:'mediumDate' }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="profile-actions">
+        <button class="btn btn-primary" (click)="toggleEditMode()">
+          Edit Profile
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Profile Edit Form (when in edit mode) -->
+  @if (currentClient && isEditMode) {
+    <div class="client-header">
+      <h2>Edit Profile</h2>
+    </div>
+
+    <form [formGroup]="clientForm" (ngSubmit)="onProfileUpdate()" class="client-form">
+      
+      <!-- Username Field (readonly) -->
+      <div class="form-group">
+        <label for="editUsername">Username</label>
+        <input
+          type="text"
+          id="editUsername"
+          formControlName="username"
+          class="form-control"
+          readonly>
+        <small class="field-hint">Username cannot be changed</small>
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="editEmail">Email Address *</label>
+        <input
+          type="email"
+          id="editEmail"
+          formControlName="email"
+          class="form-control"
+          [class.error]="hasFieldError('email')">
+        @if (hasFieldError('email')) {
+          <div class="error-message">
+            {{ getFieldError('email') }}
+          </div>
+        }
+      </div>
+
+      <!-- Name Fields Row -->
+      <div class="form-row">
+        <div class="form-group half-width">
+          <label for="editFirstName">First Name *</label>
+          <input
+            type="text"
+            id="editFirstName"
+            formControlName="firstName"
+            class="form-control"
+            [class.error]="hasFieldError('firstName')">
+          @if (hasFieldError('firstName')) {
+            <div class="error-message">
+              {{ getFieldError('firstName') }}
+            </div>
+          }
+        </div>
+
+        <div class="form-group half-width">
+          <label for="editLastName">Last Name *</label>
+          <input
+            type="text"
+            id="editLastName"
+            formControlName="lastName"
+            class="form-control"
+            [class.error]="hasFieldError('lastName')">
+          @if (hasFieldError('lastName')) {
+            <div class="error-message">
+              {{ getFieldError('lastName') }}
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Phone Field -->
+      <div class="form-group">
+        <label for="editPhone">Phone Number *</label>
+        <input
+          type="tel"
+          id="editPhone"
+          formControlName="phone"
+          class="form-control"
+          [class.error]="hasFieldError('phone')">
+        @if (hasFieldError('phone')) {
+          <div class="error-message">
+            {{ getFieldError('phone') }}
+          </div>
+        }
+      </div>
+
+      <!-- Address Field -->
+      <div class="form-group">
+        <label for="editAddress">Address</label>
+        <textarea
+          id="editAddress"
+          formControlName="address"
+          class="form-control"
+          [class.error]="hasFieldError('address')"
+          rows="3">
+        </textarea>
+        @if (hasFieldError('address')) {
+          <div class="error-message">
+            {{ getFieldError('address') }}
+          </div>
+        }
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isLoading">
+          @if (isLoading) {
+            <span class="loading-spinner"></span>
+          }
+          {{ isLoading ? 'Updating...' : 'Update Profile' }}
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="toggleEditMode()"
+          [disabled]="isLoading">
+          Cancel
+        </button>
+      </div>
+    </form>
+  }
+
+</div>
+
+<div class="client-container">
   <div class="client-header">
     <h2>{{ isEditMode ? 'Edit Profile' : 'Create Account' }}</h2>
   </div>
