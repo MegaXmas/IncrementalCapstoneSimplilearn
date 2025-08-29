@@ -171,7 +171,7 @@ public class ClientController {
             if (clientOptional.isPresent()) {
                 Client client = clientOptional.get();
                 // Return safe client data (without password)
-                return ResponseEntity.ok(new ApiResponse<>(true, "Profile retrieved successfully", client.getSafeClient()));
+                return ResponseEntity.ok(new ApiResponse<>(true, "Profile retrieved successfully", client));
 
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -228,7 +228,7 @@ public class ClientController {
             boolean success = clientService.updateClient(updatedClient);
 
             if (success) {
-                return ResponseEntity.ok(new ApiResponse<>(true, "Profile updated successfully", updatedClient.getSafeClient()));
+                return ResponseEntity.ok(new ApiResponse<>(true, "Profile updated successfully", updatedClient));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new ApiResponse<>(false, "Failed to update profile", null));

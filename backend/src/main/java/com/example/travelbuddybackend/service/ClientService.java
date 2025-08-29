@@ -168,7 +168,7 @@ public class ClientService {
         System.out.println("✓ Login successful for: " + client.getUsername());
 
         // Return success response with safe client data (no password)
-        return new LoginResponse(true, "Login successful", token, client.getSafeClient());
+        return new LoginResponse(true, "Login successful", token, client);
     }
 
     /**

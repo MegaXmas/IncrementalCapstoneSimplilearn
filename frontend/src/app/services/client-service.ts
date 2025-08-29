@@ -37,7 +37,7 @@ export interface ClientRegistration {
  * Simple form with just the credentials needed
  */
 export interface ClientLogin {
-  username: string;
+  usernameOrEmail: string;
   password: string;
 }
 
@@ -77,7 +77,7 @@ export class ClientService {
    */
   login(loginData: ClientLogin): Observable<ApiResponse<LoginResult>> {
     const loginRequest = {
-      usernameOrEmail: loginData.username, // Your Angular form uses 'username' field
+      usernameOrEmail: loginData.usernameOrEmail,
       password: loginData.password
     };
     

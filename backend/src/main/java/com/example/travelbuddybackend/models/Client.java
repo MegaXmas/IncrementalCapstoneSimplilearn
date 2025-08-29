@@ -1,5 +1,8 @@
 package com.example.travelbuddybackend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.validation.constraints.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -53,6 +56,7 @@ public class Client {
     @Size(max = 100, message = "Email must not exceed 100 characters")
     private String email;                  // Email address (also used for login)
 
+    @JsonIgnore
     @NotNull(message = "Password is required")
     @NotBlank(message = "Password cannot be blank")
     @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
@@ -340,36 +344,6 @@ public class Client {
      */
     public boolean hasPaymentInfo() {
         return credit_card != null && !credit_card.trim().isEmpty();
-    }
-
-    /**
-     * Get a safe version of this client object
-     *
-     * This creates a copy of the client with sensitive information removed.
-     * It's used when sending client data to the frontend - we never want to
-     * send passwords or full credit card numbers to the browser.
-     *
-     * @return Client object with sensitive fields removed
-     */
-    public Client getSafeClient() {
-        Client safeClient = new Client();
-        safeClient.setId(this.id);
-        safeClient.setUsername(this.username);
-        safeClient.setEmail(this.email);
-        safeClient.setFirstName(this.firstName);
-        safeClient.setLastName(this.lastName);
-        safeClient.setPhone(this.phone);
-        safeClient.setAddress(this.address);
-        safeClient.setEnabled(this.enabled);
-        safeClient.setAccountLocked(this.accountLocked);
-        safeClient.setCreatedAt(this.createdAt);
-        safeClient.setLastLogin(this.lastLogin);
-
-        // Sensitive fields are intentionally excluded:
-        // - password (never send to frontend)
-        // - credit_card (only send masked version if needed)
-
-        return safeClient;
     }
 
     /**
