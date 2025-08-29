@@ -9,7 +9,6 @@ export interface BusStation {
   busStationFullName: string;
   busStationCode: string;
   busStationCityLocation: string;
-  busStationCountryLocation: string;
 }
 
 export interface TrainStation {
@@ -17,7 +16,6 @@ export interface TrainStation {
   trainStationFullName: string;
   trainStationCode: string;
   trainStationCityLocation: string;
-  trainStationCountryLocation: string;
 }
 
 export interface Airport {
@@ -149,6 +147,44 @@ export class StationService {
       .pipe(
         catchError(error => {
           console.error('Error fetching bus station:', error);
+          return of(null);
+        })
+      );
+  }
+
+    /**
+   * Search train stations by any term (name, code, or city)
+   * Now implemented - connects to train station controller
+   */
+  searchTrainStations(query: string): Observable<TrainStation[]> {
+    if (!query || query.trim().length === 0) {
+      return of([]);
+    }
+
+    // Use 'searchTerm' parameter to match your train controller
+    const params = new HttpParams().set('searchTerm', query.trim());
+    
+    return this.http.get<TrainStation[]>(`${this.baseUrl}/train-stations/search`, { params })
+      .pipe(
+        map(stations => {
+          console.log(`Train station search found ${stations.length} results for "${query}"`);
+          return stations;
+        }),
+        catchError(error => {
+          console.error('Train station search error:', error);
+          return of([]);
+        })
+      );
+  }
+
+  /**
+   * Get a train station by ID
+   */
+  getTrainStationById(id: string): Observable<TrainStation | null> {
+    return this.http.get<TrainStation>(`${this.baseUrl}/train-stations/${id}`)
+      .pipe(
+        catchError(error => {
+          console.error('Error fetching train station:', error);
           return of(null);
         })
       );
