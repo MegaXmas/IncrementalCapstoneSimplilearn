@@ -15,6 +15,7 @@ export class ClientFormComponent implements OnInit {
 // Form for client registration
   clientForm: FormGroup;
   loginForm: FormGroup;
+  isInvalid: boolean = false;
   
   // Current client data (after login or registration)
   currentClient: Client | null = null;
@@ -134,7 +135,7 @@ onSubmit(): void {
             this.clientService.storeToken(response.data.token);
             // Set current client data
             this.currentClient = response.data.client;
-            this.successMessage = response.message;
+            this.successMessage = response.message || 'Login successful';
             // Switch to profile view
             this.isEditMode = false;
           } else {
@@ -225,7 +226,7 @@ onSubmit(): void {
   private clearMessages(): void {
     this.successMessage = '';
     this.errorMessage = '';
-  }// src/app/components/client/client.component.ts
+  }
 
 
 
@@ -300,7 +301,7 @@ onSubmit(): void {
   /**
    * Check if a field has errors and is touched
    */
-  hasFieldError(fieldName: string): boolean {
+  isFieldInvalid(fieldName: string): boolean {
     const field = this.clientForm.get(fieldName);
     return !!(field?.errors && field.touched);
   }

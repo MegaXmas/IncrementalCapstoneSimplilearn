@@ -50,9 +50,9 @@
             id="username"
             formControlName="username"
             class="form-control"
-            [class.error]="hasFieldError('username')"
+            [class.error]="isFieldInvalid('username')"
             placeholder="Enter your username">
-          @if (hasFieldError('username')) {
+          @if (isFieldInvalid('username')) {
             <div class="error-message">
               {{ getFieldError('username') }}
             </div>
@@ -67,9 +67,9 @@
             id="email"
             formControlName="email"
             class="form-control"
-            [class.error]="hasFieldError('email')"
+            [class.error]="isFieldInvalid('email')"
             placeholder="Enter your email">
-          @if (hasFieldError('email')) {
+          @if (isFieldInvalid('email')) {
             <div class="error-message">
               {{ getFieldError('email') }}
             </div>
@@ -84,9 +84,9 @@
             id="password"
             formControlName="password"
             class="form-control"
-            [class.error]="hasFieldError('password')"
+            [class.error]="isFieldInvalid('password')"
             placeholder="Enter your password">
-          @if (hasFieldError('password')) {
+          @if (isFieldInvalid('password')) {
             <div class="error-message">
               {{ getFieldError('password') }}
             </div>
@@ -105,9 +105,9 @@
               id="firstName"
               formControlName="firstName"
               class="form-control"
-              [class.error]="hasFieldError('firstName')"
+              [class.error]="isFieldInvalid('firstName')"
               placeholder="First name">
-            @if (hasFieldError('firstName')) {
+            @if (isFieldInvalid('firstName')) {
               <div class="error-message">
                 {{ getFieldError('firstName') }}
               </div>
@@ -121,9 +121,9 @@
               id="lastName"
               formControlName="lastName"
               class="form-control"
-              [class.error]="hasFieldError('lastName')"
+              [class.error]="isFieldInvalid('lastName')"
               placeholder="Last name">
-            @if (hasFieldError('lastName')) {
+            @if (isFieldInvalid('lastName')) {
               <div class="error-message">
                 {{ getFieldError('lastName') }}
               </div>
@@ -139,9 +139,9 @@
             id="phone"
             formControlName="phone"
             class="form-control"
-            [class.error]="hasFieldError('phone')"
+            [class.error]="isFieldInvalid('phone')"
             placeholder="+1234567890">
-          @if (hasFieldError('phone')) {
+          @if (isFieldInvalid('phone')) {
             <div class="error-message">
               {{ getFieldError('phone') }}
             </div>
@@ -155,11 +155,11 @@
             id="address"
             formControlName="address"
             class="form-control"
-            [class.error]="hasFieldError('address')"
+            [class.error]="isFieldInvalid('address')"
             placeholder="Enter your address"
             rows="3">
           </textarea>
-          @if (hasFieldError('address')) {
+          @if (isFieldInvalid('address')) {
             <div class="error-message">
               {{ getFieldError('address') }}
             </div>
@@ -197,22 +197,24 @@
 
       <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="client-form">
         <div class="form-group">
-          <label for="loginUsername">Username or Email *</label>
+          <label for="usernameOrEmail">Username or Email *</label>
           <input
             type="text"
-            id="loginUsername"
+            id="usernameOrEmail"
             formControlName="usernameOrEmail"
             class="form-control"
+            [class.error]="isFieldInvalid('usernameOrEmail')"
             placeholder="Enter username or email">
         </div>
 
         <div class="form-group">
-          <label for="loginPassword">Password *</label>
+          <label for="password">Password *</label>
           <input
             type="password"
-            id="loginPassword"
+            id="password"
             formControlName="password"
             class="form-control"
+            [class.error]="isFieldInvalid('password')"
             placeholder="Enter your password">
         </div>
 
@@ -308,8 +310,8 @@
           id="editEmail"
           formControlName="email"
           class="form-control"
-          [class.error]="hasFieldError('email')">
-        @if (hasFieldError('email')) {
+          [class.error]="isFieldInvalid('email')">
+        @if (isFieldInvalid('email')) {
           <div class="error-message">
             {{ getFieldError('email') }}
           </div>
@@ -325,8 +327,8 @@
             id="editFirstName"
             formControlName="firstName"
             class="form-control"
-            [class.error]="hasFieldError('firstName')">
-          @if (hasFieldError('firstName')) {
+            [class.error]="isFieldInvalid('firstName')">
+          @if (isFieldInvalid('firstName')) {
             <div class="error-message">
               {{ getFieldError('firstName') }}
             </div>
@@ -340,8 +342,8 @@
             id="editLastName"
             formControlName="lastName"
             class="form-control"
-            [class.error]="hasFieldError('lastName')">
-          @if (hasFieldError('lastName')) {
+            [class.error]="isFieldInvalid('lastName')">
+          @if (isFieldInvalid('lastName')) {
             <div class="error-message">
               {{ getFieldError('lastName') }}
             </div>
@@ -357,8 +359,8 @@
           id="editPhone"
           formControlName="phone"
           class="form-control"
-          [class.error]="hasFieldError('phone')">
-        @if (hasFieldError('phone')) {
+          [class.error]="isFieldInvalid('phone')">
+        @if (isFieldInvalid('phone')) {
           <div class="error-message">
             {{ getFieldError('phone') }}
           </div>
@@ -372,10 +374,10 @@
           id="editAddress"
           formControlName="address"
           class="form-control"
-          [class.error]="hasFieldError('address')"
+          [class.error]="isFieldInvalid('address')"
           rows="3">
         </textarea>
-        @if (hasFieldError('address')) {
+        @if (isFieldInvalid('address')) {
           <div class="error-message">
             {{ getFieldError('address') }}
           </div>
@@ -403,208 +405,6 @@
         </button>
       </div>
     </form>
-  }
-
-</div>
-
-<div class="client-container">
-  <div class="client-header">
-    <h2>{{ isEditMode ? 'Edit Profile' : 'Create Account' }}</h2>
-  </div>
-
-  <!-- Client Registration/Edit Form -->
-  <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="client-form">
-    
-    <!-- Username Field -->
-    <div class="form-group">
-      <label for="username">Username *</label>
-      <input
-        type="text"
-        id="username"
-        formControlName="username"
-        class="form-control"
-        [class.error]="hasFieldError('username')"
-        placeholder="Enter your username">
-      @if (hasFieldError('username')) {
-        <div class="error-message">
-          {{ getFieldError('username') }}
-        </div>
-      }
-    </div>
-
-    <!-- Email Field -->
-    <div class="form-group">
-      <label for="email">Email Address *</label>
-      <input
-        type="email"
-        id="email"
-        formControlName="email"
-        class="form-control"
-        [class.error]="hasFieldError('email')"
-        placeholder="Enter your email">
-      @if (hasFieldError('email')) {
-        <div class="error-message">
-          {{ getFieldError('email') }}
-        </div>
-      }
-    </div>
-
-    <!-- Password Field -->
-    @if (!isEditMode) {
-      <div class="form-group">
-        <label for="password">Password *</label>
-        <input
-          type="password"
-          id="password"
-          formControlName="password"
-          class="form-control"
-          [class.error]="hasFieldError('password')"
-          placeholder="Enter your password">
-        @if (hasFieldError('password')) {
-          <div class="error-message">
-            {{ getFieldError('password') }}
-          </div>
-        }
-        <small class="field-hint">
-          Must contain uppercase, lowercase, number, and special character
-        </small>
-      </div>
-    }
-
-    <!-- Name Fields Row -->
-    <div class="form-row">
-      <div class="form-group half-width">
-        <label for="firstName">First Name *</label>
-        <input
-          type="text"
-          id="firstName"
-          formControlName="firstName"
-          class="form-control"
-          [class.error]="hasFieldError('firstName')"
-          placeholder="First name">
-        @if (hasFieldError('firstName')) {
-          <div class="error-message">
-            {{ getFieldError('firstName') }}
-          </div>
-        }
-      </div>
-
-      <div class="form-group half-width">
-        <label for="lastName">Last Name *</label>
-        <input
-          type="text"
-          id="lastName"
-          formControlName="lastName"
-          class="form-control"
-          [class.error]="hasFieldError('lastName')"
-          placeholder="Last name">
-        @if (hasFieldError('lastName')) {
-          <div class="error-message">
-            {{ getFieldError('lastName') }}
-          </div>
-        }
-      </div>
-    </div>
-
-    <!-- Phone Field -->
-    <div class="form-group">
-      <label for="phone">Phone Number *</label>
-      <input
-        type="tel"
-        id="phone"
-        formControlName="phone"
-        class="form-control"
-        [class.error]="hasFieldError('phone')"
-        placeholder="+1234567890">
-      @if (hasFieldError('phone')) {
-        <div class="error-message">
-          {{ getFieldError('phone') }}
-        </div>
-      }
-    </div>
-
-    <!-- Address Field -->
-    <div class="form-group">
-      <label for="address">Address</label>
-      <textarea
-        id="address"
-        formControlName="address"
-        class="form-control"
-        [class.error]="hasFieldError('address')"
-        placeholder="Enter your address"
-        rows="3">
-      </textarea>
-      @if (hasFieldError('address')) {
-        <div class="error-message">
-          {{ getFieldError('address') }}
-        </div>
-      }
-    </div>
-
-    <!-- Form Actions -->
-    <div class="form-actions">
-      <button
-        type="submit"
-        class="btn btn-primary"
-        [disabled]="isLoading">
-        @if (isLoading) {
-          <span class="loading-spinner"></span>
-        }
-        {{ isLoading ? 'Processing...' : (isEditMode ? 'Update Profile' : 'Create Account') }}
-      </button>
-
-      <button
-        type="button"
-        class="btn btn-secondary"
-        (click)="resetForm()"
-        [disabled]="isLoading">
-        {{ isEditMode ? 'Cancel' : 'Clear Form' }}
-      </button>
-    </div>
-
-  </form>
-
-  <!-- Display Current Client Info (when logged in) -->
-  @if (currentClient && !isEditMode) {
-    <div class="client-info">
-      <h3>Account Information</h3>
-      <div class="info-grid">
-        <div class="info-item">
-          <strong>Name:</strong>
-          <span>{{ currentClient.firstName }} {{ currentClient.lastName }}</span>
-        </div>
-        <div class="info-item">
-          <strong>Username:</strong>
-          <span>{{ currentClient.username }}</span>
-        </div>
-        <div class="info-item">
-          <strong>Email:</strong>
-          <span>{{ currentClient.email }}</span>
-        </div>
-        <div class="info-item">
-          <strong>Phone:</strong>
-          <span>{{ currentClient.phone }}</span>
-        </div>
-        @if (currentClient.address) {
-          <div class="info-item">
-            <strong>Address:</strong>
-            <span>{{ currentClient.address }}</span>
-          </div>
-        }
-        @if (currentClient.createdAt) {
-          <div class="info-item">
-            <strong>Member Since:</strong>
-            <span>{{ currentClient.createdAt | date:'mediumDate' }}</span>
-          </div>
-        }
-      </div>
-
-      <div class="profile-actions">
-        <button class="btn btn-primary" (click)="toggleEditMode()">
-          Edit Profile
-        </button>
-      </div>
-    </div>
   }
 
 </div>
