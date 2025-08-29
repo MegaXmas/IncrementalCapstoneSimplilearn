@@ -7,10 +7,10 @@ import { CommonModule } from '@angular/common';
   selector: 'app-login',
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.html',
-  styleUrls: ['./login.css', '../shared/form-styles.css']
+  styleUrls: ['./admin-login.css', '../shared/form-styles.css']
 })
 
-export class LoginComponent implements OnInit {
+export class AdminLoginComponent implements OnInit {
   showPassword = false;
   adminLoginForm!: FormGroup;
 
@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log('form submitted', 
+    console.log('form submitted',
       this.adminLoginForm.value
     )
   }
