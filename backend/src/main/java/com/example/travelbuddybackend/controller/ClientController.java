@@ -6,12 +6,12 @@ import com.example.travelbuddybackend.service.ClientService.LoginRequest;
 import com.example.travelbuddybackend.service.ClientService.LoginResponse;
 import com.example.travelbuddybackend.service.ClientService.RegistrationRequest;
 import com.example.travelbuddybackend.service.ClientService.RegistrationResponse;
+import com.example.travelbuddybackend.service.ValidatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.Optional;
 
 /**
@@ -63,8 +63,7 @@ public class ClientController {
      * @return ResponseEntity with registration result and appropriate HTTP status
      */
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<RegistrationResult>> registerClient(
-            @Valid @RequestBody RegistrationRequest registrationRequest) {
+    public ResponseEntity<ApiResponse<RegistrationResult>> registerClient(@RequestBody RegistrationRequest registrationRequest) {
 
         System.out.println("Registration request received for username: " + registrationRequest.getUsername());
 
@@ -112,7 +111,7 @@ public class ClientController {
      */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResult>> loginClient(
-            @Valid @RequestBody LoginRequest loginRequest) {
+            @RequestBody LoginRequest loginRequest) {
 
         System.out.println("Login request received for: " + loginRequest.getUsernameOrEmail());
 
@@ -199,7 +198,7 @@ public class ClientController {
     @PutMapping("/profile")
     public ResponseEntity<ApiResponse<Client>> updateClientProfile(
             @RequestHeader("Authorization") String authHeader,
-            @Valid @RequestBody Client updatedClient) {
+            @RequestBody Client updatedClient) {
 
         try {
             // Extract and validate token
@@ -261,7 +260,7 @@ public class ClientController {
     @PostMapping("/change-password")
     public ResponseEntity<ApiResponse<String>> changePassword(
             @RequestHeader("Authorization") String authHeader,
-            @Valid @RequestBody PasswordChangeRequest passwordChangeRequest) {
+            @RequestBody PasswordChangeRequest passwordChangeRequest) {
 
         try {
             // Extract and validate token

@@ -119,33 +119,35 @@ onSubmit(): void {
   /**
    * Handle user login
    */
-  onLogin(username: string, password: string): void {
-    this.isLoading = true;
-    this.clearMessages();
-    
-    const loginData = { username, password };
-    
-    this.clientService.login(loginData).subscribe({
-      next: (response) => {
-        this.isLoading = false;
-        if (response.success && response.data) {
-          // Store the JWT token
-          this.clientService.storeToken(response.data.token);
-          // Set current client data
-          this.currentClient = response.data.client;
-          this.successMessage = response.message;
-          // Switch to profile view
-          this.isEditMode = false;
-        } else {
-          this.errorMessage = response.message || 'Login failed';
+  onLogin(): void {
+    if (this.clientForm.valid) {
+      this.isLoading = true;
+      this.clearMessages();
+      
+      const loginData: ClientLogin = this.loginForm.value;
+      
+      this.clientService.login(loginData).subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (response.success && response.data) {
+            // Store the JWT token
+            this.clientService.storeToken(response.data.token);
+            // Set current client data
+            this.currentClient = response.data.client;
+            this.successMessage = response.message;
+            // Switch to profile view
+            this.isEditMode = false;
+          } else {
+            this.errorMessage = response.message || 'Login failed';
+          }
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.errorMessage = error.error?.message || 'Login failed due to server error';
+          console.error('Login error:', error);
         }
-      },
-      error: (error) => {
-        this.isLoading = false;
-        this.errorMessage = error.error?.message || 'Login failed due to server error';
-        console.error('Login error:', error);
-      }
-    });
+      });
+    }
   }
 
   /**
