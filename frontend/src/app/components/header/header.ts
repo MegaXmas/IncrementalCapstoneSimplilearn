@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ClientService } from '../../services/client-service';
+import { AdminService } from '../../services/admin-service';
 
 @Component({
   selector: 'app-header',
@@ -13,96 +14,152 @@ import { ClientService } from '../../services/client-service';
 })
 export class HeaderComponent implements OnInit {
 
+  /**
+   * Component properties for client authentication
+   */
+  isClientLoggedIn: boolean = false;
+  clientUsername: string = '';
 
   /**
-   * Component properties
-   * isLoggedIn: boolean to track user login status
-   * userName: string to store the logged-in user's name
+   * Component properties for admin authentication
    */
-  isLoggedIn: boolean = false;
-  userName: string = '';
+  isAdminLoggedIn: boolean = false;
+  adminUsername: string = '';
 
+  /**
+   * Legacy properties for backward compatibility
+   */
+  get isLoggedIn(): boolean {
+    return this.isClientLoggedIn || this.isAdminLoggedIn;
+  }
+
+  get userName(): string {
+    return this.clientUsername || this.adminUsername || 'Guest';
+  }
   
   /**
    * Constructor to inject dependencies
-   * @param router - Angular Router for navigation
    */
   constructor(
     private router: Router,
-    private clientService: ClientService) {}
+    private clientService: ClientService,
+    private adminService: AdminService
+  ) {}
 
   /**
    * Lifecycle hook that is called after component initialization
-   * Used to check login status when component starts
+   * Used to check both client and admin login status when component starts
    */
   ngOnInit(): void {
-    this.checkLoginStatus();
+    this.checkAuthenticationStatus();
   }
 
   /**
-   * Check if user is currently logged in
-   * In a real app, this would check authentication service
+   * Check authentication status for both clients and admins
    */
-  checkLoginStatus(): void {
-    this.isLoggedIn = this.clientService.isLoggedIn();
-    
-    if (this.isLoggedIn) {
-      this.userName = this.clientService.getUsernameFromToken() || '';
-    } else {
-      this.userName = 'not logged in';
+  checkAuthenticationStatus(): void {
+    // Check client authentication
+    this.isClientLoggedIn = this.clientService.isLoggedIn();
+    if (this.isClientLoggedIn) {
+      this.clientUsername = this.clientService.getUsernameFromToken() || 'Client';
+    }
+
+    // Check admin authentication
+    this.isAdminLoggedIn = this.adminService.isLoggedIn();
+    if (this.isAdminLoggedIn) {
+      this.adminUsername = this.adminService.getUsernameFromToken() || 'Admin';
     }
   }
 
-
   /**
-   * Handle user logout
-   * Clears user data and redirects to home
+   * Handle client logout
    */
-  onLogout(): void {
-    this.checkLoginStatus();
+  onClientLogout(event: Event): void {
+    event.preventDefault();
+    
+    // Clear client authentication
     this.clientService.removeToken();
+    this.isClientLoggedIn = false;
+    this.clientUsername = '';
     
-    this.isLoggedIn = false;
-    this.userName = '';
-    
+    // Navigate to home or login page
     this.router.navigate(['/client-form']);
     
-    this.logout();
+    // Show logout confirmation
     alert('You have been logged out successfully!');
   }
 
   /**
+   * Handle admin logout
+   */
+  onAdminLogout(event: Event): void {
+    event.preventDefault();
+    
+    // Clear admin authentication
+    this.adminService.removeToken();
+    this.isAdminLoggedIn = false;
+    this.adminUsername = '';
+    
+    // Navigate to admin login page
+    this.router.navigate(['/admin-login']);
+    
+    // Show logout confirmation
+    alert('Admin session ended successfully!');
+  }
+
+  /**
+   * Legacy logout method for backward compatibility
+   * Logs out whoever is currently logged in
+   */
+  onLogout(): void {
+    if (this.isClientLoggedIn) {
+      this.onClientLogout(new Event('click'));
+    } else if (this.isAdminLoggedIn) {
+      this.onAdminLogout(new Event('click'));
+    }
+  }
+
+  /**
    * Handle login button click
-   * Navigates to login page
+   * Navigates to appropriate login page
    */
   onLogin(): void {
     this.router.navigate(['/client-form']);
   }
 
-
   /**
-   *Dropdown menu state
+   * Legacy dropdown functionality
    */
   isDropdownOpen = false;
 
-  /**
-   * Toggle the dropdown menu visibility
-   */
-  toggleDropdown() {
+  toggleDropdown(): void {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
 
   /**
-   * Handle logout button click
+   * Navigate to the appropriate profile page
    */
-  logout() {
-    console.log('Logging out...');
+  goToProfile(): void {
+    if (this.isClientLoggedIn) {
+      this.router.navigate(['/client-form']);
+    } else if (this.isAdminLoggedIn) {
+      this.router.navigate(['/admin-dashboard']);
+    }
   }
 
   /**
-   * Navigate to the profile page
+   * Legacy logout method
    */
-  goToProfile() {
-    console.log('Going to profile...');
+  logout(): void {
+    console.log('Logging out...');
+    this.onLogout();
+  }
+
+  /**
+   * Method to refresh authentication status
+   * Useful to call after login/logout operations
+   */
+  refreshAuthStatus(): void {
+    this.checkAuthenticationStatus();
   }
 }
