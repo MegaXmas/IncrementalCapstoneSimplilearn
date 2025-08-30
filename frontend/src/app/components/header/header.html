@@ -31,17 +31,17 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/flights" routerLinkActive="active">
+          <a class="nav-link" routerLink="/user-flight-booking" routerLinkActive="active">
             <i class="fas fa-plane me-1"></i>Flights
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/trains" routerLinkActive="active">
+          <a class="nav-link" routerLink="/user-train-booking" routerLinkActive="active">
             <i class="fas fa-train me-1"></i>Trains
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/buses" routerLinkActive="active">
+          <a class="nav-link" routerLink="/user-bus-booking" routerLinkActive="active">
             <i class="fas fa-bus me-1"></i>Buses
           </a>
         </li>
@@ -52,42 +52,29 @@
         </li>
       </ul>
       <ul class="navbar-nav ms-auto me-3">
-        <li class="nav-item">
+        <li class="nav-item" @if="isAdmin">
           <a class="nav-link" routerLink="admin" routerLinkActive="active">
             <i class="fas fa-user-tie me-1"></i>Admin Dashboard
           </a>
         </li>
       </ul>
+      <ul class="navbar-nav ms-auto me-3">
+        <li class="nav-item" *ngIf="!isLoggedIn">
+          <a class="nav-link" (click)="onLogin()">
+            <i class="fas fa-sign-in-alt me-1"></i>Login
+          </a>
+        </li>
+        <li class="nav-item dropdown" *ngIf="isLoggedIn">
+          <a 
+            class="nav-link dropdown-toggle d-flex align-items-center" 
+            href="#" 
+            id="userDropdown" 
+            role="button" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="false">
+            <i class="fas fa-user-circle me-1"></i>{{ userName }}
+          </a>
+        </li>
 
-      
-      <!-- User section on the right -->
-      <!-- <div class="d-flex align-items-center"> -->
-          
-          <!-- will implement the login button at a later time once a databse is set up for admin authentication -->
-          <!-- Welcome message when logged in
-          <span class="navbar-text me-3" *ngIf="isLoggedIn">
-            <i class="fas fa-user-circle me-1"></i>
-            Welcome, <strong>{{ userName }}</strong>
-          </span> -->
-          
-          <!-- Logout button (red) -->
-          <!-- <button 
-            *ngIf="isLoggedIn" 
-            class="btn btn-outline-danger btn-sm me-2" 
-            (click)="onLogout()">
-            <i class="fas fa-sign-out-alt me-1"></i>
-            Logout
-          </button> -->
-          
-          <!-- Login button (green) -->
-          <!-- <button 
-            *ngIf="!isLoggedIn" 
-            class="btn btn-outline-success btn-sm" 
-            (click)="onLogin()">
-            <i class="fas fa-sign-in-alt me-1"></i>
-            Login
-          </button> -->
-      <!-- </div> -->
-    </div>
+
   </div>
-</nav>

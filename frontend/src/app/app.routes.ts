@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AdminLoginComponent } from './components/login/admin-login';
+import { AdminLoginComponent } from './components/admin-login/admin-login';
 import { FlightFormComponent } from './components/flight-form/flight-form';
 import { TrainFormComponent } from './components/train-form/train-form';
 import { BusFormComponent } from './components/bus-form/bus-form';
@@ -9,6 +9,7 @@ import { AdminAirportFormComponent } from './components/admin-airport-form/admin
 import { AdminBusStationFormComponent } from './components/admin-bus-station-form/admin-bus-station-form';
 import { AdminTrainStationFormComponent } from './components/admin-train-station-form/admin-train-station-form';
 import { ClientFormComponent } from './components/client-form/client-form';
+import { UserTrainBookingComponent } from './components/user-train-booking/user-train-booking';
 
 // Define application routes
 export const routes: Routes = [
@@ -23,6 +24,7 @@ export const routes: Routes = [
     { path: 'bus-form', component: BusFormComponent },
     { path: 'user-bus-booking', component: UserBusBookingComponent },
     { path: 'user-flight-booking', component: UserFlightBookingComponent },
+    { path: 'user-train-booking', component: UserTrainBookingComponent },
 
 
     // Admin routes

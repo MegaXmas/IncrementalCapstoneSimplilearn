@@ -65,7 +65,7 @@ export class HeaderComponent implements OnInit {
     this.isLoggedIn = false;
     this.userName = '';
     
-    this.router.navigate(['**']);
+    this.router.navigate(['/client-form']);
     
     this.logout();
     alert('You have been logged out successfully!');

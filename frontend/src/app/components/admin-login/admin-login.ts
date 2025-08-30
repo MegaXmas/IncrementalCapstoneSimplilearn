@@ -4,15 +4,19 @@ import { OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-admin-login',
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './login.html',
+  templateUrl: './admin-login.html',
   styleUrls: ['./admin-login.css', '../shared/form-styles.css']
 })
 
 export class AdminLoginComponent implements OnInit {
   showPassword = false;
   adminLoginForm!: FormGroup;
+
+  get adminUsername() {
+    return this.adminLoginForm.get('adminUsername');
+  }
 
 
   constructor(private fb: FormBuilder) {}
