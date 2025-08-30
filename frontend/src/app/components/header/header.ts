@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { ClientService } from '../../services/client-service';
 
 @Component({
   selector: 'app-header',
@@ -26,14 +27,15 @@ export class HeaderComponent implements OnInit {
    * Constructor to inject dependencies
    * @param router - Angular Router for navigation
    */
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private clientService: ClientService) {}
 
   /**
    * Lifecycle hook that is called after component initialization
    * Used to check login status when component starts
    */
   ngOnInit(): void {
-    // Check if user is logged in when component starts
     this.checkLoginStatus();
   }
 
@@ -42,47 +44,39 @@ export class HeaderComponent implements OnInit {
    * In a real app, this would check authentication service
    */
   checkLoginStatus(): void {
-    // For demo purposes, check localStorage
-    // In real app, use proper authentication service
-    const token = localStorage.getItem('authToken');
-    const user = localStorage.getItem('userName');
+    this.isLoggedIn = this.clientService.isLoggedIn();
     
-    if (token && user) {
-      this.isLoggedIn = true;
-      this.userName = user;
+    if (this.isLoggedIn) {
+      this.userName = this.clientService.getUsernameFromToken() || '';
     } else {
-      this.isLoggedIn = false;
-      this.userName = '';
+      this.userName = 'not logged in';
     }
   }
+
 
   /**
    * Handle user logout
    * Clears user data and redirects to home
    */
-  // onLogout(): void {
-  //   // Clear user authentication data
-  //   localStorage.removeItem('authToken');
-  //   localStorage.removeItem('userName');
+  onLogout(): void {
+    this.checkLoginStatus();
+    this.clientService.removeToken();
     
-  //   // Update component state
-  //   this.isLoggedIn = false;
-  //   this.userName = '';
+    this.isLoggedIn = false;
+    this.userName = '';
     
-  //   // Redirect to home page
-  //   this.router.navigate(['/home']);
+    this.router.navigate(['**']);
     
-  //   // Optional: Show success message
-  //   alert('You have been logged out successfully!');
-  // }
+    this.logout();
+    alert('You have been logged out successfully!');
+  }
 
   /**
    * Handle login button click
    * Navigates to login page
    */
   onLogin(): void {
-    // Navigate to login page
-    this.router.navigate(['/login']);
+    this.router.navigate(['/client-form']);
   }
 
 
@@ -102,7 +96,6 @@ export class HeaderComponent implements OnInit {
    * Handle logout button click
    */
   logout() {
-    // Handle logout logic
     console.log('Logging out...');
   }
 
@@ -110,8 +103,6 @@ export class HeaderComponent implements OnInit {
    * Navigate to the profile page
    */
   goToProfile() {
-    // Navigate to profile
     console.log('Going to profile...');
   }
-
 }

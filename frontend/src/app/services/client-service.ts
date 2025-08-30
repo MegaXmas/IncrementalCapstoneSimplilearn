@@ -57,6 +57,7 @@ import { Observable } from 'rxjs';
 export class ClientService {
   
   private readonly API_BASE_URL = 'http://localhost:8080/api/clients'; // Adjust to your Spring Boot port
+
   
   constructor(private http: HttpClient) {}
 
@@ -96,6 +97,26 @@ export class ClientService {
       `${this.API_BASE_URL}/profile`,
       { headers: this.getAuthHeaders() }
     );
+  }
+
+ getUsernameFromToken(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      // Decode JWT token (it has 3 parts separated by dots)
+      const tokenParts = token.split('.');
+      if (tokenParts.length !== 3) return null;
+
+      // Decode the payload (middle part)
+      const payload = JSON.parse(atob(tokenParts[1]));
+      
+      // JWT stores username in the 'sub' field
+      return payload.sub || null;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
   }
 
   /**
