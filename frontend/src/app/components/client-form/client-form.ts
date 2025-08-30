@@ -12,20 +12,17 @@ import { Client, ClientRegistration, ClientLogin, ClientService } from '../../se
 })
 export class ClientFormComponent implements OnInit {
 
-// Form for client registration
   clientForm: FormGroup;
   loginForm: FormGroup;
-  isInvalid: boolean = false;
-  
-  // Current client data (after login or registration)
+
   currentClient: Client | null = null;
-  
-  // UI state management
+  showPassword = false;
+
+  isInvalid: boolean = false;
   isLoading = false;
   isEditMode = false;
   isLoginMode = true;
 
-  // Success/error messages
   successMessage: string = '';
   errorMessage: string = '';
   
@@ -33,7 +30,6 @@ export class ClientFormComponent implements OnInit {
     private formBuilder: FormBuilder,
     private clientService: ClientService
   ) {
-    // Initialize the reactive form with validation rules that match your Java model
     this.clientForm = this.formBuilder.group({
       username: ['', [
         Validators.required,
@@ -72,7 +68,7 @@ export class ClientFormComponent implements OnInit {
         Validators.maxLength(200)
       ]]
     });
-// Initialize login form
+
     this.loginForm = this.formBuilder.group({
       usernameOrEmail: ['', [Validators.required]],
       password: ['', [Validators.required]]
@@ -80,13 +76,12 @@ export class ClientFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Check if user is already logged in and load their profile
     if (this.clientService.isLoggedIn()) {
       this.loadCurrentUserProfile();
     }
   }
 
-onSubmit(): void {
+  onSubmit(): void {
     if (this.clientForm.valid) {
       this.isLoading = true;
       this.clearMessages();
@@ -100,7 +95,6 @@ onSubmit(): void {
           if (response.success && response.data) {
             this.successMessage = response.message;
             this.resetForm();
-            // Optionally redirect to login or automatically log them in
           } else {
             this.errorMessage = response.message || 'Registration failed';
           }
@@ -221,14 +215,19 @@ onSubmit(): void {
   }
 
   /**
+   * Toggle password visibility
+   */
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  /**
    * Clear success and error messages
    */
   private clearMessages(): void {
     this.successMessage = '';
     this.errorMessage = '';
   }
-
-
 
   /**
    * Toggle between view and edit modes
@@ -242,7 +241,7 @@ onSubmit(): void {
     }
   }
 
-/**
+  /**
    * Get error message for a specific form field
    */
   getFieldError(fieldName: string): string {
