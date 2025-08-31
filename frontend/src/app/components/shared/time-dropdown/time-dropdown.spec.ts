@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TimeDropdown } from './time-dropdown';
+import { TimeDropdownComponent } from './time-dropdown';
 
 describe('TimeDropdown', () => {
-  let component: TimeDropdown;
-  let fixture: ComponentFixture<TimeDropdown>;
+  let component: TimeDropdownComponent;
+  let fixture: ComponentFixture<TimeDropdownComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TimeDropdown]
+      imports: [TimeDropdownComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(TimeDropdown);
+    fixture = TestBed.createComponent(TimeDropdownComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AdminTrainStationForm } from './admin-train-station-form';
+import { AdminTrainStationFormComponent } from './admin-train-station-form';
 
 describe('AdminTrainStationForm', () => {
-  let component: AdminTrainStationForm;
-  let fixture: ComponentFixture<AdminTrainStationForm>;
+  let component: AdminTrainStationFormComponent;
+  let fixture: ComponentFixture<AdminTrainStationFormComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AdminTrainStationForm]
+      imports: [AdminTrainStationFormComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AdminTrainStationForm);
+    fixture = TestBed.createComponent(AdminTrainStationFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
