@@ -1,0 +1,11 @@
+.booking-search-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.result-item {
+    margin-bottom: 10px;
+}
+.form-group {
+    margin-bottom: 15px;
+}

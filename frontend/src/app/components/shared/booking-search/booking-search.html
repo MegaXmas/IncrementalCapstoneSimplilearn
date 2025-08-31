@@ -1,1 +1,116 @@
 <p>booking-search works!</p>
+<div class="booking-search-container">
+    <h3>Search Travel Tickets</h3>
+    
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+    
+    <!-- Transport Type Selection -->
+    <div class="form-group mb-3">
+        <label class="form-label">Transport Type</label>
+        <select formControlName="transportType" class="form-control">
+        <option value="">All Transport Types</option>
+        <option value="flight">Flight</option>
+        <option value="train">Train</option>
+        <option value="bus">Bus</option>
+        </select>
+    </div>
+
+    <!-- Departure and Arrival Cities -->
+    <div class="row">
+        <div class="col-md-6">
+        <div class="form-group mb-3">
+            <label class="form-label">From City</label>
+            <input type="text" 
+                    formControlName="departureCity" 
+                    class="form-control" 
+                    placeholder="Enter departure city">
+        </div>
+        </div>
+        <div class="col-md-6">
+        <div class="form-group mb-3">
+            <label class="form-label">To City</label>
+            <input type="text" 
+                    formControlName="arrivalCity" 
+                    class="form-control" 
+                    placeholder="Enter arrival city">
+        </div>
+        </div>
+    </div>
+
+    <!-- Station Search Components -->
+    <div class="row">
+        <div class="col-md-6">
+        <app-station-search
+            label="Departure Station"
+            placeholder="Search departure station..."
+            [stationType]="getStationType()"
+            formControlName="departureStation">
+        </app-station-search>
+        </div>
+        <div class="col-md-6">
+        <app-station-search
+            label="Arrival Station"
+            placeholder="Search arrival station..."
+            [stationType]="getStationType()"
+            formControlName="arrivalStation">
+        </app-station-search>
+        </div>
+    </div>
+
+    <!-- Departure Time -->
+    <div class="form-group mb-3">
+        <label class="form-label">Departure Time</label>
+        <input type="datetime-local" 
+                formControlName="departureTime" 
+                class="form-control">
+    </div>
+
+    <!-- Price Range -->
+    <div class="row">
+        <div class="col-md-6">
+        <div class="form-group mb-3">
+            <label class="form-label">Min Price ($)</label>
+            <input type="number" 
+                    formControlName="minPrice" 
+                    class="form-control" 
+                    placeholder="0">
+        </div>
+        </div>
+        <div class="col-md-6">
+        <div class="form-group mb-3">
+            <label class="form-label">Max Price ($)</label>
+            <input type="number" 
+                    formControlName="maxPrice" 
+                    class="form-control" 
+                    placeholder="1000">
+        </div>
+        </div>
+    </div>
+
+    <!-- Search Button -->
+    <button type="submit" class="btn btn-primary w-100">
+        Search Tickets
+    </button>
+    </form>
+
+    <!-- Search Results -->
+    @if (searchResults.length > 0) {
+    <div class="search-results mt-4">
+        <h4>Available Tickets ({{searchResults.length}} found)</h4>
+        @for (ticket of searchResults; track ticket.id) {
+        <div class="result-item">
+            <div class="card mb-2">
+            <div class="card-body">
+                <h5>{{ticket.transportType | titlecase}} - {{ticket.route}}</h5>
+                <p><strong>Time:</strong> {{ticket.departureTime}}</p>
+                <p><strong>Price:</strong> ${{ticket.price}}</p>
+                <button class="btn btn-success" (click)="selectTicket(ticket)">
+                Book This Ticket
+                </button>
+            </div>
+            </div>
+        </div>
+        }
+    </div>
+    }
+</div>
