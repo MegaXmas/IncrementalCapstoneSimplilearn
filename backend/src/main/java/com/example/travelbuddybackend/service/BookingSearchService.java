@@ -1,3 +1,4 @@
+// Enhanced BookingSearchService.java - Uses your existing detail services
 package com.example.travelbuddybackend.service;
 
 import com.example.travelbuddybackend.models.*;
@@ -157,9 +158,12 @@ public class BookingSearchService {
     private List<AvailableTicket> searchFlights(BookingSearchCriteria criteria) {
         List<FlightDetails> flights = flightDetailsService.getAllFlightDetails();
 
+        System.out.println("🛩️ Initial flight count: " + flights.size());
+
         // Apply airline filter if specified
         if (criteria.getAirline() != null && !criteria.getAirline().trim().isEmpty()) {
             flights = flightDetailsService.findFlightsByAirline(criteria.getAirline());
+            System.out.println("🛩️ After airline filter (" + criteria.getAirline() + "): " + flights.size());
         }
 
         // Apply price range filter using your existing method
@@ -168,12 +172,43 @@ public class BookingSearchService {
                     criteria.getMinPrice().toString(),
                     criteria.getMaxPrice().toString()
             );
+            System.out.println("🛩️ After price filter (" + criteria.getMinPrice() + "-" + criteria.getMaxPrice() + "): " + flights.size());
         }
 
         // Convert to AvailableTicket objects and apply location filters
-        return flights.stream()
-                .filter(flight -> matchesAirportLocation(flight.getFlightOrigin(), criteria.getDepartureCity()))
-                .filter(flight -> matchesAirportLocation(flight.getFlightDestination(), criteria.getArrivalCity()))
+        List<AvailableTicket> results = flights.stream()
+                .filter(flight -> {
+                    boolean matches = matchesAirportLocation(flight.getFlightOrigin(), criteria.getDepartureCity());
+                    if (!matches) {
+                        System.out.println("🛩️ Flight " + flight.getFlightNumber() + " filtered out by departure city: " +
+                                getAirportDisplayName(flight.getFlightOrigin()) + " vs " + criteria.getDepartureCity());
+                    }
+                    return matches;
+                })
+                .filter(flight -> {
+                    boolean matches = matchesAirportLocation(flight.getFlightDestination(), criteria.getArrivalCity());
+                    if (!matches) {
+                        System.out.println("🛩️ Flight " + flight.getFlightNumber() + " filtered out by arrival city: " +
+                                getAirportDisplayName(flight.getFlightDestination()) + " vs " + criteria.getArrivalCity());
+                    }
+                    return matches;
+                })
+                .filter(flight -> {
+                    boolean matches = matchesAirportLocation(flight.getFlightOrigin(), criteria.getDepartureStation());
+                    if (!matches && criteria.getDepartureStation() != null && !criteria.getDepartureStation().trim().isEmpty()) {
+                        System.out.println("🛩️ Flight " + flight.getFlightNumber() + " filtered out by departure station: " +
+                                getAirportDisplayName(flight.getFlightOrigin()) + " vs " + criteria.getDepartureStation());
+                    }
+                    return matches;
+                })
+                .filter(flight -> {
+                    boolean matches = matchesAirportLocation(flight.getFlightDestination(), criteria.getArrivalStation());
+                    if (!matches && criteria.getArrivalStation() != null && !criteria.getArrivalStation().trim().isEmpty()) {
+                        System.out.println("🛩️ Flight " + flight.getFlightNumber() + " filtered out by arrival station: " +
+                                getAirportDisplayName(flight.getFlightDestination()) + " vs " + criteria.getArrivalStation());
+                    }
+                    return matches;
+                })
                 .map(flight -> new AvailableTicket(
                         flight.getId().longValue(),
                         "flight",
@@ -186,6 +221,9 @@ public class BookingSearchService {
                         flight.getFlightAirline()
                 ))
                 .collect(Collectors.toList());
+
+        System.out.println("🛩️ Final flight results: " + results.size());
+        return results;
     }
 
     // Search trains using your existing TrainDetailsService methods
@@ -265,10 +303,31 @@ public class BookingSearchService {
         }
         if (airport == null) return false;
 
-        String search = searchLocation.toLowerCase();
-        return (airport.getAirportFullName() != null && airport.getAirportFullName().toLowerCase().contains(search)) ||
-                (airport.getAirportCode() != null && airport.getAirportCode().toLowerCase().contains(search)) ||
-                (airport.getAirportCityLocation() != null && airport.getAirportCityLocation().toLowerCase().contains(search));
+        String search = searchLocation.toLowerCase().trim();
+
+        // Check if search is a numeric ID (from station search component)
+        try {
+            Long searchId = Long.parseLong(search);
+            if (airport.getId() != null && airport.getId().equals(searchId.intValue())) {
+                System.out.println("🎯 Airport ID match: " + airport.getId() + " = " + searchId);
+                return true;
+            }
+        } catch (NumberFormatException e) {
+            // Not a number, continue with text matching
+        }
+
+        // Text-based matching for manual input
+        boolean nameMatch = airport.getAirportFullName() != null && airport.getAirportFullName().toLowerCase().contains(search);
+        boolean codeMatch = airport.getAirportCode() != null && airport.getAirportCode().toLowerCase().contains(search);
+        boolean cityMatch = airport.getAirportCityLocation() != null && airport.getAirportCityLocation().toLowerCase().contains(search);
+
+        if (nameMatch || codeMatch || cityMatch) {
+            System.out.println("🎯 Airport text match: " + getAirportDisplayName(airport) + " matches " + search);
+            return true;
+        }
+
+        System.out.println("❌ No airport match: " + getAirportDisplayName(airport) + " vs " + search);
+        return false;
     }
 
     private boolean matchesStationLocation(TrainStation station, String searchLocation) {
@@ -277,10 +336,25 @@ public class BookingSearchService {
         }
         if (station == null) return false;
 
-        String search = searchLocation.toLowerCase();
-        return (station.getTrainStationFullName() != null && station.getTrainStationFullName().toLowerCase().contains(search)) ||
-                (station.getTrainStationCode() != null && station.getTrainStationCode().toLowerCase().contains(search)) ||
-                (station.getTrainStationCityLocation() != null && station.getTrainStationCityLocation().toLowerCase().contains(search));
+        String search = searchLocation.toLowerCase().trim();
+
+        // Check if search is a numeric ID (from station search component)
+        try {
+            Long searchId = Long.parseLong(search);
+            if (station.getId() != null && station.getId().equals(searchId.intValue())) {
+                System.out.println("🎯 Train Station ID match: " + station.getId() + " = " + searchId);
+                return true;
+            }
+        } catch (NumberFormatException e) {
+            // Not a number, continue with text matching
+        }
+
+        // Text-based matching for manual input
+        boolean nameMatch = station.getTrainStationFullName() != null && station.getTrainStationFullName().toLowerCase().contains(search);
+        boolean codeMatch = station.getTrainStationCode() != null && station.getTrainStationCode().toLowerCase().contains(search);
+        boolean cityMatch = station.getTrainStationCityLocation() != null && station.getTrainStationCityLocation().toLowerCase().contains(search);
+
+        return nameMatch || codeMatch || cityMatch;
     }
 
     private boolean matchesBusStationLocation(BusStation station, String searchLocation) {
@@ -289,10 +363,25 @@ public class BookingSearchService {
         }
         if (station == null) return false;
 
-        String search = searchLocation.toLowerCase();
-        return (station.getBusStationFullName() != null && station.getBusStationFullName().toLowerCase().contains(search)) ||
-                (station.getBusStationCode() != null && station.getBusStationCode().toLowerCase().contains(search)) ||
-                (station.getBusStationCityLocation() != null && station.getBusStationCityLocation().toLowerCase().contains(search));
+        String search = searchLocation.toLowerCase().trim();
+
+        // Check if search is a numeric ID (from station search component)
+        try {
+            Long searchId = Long.parseLong(search);
+            if (station.getId() != null && station.getId().equals(searchId.intValue())) {
+                System.out.println("🎯 Bus Station ID match: " + station.getId() + " = " + searchId);
+                return true;
+            }
+        } catch (NumberFormatException e) {
+            // Not a number, continue with text matching
+        }
+
+        // Text-based matching for manual input
+        boolean nameMatch = station.getBusStationFullName() != null && station.getBusStationFullName().toLowerCase().contains(search);
+        boolean codeMatch = station.getBusStationCode() != null && station.getBusStationCode().toLowerCase().contains(search);
+        boolean cityMatch = station.getBusStationCityLocation() != null && station.getBusStationCityLocation().toLowerCase().contains(search);
+
+        return nameMatch || codeMatch || cityMatch;
     }
 
     private String getAirportDisplayName(Airport airport) {
