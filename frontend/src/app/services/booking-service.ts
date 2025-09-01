@@ -3,7 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
-// Interface matching your Java BookingSearchCriteria
 export interface BookingSearchCriteria {
   transportType?: string;
   departureCity?: string;
@@ -16,8 +15,6 @@ export interface BookingSearchCriteria {
   airline?: string; // For flights
   line?: string;    // For trains/buses
 }
-
-// Interface matching your Java AvailableTicket
 export interface AvailableTicket {
   id: number;
   transportType: string;
@@ -30,7 +27,6 @@ export interface AvailableTicket {
   additionalInfo: string; // airline, line, etc.
 }
 
-// Interface matching your Java Booking model
 export interface Booking {
   id?: number;
   bookingId: string;

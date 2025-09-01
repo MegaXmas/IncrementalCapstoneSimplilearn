@@ -10,6 +10,7 @@ import { AdminBusStationFormComponent } from './components/admin-bus-station-for
 import { AdminTrainStationFormComponent } from './components/admin-train-station-form/admin-train-station-form';
 import { ClientFormComponent } from './components/client-form/client-form';
 import { UserTrainBookingComponent } from './components/user-train-booking/user-train-booking';
+import { BookingSearchComponent } from './components/shared/booking-search/booking-search';
 
 // Define application routes
 export const routes: Routes = [
@@ -25,6 +26,7 @@ export const routes: Routes = [
     { path: 'user-bus-booking', component: UserBusBookingComponent },
     { path: 'user-flight-booking', component: UserFlightBookingComponent },
     { path: 'user-train-booking', component: UserTrainBookingComponent },
+    { path: 'booking-search', component: BookingSearchComponent },
 
 
     // Admin routes

@@ -46,29 +46,11 @@
           </div>
         </div>
 
-        <!-- Departure and Arrival Cities -->
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">From City</label>
-            <input type="text" 
-                   formControlName="departureCity" 
-                   class="form-control" 
-                   placeholder="Enter departure city">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">To City</label>
-            <input type="text" 
-                   formControlName="arrivalCity" 
-                   class="form-control" 
-                   placeholder="Enter arrival city">
-          </div>
-        </div>
-
         <!-- Station Search Components -->
         <div class="row mb-3">
           <div class="col-md-6">
             <app-station-search
-              label="Departure Station (Optional)"
+              label="Departure Station/ City"
               placeholder="Search departure station..."
               [stationType]="getStationType()"
               formControlName="departureStation">
@@ -76,7 +58,7 @@
           </div>
           <div class="col-md-6">
             <app-station-search
-              label="Arrival Station (Optional)"
+              label="Arrival Station/ City"
               placeholder="Search arrival station..."
               [stationType]="getStationType()"
               formControlName="arrivalStation">
