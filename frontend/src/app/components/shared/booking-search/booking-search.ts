@@ -34,6 +34,7 @@ export class BookingSearchComponent implements OnInit {
       arrivalCity: [''],
       departureStation: [''],
       arrivalStation: [''],
+      departureDate: [''],
       departureTime: [''],
       minPrice: [0],
       maxPrice: [20000],

@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { DateDropdownComponent } from '../shared/date-dropdown/date-dropdown';
+import { DateInputComponent } from '../shared/date-dropdown/date-input';
+import { TimeInputComponent } from '../shared/time-dropdown/time-input';
 import { ClientService } from '../../services/client-service';
 @Component({
   selector: 'app-user-train-booking',
   imports: [
     CommonModule, 
     ReactiveFormsModule, 
-    DateDropdownComponent,
+    DateInputComponent,
+    TimeInputComponent
   ],
   templateUrl: './user-train-booking.html',
   styleUrls: ['./user-train-booking.css','../shared/form-styles.css'],

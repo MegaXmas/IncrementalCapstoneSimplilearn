@@ -39,13 +39,27 @@
           </div>
         </div>
 
-        <!-- Departure Time -->
+        <!-- Date and Time Row -->
         <div class="row mb-3">
+          <!-- Departure Date -->
           <div class="col-md-6">
             <app-date-input
-            label="Departure Date"
-            formControlName="departureTime">
+              label="Departure Date"
+              id="departure-date"
+              formControlName="departureDate"
+              [isInvalid]="isFieldInvalid('departureDate')"
+              errorMessage="Please select a departure date">
             </app-date-input>
+          </div>
+
+          <!-- Departure Time with Dropdown -->
+          <div class="col-md-6">
+            <app-time-dropdown 
+              label="Departure Time"
+              id="departure-time"
+              formControlName="departureTime"
+              errorMessage="Please select a departure time">
+            </app-time-dropdown>
           </div>
         </div>
 

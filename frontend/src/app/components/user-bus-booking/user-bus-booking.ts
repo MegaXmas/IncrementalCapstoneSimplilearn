@@ -4,12 +4,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { StationSearchComponent } from '../shared/station-search/station-search';
 import { BookingService, BookingSearchCriteria, AvailableTicket } from '../../services/booking-service';
-import { DateInputComponent } from "../shared/date-dropdown/date-input-component";
+import { DateInputComponent } from "../shared/date-dropdown/date-input";
+import { TimeDropdownComponent } from '../shared/time-dropdown/time-dropdown';
 
 @Component({
   selector: 'app-booking-search',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, StationSearchComponent, DateInputComponent],
+  imports: [CommonModule, ReactiveFormsModule, StationSearchComponent, DateInputComponent, TimeDropdownComponent],
   templateUrl: './bus-booking-search.html',
   styleUrls: ['../shared/booking-search/booking-search.css', '../shared/form-styles.css']
 })
@@ -32,11 +33,17 @@ searchForm!: FormGroup;
     this.searchForm = this.fb.group({
       departureStation: [''],
       arrivalStation: [''],
+      departureDate: [''],
       departureTime: [''],
       minPrice: [0],
       maxPrice: [20000],
       line: ['']  // Bus line (e.g., Greyhound)
     });
+  }
+
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.searchForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched))
   }
   
   // Always return 'bus' since this component is bus-specific
