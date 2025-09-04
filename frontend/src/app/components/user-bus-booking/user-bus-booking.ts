@@ -1,4 +1,3 @@
-// Updated booking-search.component.ts
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -37,7 +36,7 @@ searchForm!: FormGroup;
       departureTime: [''],
       minPrice: [0],
       maxPrice: [20000],
-      line: ['']  // Bus line (e.g., Greyhound)
+      line: ['']
     });
   }
 
@@ -52,9 +51,8 @@ searchForm!: FormGroup;
   }
   
   onSearch(): void {
-    // Create search criteria with bus type fixed
     const searchCriteria: BookingSearchCriteria = {
-      transportType: 'bus',  // Fixed to bus
+      transportType: 'bus',
       ...this.searchForm.value
     };
     
@@ -88,7 +86,6 @@ searchForm!: FormGroup;
     console.log('Bus ticket selected:', ticket);
   }
   
-  // Helper methods using the service
   formatTicketRoute(ticket: AvailableTicket): string {
     return this.bookingService.formatTicketRoute(ticket);
   }

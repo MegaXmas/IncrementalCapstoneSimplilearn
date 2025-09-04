@@ -1,42 +1,114 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { DateInputComponent } from '../shared/date-dropdown/date-input';
-import { TimeInputComponent } from '../shared/time-dropdown/time-input';
+import { StationSearchComponent } from '../shared/station-search/station-search';
+import { BookingService, BookingSearchCriteria, AvailableTicket } from '../../services/booking-service';
+import { DateInputComponent } from "../shared/date-dropdown/date-input";
+import { TimeDropdownComponent } from '../shared/time-dropdown/time-dropdown';
 
 @Component({
-  selector: 'app-user-flight-booking',
-  imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    DateInputComponent,
-    TimeInputComponent
-  ],
-  templateUrl: './user-flight-booking.html',
-  styleUrls: ['./user-flight-booking.css','../shared/form-styles.css'],
+  selector: 'app-booking-search',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, StationSearchComponent, DateInputComponent, TimeDropdownComponent],
+  templateUrl: './flight-booking-search.html',
+  styleUrls: ['../shared/booking-search/booking-search.css', '../shared/form-styles.css']
 })
-export class UserFlightBookingComponent {
-  userFlightBookingForm!: FormGroup;
-  isInvalid: boolean = false;
-
-  constructor(private fb: FormBuilder) {}
-
-
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.userFlightBookingForm.get(fieldName);
-    return (field?.invalid ?? false) && (field?.touched ?? false);
+export class UserFlightBookingComponent implements OnInit {
+ 
+searchForm!: FormGroup;
+  searchResults: AvailableTicket[] = [];
+  isSearching = false;
+  searchError = '';
+ 
+  @Output() ticketSelected = new EventEmitter<AvailableTicket>();
+  
+  constructor(
+    private fb: FormBuilder,
+    private bookingService: BookingService
+  ) {}
+  
+  ngOnInit(): void {
+    // Create the search form for flightes only
+    this.searchForm = this.fb.group({
+      originAirport: [''],
+      destinationAirport: [''],
+      departureDate: [''],
+      departureTime: [''],
+      minPrice: [0],
+      maxPrice: [20000],
+      airline: ['']
+    });
   }
 
-  onSubmit(): void {
-    if (this.userFlightBookingForm.valid) {
-      console.log('Form submitted:', this.userFlightBookingForm.value);
-      // Handle form submission here
-    } else {
-      console.log('Form is invalid');
-      // Mark all fields as touched to show validation errors
-      Object.keys(this.userFlightBookingForm.controls).forEach(key => {
-        this.userFlightBookingForm.get(key)?.markAsTouched();
-      });
-    }
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.searchForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched))
+  }
+  
+  // Always return 'airport' since this component is flight-specific
+  getStationType(): 'airport' {
+    return 'airport';
+  }
+  
+  onSearch(): void {
+    const searchCriteria: BookingSearchCriteria = {
+      transportType: 'flight',
+      ...this.searchForm.value
+    };
+    
+    console.log('Searching flightes with criteria:', searchCriteria);
+    
+    this.isSearching = true;
+    this.searchError = '';
+    this.searchResults = [];
+    
+    this.bookingService.searchAvailableTickets(searchCriteria).subscribe({
+      next: (tickets: AvailableTicket[]) => {
+        console.log('✅ Flight search completed, found tickets:', tickets);
+        this.searchResults = tickets;
+        this.isSearching = false;
+        
+        if (tickets.length === 0) {
+          this.searchError = 'No flight tickets found matching your criteria. Try adjusting your search.';
+        }
+      },
+      error: (error) => {
+        console.error('❌ Flight search failed:', error);
+        this.searchError = 'Flight search failed. Please check your connection and try again.';
+        this.isSearching = false;
+        this.searchResults = [];
+      }
+    });
+  }
+  
+  selectTicket(ticket: AvailableTicket): void {
+    this.ticketSelected.emit(ticket);
+    console.log('Flight ticket selected:', ticket);
+  }
+  
+  formatTicketRoute(ticket: AvailableTicket): string {
+    return this.bookingService.formatTicketRoute(ticket);
+  }
+  
+  formatTicketTime(ticket: AvailableTicket): string {
+    return this.bookingService.formatTicketTime(ticket);
+  }
+  
+  formatPrice(price: number): string {
+    return this.bookingService.formatPrice(price);
+  }
+  
+  // Clear search results
+  clearSearch(): void {
+    this.searchResults = [];
+    this.searchError = '';
+    this.searchForm.reset({
+      departureStation: '',
+      arrivalStation: '',
+      departureTime: '',
+      minPrice: 0,
+      maxPrice: 20000,
+      line: ''
+    });
   }
 }
