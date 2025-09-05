@@ -74,16 +74,6 @@
                    formControlName="departureTime" 
                    class="form-control">
           </div>
-          <div class="col-md-6">
-            <!-- Quick search buttons -->
-            <label class="form-label">Quick Search (ignores other criteria)</label>
-            <div class="btn-group w-100" role="group">
-              <button type="button" class="btn btn-outline-primary btn-sm" (click)="searchFlightsOnly()" title="Search all flights with airline filter only">✈️ All Flights</button>
-              <button type="button" class="btn btn-outline-success btn-sm" (click)="searchTrainsOnly()" title="Search all trains with line filter only">🚂 All Trains</button>
-              <button type="button" class="btn btn-outline-warning btn-sm" (click)="searchBusesOnly()" title="Search all buses with line filter only">🚌 All Buses</button>
-            </div>
-            <small class="text-muted">These buttons ignore city/station/price filters</small>
-          </div>
         </div>
 
         <!-- Price Range -->

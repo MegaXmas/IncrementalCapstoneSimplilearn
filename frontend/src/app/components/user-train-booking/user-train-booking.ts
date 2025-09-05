@@ -105,6 +105,7 @@ searchForm!: FormGroup;
     this.searchForm.reset({
       departureStation: '',
       arrivalStation: '',
+      departureDate: '',
       departureTime: '',
       minPrice: 0,
       maxPrice: 20000,
