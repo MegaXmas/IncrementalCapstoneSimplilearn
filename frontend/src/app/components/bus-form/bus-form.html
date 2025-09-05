@@ -68,22 +68,22 @@
 
     <!-- Date Dropdown Components -->
     <div class="form-group">
-      <app-date-dropdown
+      <app-date-input
         label="bus Departure Date"
         id="busDepartureDate"
         formControlName="busDepartureDate">
-      </app-date-dropdown>
+      </app-date-input>
       @if (isFieldInvalid('busDepartureDate')) {
         <div class="text-danger">Please select the departure date</div>
       }
     </div><br>
 
     <div class="form-group">
-      <app-date-dropdown
+      <app-date-input
         label="bus Arrival Date"
         id="busArrivalDate"
         formControlName="busArrivalDate">
-      </app-date-dropdown>
+      </app-date-input>
       @if (isFieldInvalid('busArrivalDate')) {
         <div class="text-danger">Please select the arrival date</div>
       }

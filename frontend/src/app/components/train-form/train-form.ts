@@ -15,7 +15,7 @@ import { StationService } from '../../services/station-service';
     CommonModule,
     ReactiveFormsModule,
     DateInputComponent,
-    DateInputComponent,
+    TimeDropdownComponent,
     DurationDropdownComponent,
     StationSearchComponent 
   ],

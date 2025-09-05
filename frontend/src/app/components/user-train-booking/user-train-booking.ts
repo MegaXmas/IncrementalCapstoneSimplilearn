@@ -1,46 +1,114 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { DateInputComponent } from '../shared/date-dropdown/date-input';
+import { StationSearchComponent } from '../shared/station-search/station-search';
+import { BookingService, BookingSearchCriteria, AvailableTicket } from '../../services/booking-service';
+import { DateInputComponent } from "../shared/date-dropdown/date-input";
 import { TimeDropdownComponent } from '../shared/time-dropdown/time-dropdown';
-import { ClientService } from '../../services/client-service';
-@Component({
-  selector: 'app-user-train-booking',
-  imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    DateInputComponent,
-    TimeDropdownComponent
-  ],
-  templateUrl: './user-train-booking.html',
-  styleUrls: ['./user-train-booking.css','../shared/form-styles.css'],
-})
-export class UserTrainBookingComponent {
-  userTrainBookingForm!: FormGroup;
-  isInvalid: boolean = false;
-  isLoggedIn: boolean = false;
 
+@Component({
+  selector: 'app-booking-search',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, StationSearchComponent, DateInputComponent, TimeDropdownComponent],
+  templateUrl: './train-booking-search.html',
+  styleUrls: ['../shared/booking-search/booking-search.css', '../shared/form-styles.css']
+})
+export class UserTrainBookingComponent implements OnInit {
+ 
+searchForm!: FormGroup;
+  searchResults: AvailableTicket[] = [];
+  isSearching = false;
+  searchError = '';
+ 
+  @Output() ticketSelected = new EventEmitter<AvailableTicket>();
+  
   constructor(
     private fb: FormBuilder,
-    private clientService: ClientService) {}
-
-
-  isFieldInvalid(fieldName: string): boolean {
-    this.isLoggedIn = this.clientService.getToken() !== null;
-    const field = this.userTrainBookingForm.get(fieldName);
-    return (field?.invalid ?? false) && (field?.touched ?? false);
+    private bookingService: BookingService
+  ) {}
+  
+  ngOnInit(): void {
+    // Create the search form for traines only
+    this.searchForm = this.fb.group({
+      departureStation: [''],
+      arrivalStation: [''],
+      departureDate: [''],
+      departureTime: [''],
+      minPrice: [0],
+      maxPrice: [20000],
+      line: ['']
+    });
   }
 
-  onSubmit(): void {
-    if (this.userTrainBookingForm.valid) {
-      console.log('Form submitted:', this.userTrainBookingForm.value);
-      // Handle form submission here
-    } else {
-      console.log('Form is invalid');
-      // Mark all fields as touched to show validation errors
-      Object.keys(this.userTrainBookingForm.controls).forEach(key => {
-        this.userTrainBookingForm.get(key)?.markAsTouched();
-      });
-    }
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.searchForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched))
+  }
+  
+  // Always return 'train' since this component is train-specific
+  getStationType(): 'train' {
+    return 'train';
+  }
+  
+  onSearch(): void {
+    const searchCriteria: BookingSearchCriteria = {
+      transportType: 'train',
+      ...this.searchForm.value
+    };
+    
+    console.log('Searching traines with criteria:', searchCriteria);
+    
+    this.isSearching = true;
+    this.searchError = '';
+    this.searchResults = [];
+    
+    this.bookingService.searchAvailableTickets(searchCriteria).subscribe({
+      next: (tickets: AvailableTicket[]) => {
+        console.log('✅ Train search completed, found tickets:', tickets);
+        this.searchResults = tickets;
+        this.isSearching = false;
+        
+        if (tickets.length === 0) {
+          this.searchError = 'No train tickets found matching your criteria. Try adjusting your search.';
+        }
+      },
+      error: (error) => {
+        console.error('❌ Train search failed:', error);
+        this.searchError = 'Train search failed. Please check your connection and try again.';
+        this.isSearching = false;
+        this.searchResults = [];
+      }
+    });
+  }
+  
+  selectTicket(ticket: AvailableTicket): void {
+    this.ticketSelected.emit(ticket);
+    console.log('Train ticket selected:', ticket);
+  }
+  
+  formatTicketRoute(ticket: AvailableTicket): string {
+    return this.bookingService.formatTicketRoute(ticket);
+  }
+  
+  formatTicketTime(ticket: AvailableTicket): string {
+    return this.bookingService.formatTicketTime(ticket);
+  }
+  
+  formatPrice(price: number): string {
+    return this.bookingService.formatPrice(price);
+  }
+  
+  // Clear search results
+  clearSearch(): void {
+    this.searchResults = [];
+    this.searchError = '';
+    this.searchForm.reset({
+      departureStation: '',
+      arrivalStation: '',
+      departureTime: '',
+      minPrice: 0,
+      maxPrice: 20000,
+      line: ''
+    });
   }
 }
