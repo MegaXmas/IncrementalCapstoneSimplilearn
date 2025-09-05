@@ -103,12 +103,12 @@ searchForm!: FormGroup;
     this.searchResults = [];
     this.searchError = '';
     this.searchForm.reset({
-      departureStation: '',
-      arrivalStation: '',
+      originAirport: '',
+      destinationAirport: '',
       departureTime: '',
       minPrice: 0,
       maxPrice: 20000,
-      line: ''
+      airline: ''
     });
   }
 }

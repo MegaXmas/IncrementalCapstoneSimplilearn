@@ -1,4 +1,3 @@
-// Updated booking-search.component.ts
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -75,88 +74,6 @@ export class BookingSearchComponent implements OnInit {
         this.searchError = 'Search failed. Please check your connection and try again.';
         this.isSearching = false;
         this.searchResults = [];
-      }
-    });
-  }
-  
-  // Quick search methods - these are separate from the main form search
-  searchFlightsOnly(): void {
-    this.isSearching = true;
-    this.searchError = '';
-    
-    // Create criteria with only flight type and airline
-    const quickCriteria: BookingSearchCriteria = {
-      transportType: 'flight',
-      airline: this.searchForm.get('airline')?.value || undefined
-    };
-    
-    this.bookingService.searchAvailableTickets(quickCriteria).subscribe({
-      next: (tickets) => {
-        this.searchResults = tickets;
-        this.isSearching = false;
-        
-        if (tickets.length === 0) {
-          this.searchError = 'No flights found. Try adjusting your search.';
-        }
-      },
-      error: (error) => {
-        console.error('❌ Flight search failed:', error);
-        this.searchError = 'Flight search failed.';
-        this.isSearching = false;
-      }
-    });
-  }
-  
-  searchTrainsOnly(): void {
-    this.isSearching = true;
-    this.searchError = '';
-    
-    // Create criteria with only train type and line
-    const quickCriteria: BookingSearchCriteria = {
-      transportType: 'train',
-      line: this.searchForm.get('line')?.value || undefined
-    };
-    
-    this.bookingService.searchAvailableTickets(quickCriteria).subscribe({
-      next: (tickets) => {
-        this.searchResults = tickets;
-        this.isSearching = false;
-        
-        if (tickets.length === 0) {
-          this.searchError = 'No trains found. Try adjusting your search.';
-        }
-      },
-      error: (error) => {
-        console.error('❌ Train search failed:', error);
-        this.searchError = 'Train search failed.';
-        this.isSearching = false;
-      }
-    });
-  }
-  
-  searchBusesOnly(): void {
-    this.isSearching = true;
-    this.searchError = '';
-    
-    // Create criteria with only bus type and line
-    const quickCriteria: BookingSearchCriteria = {
-      transportType: 'bus',
-      line: this.searchForm.get('line')?.value || undefined
-    };
-    
-    this.bookingService.searchAvailableTickets(quickCriteria).subscribe({
-      next: (tickets) => {
-        this.searchResults = tickets;
-        this.isSearching = false;
-        
-        if (tickets.length === 0) {
-          this.searchError = 'No buses found. Try adjusting your search.';
-        }
-      },
-      error: (error) => {
-        console.error('❌ Bus search failed:', error);
-        this.searchError = 'Bus search failed.';
-        this.isSearching = false;
       }
     });
   }
