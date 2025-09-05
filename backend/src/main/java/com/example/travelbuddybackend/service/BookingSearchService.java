@@ -226,13 +226,16 @@ public class BookingSearchService {
         return results;
     }
 
-    // Search trains using your existing TrainDetailsService methods
     private List<AvailableTicket> searchTrains(BookingSearchCriteria criteria) {
         List<TrainDetails> trains = trainDetailsService.getAllTrainDetails();
+
+        System.out.println("🚂 Starting train search with " + trains.size() + " trains");
+        System.out.println("🚂 Looking for: " + criteria.getDepartureStation() + " → " + criteria.getArrivalStation());
 
         // Apply line filter if specified
         if (criteria.getLine() != null && !criteria.getLine().trim().isEmpty()) {
             trains = trainDetailsService.findTrainsByLine(criteria.getLine());
+            System.out.println("🚂 After line filter: " + trains.size() + " trains");
         }
 
         // Apply price range filter using your existing method
@@ -241,24 +244,52 @@ public class BookingSearchService {
                     criteria.getMinPrice().toString(),
                     criteria.getMaxPrice().toString()
             );
+            System.out.println("🚂 After price filter: " + trains.size() + " trains");
         }
 
-        // Convert to AvailableTicket objects and apply location filters
-        return trains.stream()
-                .filter(train -> matchesStationLocation(train.getTrainDepartureStation(), criteria.getDepartureStation()))
-                .filter(train -> matchesStationLocation(train.getTrainArrivalStation(), criteria.getArrivalStation()))
-                .map(train -> new AvailableTicket(
-                        train.getId().longValue(),
-                        "train",
-                        train.getTrainNumber(),
-                        getTrainStationDisplayName(train.getTrainDepartureStation()),
-                        getTrainStationDisplayName(train.getTrainArrivalStation()),
-                        train.getTrainDepartureDate() + " " + train.getTrainDepartureTime(),
-                        train.getTrainArrivalDate() + " " + train.getTrainArrivalTime(),
-                        Double.parseDouble(train.getTrainRidePrice()),
-                        train.getTrainLine()
-                ))
+        // Enhanced filtering with detailed logging
+        List<AvailableTicket> results = trains.stream()
+                .filter(train -> {
+                    String depCode = train.getTrainDepartureStation() != null ?
+                            train.getTrainDepartureStation().getTrainStationCode() : "null";
+                    String arrCode = train.getTrainArrivalStation() != null ?
+                            train.getTrainArrivalStation().getTrainStationCode() : "null";
+
+                    System.out.println("🚂 Checking train " + train.getTrainNumber() +
+                            ": " + depCode + " → " + arrCode);
+
+                    boolean depMatch = matchesStationLocation(train.getTrainDepartureStation(), criteria.getDepartureStation());
+                    System.out.println("   🔍 Departure match (" + depCode + " vs " + criteria.getDepartureStation() + "): " + depMatch);
+
+                    return depMatch;
+                })
+                .filter(train -> {
+                    String arrCode = train.getTrainArrivalStation() != null ?
+                            train.getTrainArrivalStation().getTrainStationCode() : "null";
+
+                    boolean arrMatch = matchesStationLocation(train.getTrainArrivalStation(), criteria.getArrivalStation());
+                    System.out.println("   🔍 Arrival match (" + arrCode + " vs " + criteria.getArrivalStation() + "): " + arrMatch);
+
+                    return arrMatch;
+                })
+                .map(train -> {
+                    System.out.println("✅ Train " + train.getTrainNumber() + " passed all filters!");
+                    return new AvailableTicket(
+                            train.getId().longValue(),
+                            "train",
+                            train.getTrainNumber(),
+                            getTrainStationDisplayName(train.getTrainDepartureStation()),
+                            getTrainStationDisplayName(train.getTrainArrivalStation()),
+                            train.getTrainDepartureDate() + " " + train.getTrainDepartureTime(),
+                            train.getTrainArrivalDate() + " " + train.getTrainArrivalTime(),
+                            Double.parseDouble(train.getTrainRidePrice()),
+                            train.getTrainLine()
+                    );
+                })
                 .collect(Collectors.toList());
+
+        System.out.println("🚂 Final results: " + results.size() + " trains");
+        return results;
     }
 
     // Search buses using your existing BusDetailsService methods
@@ -318,7 +349,7 @@ public class BookingSearchService {
 
         // Text-based matching for manual input
         boolean nameMatch = airport.getAirportFullName() != null && airport.getAirportFullName().toLowerCase().contains(search);
-        boolean codeMatch = airport.getAirportCode() != null && airport.getAirportCode().toLowerCase().contains(search);
+        boolean codeMatch = airport.getAirportCode() != null && airport.getAirportCode().toUpperCase().contains(search);
         boolean cityMatch = airport.getAirportCityLocation() != null && airport.getAirportCityLocation().toLowerCase().contains(search);
 
         if (nameMatch || codeMatch || cityMatch) {
@@ -331,30 +362,59 @@ public class BookingSearchService {
     }
 
     private boolean matchesStationLocation(TrainStation station, String searchLocation) {
+        System.out.println("🔍 matchesStationLocation called:");
+        System.out.println("   Station: " + (station != null ? station.getTrainStationCode() : "null"));
+        System.out.println("   Search: " + searchLocation);
+
         if (searchLocation == null || searchLocation.trim().isEmpty()) {
+            System.out.println("   ✅ No filter applied - returning true");
             return true; // No filter applied
         }
-        if (station == null) return false;
+
+        if (station == null) {
+            System.out.println("   ❌ Station is null - returning false");
+            return false;
+        }
 
         String search = searchLocation.toLowerCase().trim();
+        System.out.println("   Search lowercased: '" + search + "'");
 
         // Check if search is a numeric ID (from station search component)
         try {
             Long searchId = Long.parseLong(search);
             if (station.getId() != null && station.getId().equals(searchId.intValue())) {
-                System.out.println("🎯 Train Station ID match: " + station.getId() + " = " + searchId);
+                System.out.println("   ✅ Train Station ID match: " + station.getId() + " = " + searchId);
                 return true;
             }
+            System.out.println("   ❌ ID mismatch: " + station.getId() + " != " + searchId);
         } catch (NumberFormatException e) {
-            // Not a number, continue with text matching
+            System.out.println("   📝 Not a number, checking text match...");
         }
 
         // Text-based matching for manual input
-        boolean nameMatch = station.getTrainStationFullName() != null && station.getTrainStationFullName().toLowerCase().contains(search);
-        boolean codeMatch = station.getTrainStationCode() != null && station.getTrainStationCode().toLowerCase().contains(search);
-        boolean cityMatch = station.getTrainStationCityLocation() != null && station.getTrainStationCityLocation().toLowerCase().contains(search);
+        String stationName = station.getTrainStationFullName();
+        String stationCode = station.getTrainStationCode();
+        String stationCity = station.getTrainStationCityLocation();
 
-        return nameMatch || codeMatch || cityMatch;
+        System.out.println("   Station details:");
+        System.out.println("     Name: '" + stationName + "'");
+        System.out.println("     Code: '" + stationCode + "'");
+        System.out.println("     City: '" + stationCity + "'");
+
+        boolean nameMatch = stationName != null && stationName.toLowerCase().contains(search);
+        boolean codeMatch = stationCode != null && stationCode.toLowerCase().contains(search);
+        boolean cityMatch = stationCity != null && stationCity.toLowerCase().contains(search);
+
+        System.out.println("   Match results:");
+        System.out.println("     Name match: " + nameMatch);
+        System.out.println("     Code match: " + codeMatch +
+                (stationCode != null ? " ('" + stationCode.toLowerCase() + "' contains '" + search + "')" : ""));
+        System.out.println("     City match: " + cityMatch);
+
+        boolean result = nameMatch || codeMatch || cityMatch;
+        System.out.println("   🎯 Final result: " + result);
+
+        return result;
     }
 
     private boolean matchesBusStationLocation(BusStation station, String searchLocation) {
@@ -378,7 +438,7 @@ public class BookingSearchService {
 
         // Text-based matching for manual input
         boolean nameMatch = station.getBusStationFullName() != null && station.getBusStationFullName().toLowerCase().contains(search);
-        boolean codeMatch = station.getBusStationCode() != null && station.getBusStationCode().toLowerCase().contains(search);
+        boolean codeMatch = station.getBusStationCode() != null && station.getBusStationCode().toUpperCase().contains(search);
         boolean cityMatch = station.getBusStationCityLocation() != null && station.getBusStationCityLocation().toLowerCase().contains(search);
 
         return nameMatch || codeMatch || cityMatch;

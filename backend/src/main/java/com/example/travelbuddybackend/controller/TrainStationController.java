@@ -171,43 +171,4 @@ public class TrainStationController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
-    @GetMapping("/name/{searchTerm}")
-    public ResponseEntity<List<TrainStation>> searchTrainStationsByName(@PathVariable String searchTerm) {
-        try {
-            var searchResults = trainStationService.findTrainStationsByPartialName(searchTerm);
-
-            System.out.println("✓ Controller: Train station search for '" + searchTerm + "' returned " + searchResults.size() + " results");
-            return ResponseEntity.ok(searchResults);
-        } catch (Exception e) {
-            System.out.println("✗ Controller Error: " + e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/code/{searchTerm}")
-    public ResponseEntity<List<TrainStation>> searchTrainStationsByCode(@PathVariable String searchTerm) {
-        try {
-            var searchResults = trainStationService.findTrainStationsByCode(searchTerm);
-
-            System.out.println("✓ Controller: Train station search for '" + searchTerm + "' returned " + searchResults.size() + " results");
-            return ResponseEntity.ok(searchResults);
-        } catch (Exception e) {
-            System.out.println("✗ Controller Error: " + e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/city/{searchTerm}")
-    public ResponseEntity<List<TrainStation>> getTrainStationsByCity(@PathVariable String searchTerm) {
-        try {
-            var searchResults = trainStationService.findTrainStationsByPartialCity(searchTerm);
-
-            System.out.println("✓ Controller: Train station search for '" + searchTerm + "' returned " + searchResults.size() + " results");
-            return ResponseEntity.ok(searchResults);
-        } catch (Exception e) {
-            System.out.println("✗ Controller Error: " + e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
-    }
 }

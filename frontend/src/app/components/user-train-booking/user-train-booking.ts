@@ -51,12 +51,20 @@ searchForm!: FormGroup;
   }
   
   onSearch(): void {
+    const formValue = this.searchForm.value;
+    
     const searchCriteria: BookingSearchCriteria = {
       transportType: 'train',
-      ...this.searchForm.value
+      // Form field names already match backend expectations
+      departureStation: formValue.departureStation,
+      arrivalStation: formValue.arrivalStation,
+      departureTime: formValue.departureTime,
+      minPrice: formValue.minPrice,
+      maxPrice: formValue.maxPrice,
+      line: formValue.line
     };
     
-    console.log('Searching traines with criteria:', searchCriteria);
+    console.log('Searching trains with criteria:', searchCriteria);
     
     this.isSearching = true;
     this.searchError = '';

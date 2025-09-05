@@ -30,12 +30,15 @@ public class BookingSearchController {
      */
     @PostMapping("/available-tickets")
     public ResponseEntity<List<AvailableTicket>> searchAvailableTickets(@RequestBody BookingSearchCriteria criteria) {
-
         try {
             System.out.println("🔍 Searching available tickets:");
             System.out.println("Transport Type: " + criteria.getTransportType());
-            System.out.println("From: " + criteria.getDepartureCity());
-            System.out.println("To: " + criteria.getArrivalCity());
+
+            // Fix these to show the actual fields being sent:
+            System.out.println("Departure Station: " + criteria.getDepartureStation());
+            System.out.println("Arrival Station: " + criteria.getArrivalStation());
+            System.out.println("Departure City: " + criteria.getDepartureCity());
+            System.out.println("Arrival City: " + criteria.getArrivalCity());
             System.out.println("Airline/Line: " + criteria.getAirline() + "/" + criteria.getLine());
 
             List<AvailableTicket> results = bookingSearchService.searchAvailableTickets(criteria);
