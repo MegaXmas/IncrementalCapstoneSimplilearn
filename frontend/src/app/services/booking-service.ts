@@ -10,6 +10,7 @@ export interface BookingSearchCriteria {
   departureStation?: string;
   arrivalStation?: string;
   departureTime?: string;
+  departureDate?: string; 
   minPrice?: number;
   maxPrice?: number;
   airline?: string; // For flights
