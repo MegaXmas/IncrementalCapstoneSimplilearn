@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DateInputComponent } from '../shared/date-dropdown/date-input';
-import { TimeInputComponent } from '../shared/time-dropdown/time-input';
+import { TimeDropdownComponent } from '../shared/time-dropdown/time-dropdown';
 import { ClientService } from '../../services/client-service';
 @Component({
   selector: 'app-user-train-booking',
@@ -10,7 +10,7 @@ import { ClientService } from '../../services/client-service';
     CommonModule, 
     ReactiveFormsModule, 
     DateInputComponent,
-    TimeInputComponent
+    TimeDropdownComponent
   ],
   templateUrl: './user-train-booking.html',
   styleUrls: ['./user-train-booking.css','../shared/form-styles.css'],
