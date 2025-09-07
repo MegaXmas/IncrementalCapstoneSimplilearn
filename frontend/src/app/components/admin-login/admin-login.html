@@ -20,10 +20,12 @@
              formControlName="adminUsername" 
              required
              [class.invalid]="adminLoginForm.get('adminUsername')?.invalid && (adminLoginForm.get('adminUsername')?.dirty || adminLoginForm.get('adminUsername')?.touched)">
-      <div *ngIf="adminLoginForm.get('adminUsername')?.invalid && adminLoginForm.get('adminUsername')?.touched" 
+      @if (adminLoginForm.get('adminUsername')?.invalid && adminLoginForm.get('adminUsername')?.touched) {
+      <div
            class="text-danger">
-          Enter Admin Username
+          Enter Admin Password
       </div>
+      }
     </div><br>
 
     <!-- Password field group -->
@@ -35,10 +37,12 @@
              formControlName="adminPassword" 
              required
              [class.invalid]="adminLoginForm.get('adminPassword')?.invalid && (adminLoginForm.get('adminPassword')?.dirty || adminLoginForm.get('adminPassword')?.touched)">
-      <div *ngIf="adminLoginForm.get('adminPassword')?.invalid && adminLoginForm.get('adminPassword')?.touched" 
+      @if (adminLoginForm.get('adminPassword')?.invalid && adminLoginForm.get('adminPassword')?.touched) {
+      <div
            class="text-danger">
           Enter Admin Password
       </div>
+      }
     </div><br>
     
     <!-- Checkbox field group with proper binding -->

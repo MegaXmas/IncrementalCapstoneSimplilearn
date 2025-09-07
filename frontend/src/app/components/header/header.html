@@ -54,32 +54,38 @@
 
       <!-- Admin Dashboard Link (only shown if admin is logged in) -->
       <ul class="navbar-nav ms-auto me-3">
-        <li class="nav-item" *ngIf="isAdminLoggedIn">
+        @if (isAdminLoggedIn) {
+          <li class="nav-item">
           <a class="nav-link" routerLink="/admin-dashboard" routerLinkActive="active">
             <i class="fas fa-user-shield me-1"></i>Admin Dashboard
           </a>
         </li>
+       }
       </ul>
 
       <!-- User Authentication Section -->
       <ul class="navbar-nav ms-auto">
         
         <!-- Login Link (shown when no one is logged in) -->
-        <li class="nav-item" *ngIf="!isClientLoggedIn && !isAdminLoggedIn">
-          <a class="nav-link" routerLink="/client-form">
+         @if (!isClientLoggedIn && !isAdminLoggedIn) {
+        <li class="nav-item"> <a class="nav-link" routerLink="/client-form">
             <i class="fas fa-sign-in-alt me-1"></i>Login
           </a>
         </li>
+        }
 
         <!-- Admin Login Link (shown when no admin is logged in) -->
-        <li class="nav-item" *ngIf="!isAdminLoggedIn">
+        @if (!isAdminLoggedIn) {
+        <li class="nav-item">
           <a class="nav-link" routerLink="/admin-login">
             <i class="fas fa-user-shield me-1"></i>Admin
           </a>
         </li>
+        }
 
         <!-- Client Profile Dropdown (shown when client is logged in) -->
-        <li class="nav-item dropdown" *ngIf="isClientLoggedIn">
+         @if (isClientLoggedIn) {
+        <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle d-flex align-items-center"
             href="#"
@@ -108,9 +114,11 @@
             </li>
           </ul>
         </li>
+        }
 
         <!-- Admin Profile Dropdown (shown when admin is logged in) -->
-        <li class="nav-item dropdown" *ngIf="isAdminLoggedIn">
+         @if (isAdminLoggedIn) {
+        <li class="nav-item dropdown">
           <a
             class="nav-link dropdown-toggle d-flex align-items-center"
             href="#"
@@ -123,7 +131,7 @@
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
             <li>
               <a class="dropdown-item" routerLink="/admin-dashboard">
-                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                <i class="fas fa-tachometer-alt me-2"></i> Admin Dashboard
               </a>
             </li>
             <li>
@@ -149,7 +157,7 @@
             </li>
           </ul>
         </li>
-
+        }
       </ul>
     </div>
   </div>
