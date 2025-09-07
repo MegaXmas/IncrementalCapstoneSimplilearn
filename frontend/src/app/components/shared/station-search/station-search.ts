@@ -186,7 +186,7 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
     this.filteredStations = [];
     
     // Update form value with the station ID
-    this.onChange(station.id);
+    this.onChange(station.code);
     this.onTouch();
   }
 

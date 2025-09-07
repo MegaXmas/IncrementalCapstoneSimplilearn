@@ -78,7 +78,7 @@ public class BusStationRepository {
         try {
             List<BusStation> busStations = jdbcTemplate.query(
                     "SELECT id, busStationFullName, busStationCode, busStationCityLocation FROM bus_stations WHERE busStationCode = ?",
-                    new BusStationRowMapper(), stationCode);
+                    new BusStationRowMapper(), stationCode.toUpperCase());
 
             if (busStations.isEmpty()) {
                 System.out.println("✗ Repository: Bus station with code " + stationCode + " not found");

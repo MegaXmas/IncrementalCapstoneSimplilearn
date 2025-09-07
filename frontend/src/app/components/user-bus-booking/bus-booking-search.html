@@ -1,48 +1,20 @@
-<!-- booking-search.html -->
 <div class="booking-search-container">
   <div class="card">
     <div class="card-header">
-      <h3 class="mb-0">🔍 Search Travel Tickets</h3>
+      <h3 class="mb-0">🚌 Search Bus Tickets</h3>
     </div>
     
     <div class="card-body">
       <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
         
-        <!-- Transport Type Selection -->
+        <!-- Bus Line -->
         <div class="row mb-3">
           <div class="col-md-6">
-            <label class="form-label">Transport Type</label>
-            <select formControlName="transportType" class="form-control">
-              <option value="">All Transport Types</option>
-              <option value="flight">✈️ Flight</option>
-              <option value="train">🚂 Train</option>
-              <option value="bus">🚌 Bus</option>
-            </select>
-          </div>
-          
-          <!-- Airline/Line based on transport type -->
-          <div class="col-md-6">
-            @if (searchForm.get('transportType')?.value === 'flight') {
-              <label class="form-label">Airline (Optional)</label>
-              <input type="text" 
-                     formControlName="airline" 
-                     class="form-control" 
-                     placeholder="e.g., Delta, American Airlines">
-            }
-            @else if (searchForm.get('transportType')?.value === 'train') {
-              <label class="form-label">Train Line (Optional)</label>
-              <input type="text" 
-                     formControlName="line" 
-                     class="form-control" 
-                     placeholder="e.g., Amtrak, Metro-North">
-            }
-            @else if (searchForm.get('transportType')?.value === 'bus') {
-              <label class="form-label">Bus Line (Optional)</label>
-              <input type="text" 
-                     formControlName="line" 
-                     class="form-control" 
-                     placeholder="e.g., Greyhound, Megabus">
-            }
+            <label class="form-label">Bus Line (Optional)</label>
+            <input type="text" 
+                   formControlName="line" 
+                   class="form-control" 
+                   placeholder="e.g., Greyhound, Megabus">
           </div>
         </div>
 
@@ -50,7 +22,7 @@
         <div class="row mb-3">
           <div class="col-md-6">
             <app-station-search
-              label="Departure Station (Optional)"
+              label="Departure Station"
               placeholder="Search departure station..."
               [stationType]="getStationType()"
               formControlName="departureStation">
@@ -58,7 +30,7 @@
           </div>
           <div class="col-md-6">
             <app-station-search
-              label="Arrival Station (Optional)"
+              label="Arrival Station"
               placeholder="Search arrival station..."
               [stationType]="getStationType()"
               formControlName="arrivalStation">
@@ -66,13 +38,27 @@
           </div>
         </div>
 
-        <!-- Departure Time -->
+        <!-- Date and Time Row -->
         <div class="row mb-3">
+          <!-- Departure Date -->
           <div class="col-md-6">
-            <label class="form-label">Departure Time (Optional)</label>
-            <input type="datetime-local" 
-                   formControlName="departureTime" 
-                   class="form-control">
+            <app-date-input
+              label="Departure Date"
+              id="departure-date"
+              formControlName="departureDate"
+              [isInvalid]="isFieldInvalid('departureDate')"
+              errorMessage="Please select a departure date">
+            </app-date-input>
+          </div>
+
+          <!-- Departure Time with Dropdown -->
+          <div class="col-md-6">
+            <app-time-dropdown 
+              label="Departure Time"
+              id="departure-time"
+              formControlName="departureTime"
+              errorMessage="Please select a departure time">
+            </app-time-dropdown>
           </div>
         </div>
 
@@ -96,7 +82,7 @@
           </div>
         </div>
 
-        <!-- Search Buttons -->
+        <!-- Search Button -->
         <div class="row">
           <div class="col-md-8">
             <button type="submit" 
@@ -106,7 +92,7 @@
                 <span class="spinner-border spinner-border-sm me-2"></span>
                 Searching...
               } @else {
-                🔍 Search All Tickets
+                🚌 Search Bus Tickets
               }
             </button>
           </div>
@@ -135,7 +121,7 @@
     <div class="search-results mt-4">
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <h4 class="mb-0">🎫 Available Tickets</h4>
+          <h4 class="mb-0">🚌 Available Bus Tickets</h4>
           <span class="badge bg-primary">{{ searchResults.length }} found</span>
         </div>
         
@@ -145,13 +131,7 @@
               <div class="row align-items-center">
                 <div class="col-md-8">
                   <div class="d-flex align-items-center mb-2">
-                    @if (ticket.transportType === 'flight') {
-                      <span class="badge bg-primary me-2">✈️ Flight</span>
-                    } @else if (ticket.transportType === 'train') {
-                      <span class="badge bg-success me-2">🚂 Train</span>
-                    } @else {
-                      <span class="badge bg-warning me-2">🚌 Bus</span>
-                    }
+                    <span class="badge bg-warning me-2">🚌 Bus</span>
                     <strong>{{ ticket.number }}</strong>
                     <span class="text-muted ms-2">{{ ticket.additionalInfo }}</span>
                   </div>

@@ -37,32 +37,6 @@ export class StationService {
   constructor(private http: HttpClient) {}
 
   /**
-   * Search bus stations by any term (name, code, or city)
-   * TODO: Implement when bus controller is ready
-   */
-  universalBusStationSearch(query: string): Observable<BusStation[]> {
-    if (!query || query.trim().length === 0) {
-      return of([]);
-    }
-    // Placeholder - implement when bus controller is ready
-    console.log('Bus station search not implemented yet');
-    return of([]);
-  }
-
-  /**
-   * Search train stations by any term (name, code, or city)
-   * TODO: Implement when train controller is ready
-   */
-  universalTrainStationSearch(query: string): Observable<TrainStation[]> {
-    if (!query || query.trim().length === 0) {
-      return of([]);
-    }
-    // Placeholder - implement when train controller is ready
-    console.log('Train station search not implemented yet');
-    return of([]);
-  }
-
-  /**
    * Search airports by any term (name, code, or city)
    * Uses the airport controller search endpoint we created
    */

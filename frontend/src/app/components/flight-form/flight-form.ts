@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { DateDropdownComponent } from '../shared/date-dropdown/date-dropdown';
+import { DateInputComponent } from '../shared/date-dropdown/date-input';
 import { TimeDropdownComponent } from '../shared/time-dropdown/time-dropdown';
 import { DurationDropdownComponent } from '../shared/duration-dropdown/duration-dropdown';
 import { AirportService } from '../../services/airport-service';
@@ -16,7 +16,7 @@ import { StationSearchComponent } from '../shared/station-search/station-search'
   imports: [
     CommonModule, 
     ReactiveFormsModule, 
-    DateDropdownComponent,
+    DateInputComponent,
     TimeDropdownComponent, 
     DurationDropdownComponent,
     StationSearchComponent

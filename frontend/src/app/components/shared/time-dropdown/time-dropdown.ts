@@ -7,7 +7,7 @@ import { BaseFormControl } from '../base-form-control';
   selector: 'app-time-dropdown',
   imports: [CommonModule],
   templateUrl: './time-dropdown.html',
-  styleUrls: ['./time-dropdown.css', '../form-styles.css'],
+  styleUrls: ['../form-styles.css'],
   standalone: true,
   providers: [
     {

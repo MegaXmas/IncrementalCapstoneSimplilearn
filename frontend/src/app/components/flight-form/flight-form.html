@@ -66,22 +66,22 @@
 
         <!-- Date Dropdown Components - Simplified validation -->
         <div class="form-group">
-          <app-date-dropdown
+          <app-date-input
             label="Flight Departure Date"
             id="flightDepartureDate"
             formControlName="flightDepartureDate">
-          </app-date-dropdown>
+          </app-date-input>
           @if (isFieldInvalid('flightDepartureDate')) {
             <div class="text-danger">Please select the departure date</div>
           }
         </div><br>
 
         <div class="form-group">
-          <app-date-dropdown
+          <app-date-input
             label="Flight Arrival Date"
             id="flightArrivalDate"
             formControlName="flightArrivalDate">
-          </app-date-dropdown>
+          </app-date-input>
           @if (isFieldInvalid('flightArrivalDate')) {
             <div class="text-danger">Please select the arrival date</div>
           }

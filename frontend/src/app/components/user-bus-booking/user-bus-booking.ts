@@ -1,89 +1,114 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { DateDropdownComponent } from '../shared/date-dropdown/date-dropdown';
 import { StationSearchComponent } from '../shared/station-search/station-search';
+import { BookingService, BookingSearchCriteria, AvailableTicket } from '../../services/booking-service';
+import { DateInputComponent } from "../shared/date-dropdown/date-input";
+import { TimeDropdownComponent } from '../shared/time-dropdown/time-dropdown';
 
 @Component({
-  selector: 'app-user-bus-booking',
-  imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    DateDropdownComponent,
-    StationSearchComponent,
-  ],
-  templateUrl: './user-bus-booking.html',
-  styleUrls: ['./user-bus-booking.css','../shared/form-styles.css'],
+  selector: 'app-booking-search',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, StationSearchComponent, DateInputComponent, TimeDropdownComponent],
+  templateUrl: './bus-booking-search.html',
+  styleUrls: ['../shared/booking-search/booking-search.css', '../shared/form-styles.css']
 })
 export class UserBusBookingComponent implements OnInit {
-  userBusBookingForm!: FormGroup;
+ 
+searchForm!: FormGroup;
+  searchResults: AvailableTicket[] = [];
+  isSearching = false;
+  searchError = '';
+ 
+  @Output() ticketSelected = new EventEmitter<AvailableTicket>();
   
-  // Simple tracking properties
-  showInputTracking: boolean = false;
-  currentInputs: any = {
-    busDepartureStation: '',
-    busArrivalStation: '',
-    busDepartureDate: ''
-  };
-
-  constructor(private fb: FormBuilder) {}
-
+  constructor(
+    private fb: FormBuilder,
+    private bookingService: BookingService
+  ) {}
+  
   ngOnInit(): void {
-    // Create the reactive form
-    this.userBusBookingForm = this.fb.group({
-      busDepartureStation: ['', Validators.required],
-      busArrivalStation: ['', Validators.required],
-      busDepartureDate: ['', Validators.required]
-    });
-
-    // Track form changes
-    this.userBusBookingForm.valueChanges.subscribe(values => {
-      this.currentInputs = { ...values };
-      console.log('Form values changed:', values);
+    // Create the search form for buses only
+    this.searchForm = this.fb.group({
+      departureStation: [''],
+      arrivalStation: [''],
+      departureDate: [''],
+      departureTime: [''],
+      minPrice: [0],
+      maxPrice: [20000],
+      line: ['']
     });
   }
 
-  /**
-   * Check if a field is invalid and has been touched
-   */
   isFieldInvalid(fieldName: string): boolean {
-    const field = this.userBusBookingForm.get(fieldName);
-    return (field?.invalid ?? false) && (field?.touched ?? false);
+    const field = this.searchForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched))
   }
-
-  /**
-   * Toggle the input tracking display
-   */
-  toggleInputTracking(): void {
-    this.showInputTracking = !this.showInputTracking;
+  
+  // Always return 'bus' since this component is bus-specific
+  getStationType(): 'bus' {
+    return 'bus';
   }
-
-  /**
-   * Handle form reset
-   */
-  onFormReset(): void {
-    this.userBusBookingForm.reset();
-    this.currentInputs = {
-      busDepartureStation: '',
-      busArrivalStation: '',
-      busDepartureDate: ''
+  
+  onSearch(): void {
+    const searchCriteria: BookingSearchCriteria = {
+      transportType: 'bus',
+      ...this.searchForm.value
     };
-    console.log('Form reset');
+    
+    console.log('Searching buses with criteria:', searchCriteria);
+    
+    this.isSearching = true;
+    this.searchError = '';
+    this.searchResults = [];
+    
+    this.bookingService.searchAvailableTickets(searchCriteria).subscribe({
+      next: (tickets: AvailableTicket[]) => {
+        console.log('✅ Bus search completed, found tickets:', tickets);
+        this.searchResults = tickets;
+        this.isSearching = false;
+        
+        if (tickets.length === 0) {
+          this.searchError = 'No bus tickets found matching your criteria. Try adjusting your search.';
+        }
+      },
+      error: (error) => {
+        console.error('❌ Bus search failed:', error);
+        this.searchError = 'Bus search failed. Please check your connection and try again.';
+        this.isSearching = false;
+        this.searchResults = [];
+      }
+    });
   }
-
-  /**
-   * Handle form submission
-   */
-  onSubmit(): void {
-    if (this.userBusBookingForm.valid) {
-      console.log('Form submitted successfully:', this.userBusBookingForm.value);
-      // Handle form submission here
-    } else {
-      console.log('Form is invalid');
-      // Mark all fields as touched to show validation errors
-      Object.keys(this.userBusBookingForm.controls).forEach(key => {
-        this.userBusBookingForm.get(key)?.markAsTouched();
-      });
-    }
+  
+  selectTicket(ticket: AvailableTicket): void {
+    this.ticketSelected.emit(ticket);
+    console.log('Bus ticket selected:', ticket);
+  }
+  
+  formatTicketRoute(ticket: AvailableTicket): string {
+    return this.bookingService.formatTicketRoute(ticket);
+  }
+  
+  formatTicketTime(ticket: AvailableTicket): string {
+    return this.bookingService.formatTicketTime(ticket);
+  }
+  
+  formatPrice(price: number): string {
+    return this.bookingService.formatPrice(price);
+  }
+  
+  // Clear search results
+  clearSearch(): void {
+    this.searchResults = [];
+    this.searchError = '';
+    this.searchForm.reset({
+      departureStation: '',
+      arrivalStation: '',
+      departureTime: '',
+      minPrice: 0,
+      maxPrice: 20000,
+      line: ''
+    });
   }
 }

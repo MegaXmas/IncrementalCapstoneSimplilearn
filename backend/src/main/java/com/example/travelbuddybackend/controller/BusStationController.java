@@ -171,43 +171,4 @@ public class BusStationController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
-    @GetMapping("/name/{searchTerm}")
-    public ResponseEntity<List<BusStation>> searchBusStationsByName(@PathVariable String searchTerm) {
-        try {
-            var searchResults = busStationService.findBusStationsByPartialName(searchTerm);
-
-            System.out.println("✓ Controller: Bus station search for '" + searchTerm + "' returned " + searchResults.size() + " results");
-            return ResponseEntity.ok(searchResults);
-        } catch (Exception e) {
-            System.out.println("✗ Controller Error: " + e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/code/{searchTerm}")
-    public ResponseEntity<List<BusStation>> searchBusStationsByCode(@PathVariable String searchTerm) {
-        try {
-            var searchResults = busStationService.findBusStationsByCode(searchTerm);
-
-            System.out.println("✓ Controller: Bus station search for '" + searchTerm + "' returned " + searchResults.size() + " results");
-            return ResponseEntity.ok(searchResults);
-        } catch (Exception e) {
-            System.out.println("✗ Controller Error: " + e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/city/{searchTerm}")
-    public ResponseEntity<List<BusStation>> getBusStationsByCity(@PathVariable String searchTerm) {
-        try {
-            var searchResults = busStationService.findBusStationsByCityLocation(searchTerm);
-
-            System.out.println("✓ Controller: Bus station search for '" + searchTerm + "' returned " + searchResults.size() + " results");
-            return ResponseEntity.ok(searchResults);
-        } catch (Exception e) {
-            System.out.println("✗ Controller Error: " + e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
-    }
 }

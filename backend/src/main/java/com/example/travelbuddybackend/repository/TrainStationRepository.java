@@ -78,7 +78,7 @@ public class TrainStationRepository {
         try {
             List<TrainStation> trainStations = jdbcTemplate.query(
                     "SELECT id, trainStationFullName, trainStationCode, trainStationCityLocation FROM train_stations WHERE trainStationCode = ?",
-                    new TrainStationRowMapper(), stationCode);
+                    new TrainStationRowMapper(), stationCode.toUpperCase());
 
             if (trainStations.isEmpty()) {
                 System.out.println("✗ Repository: Train station with code " + stationCode + " not found");
