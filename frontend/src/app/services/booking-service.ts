@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import { BusDetails } from './bus-details-service';
 
 export interface BookingSearchCriteria {
   transportType?: string;
@@ -141,6 +142,13 @@ export class BookingService {
           return of([]);
         })
       );
+  }
+
+  // New method for creating bus bookings
+  createBusBooking(bookingRequest: BusDetails): Observable<any> {
+    return this.http.post(`${this.baseUrl}/bookings/bus`, bookingRequest, {
+      withCredentials: true  // Include session cookies
+    });
   }
 
   /**
