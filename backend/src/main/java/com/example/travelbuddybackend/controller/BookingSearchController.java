@@ -2,9 +2,10 @@
 package com.example.travelbuddybackend.controller;
 
 import com.example.travelbuddybackend.models.Booking;
+import com.example.travelbuddybackend.models.AvailableTicket;
+
 import com.example.travelbuddybackend.service.BookingSearchService;
 import com.example.travelbuddybackend.service.BookingSearchService.BookingSearchCriteria;
-import com.example.travelbuddybackend.service.BookingSearchService.AvailableTicket;
 import com.example.travelbuddybackend.service.BookingService;
 
 import org.springframework.beans.factory.annotation.Autowired;

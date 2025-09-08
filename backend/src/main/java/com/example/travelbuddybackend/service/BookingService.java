@@ -1,6 +1,7 @@
 package com.example.travelbuddybackend.service;
 
 import com.example.travelbuddybackend.models.*;
+import com.example.travelbuddybackend.models.AvailableTicket;
 import com.example.travelbuddybackend.repository.BookingRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,10 @@ public class BookingService {
     @Autowired
     public BookingService(BookingRepository bookingRepository) {
         this.bookingRepository = bookingRepository;
-        this.objectMapper = new ObjectMapper(); // Jackson library for JSON handling
+        this.objectMapper = new ObjectMapper();
     }
+
+
 
     // =============================================================
     // POLYMORPHIC BOOKING METHODS - Core business functionality
@@ -123,7 +126,7 @@ public class BookingService {
      * @param busDetails The bus being booked
      * @return Booking object if successful, null if failed
      */
-    public Booking bookTicket(Client client, BusDetails busDetails) {
+    public Booking bookTicket(Client client, BookingSearchService.AvailableTicket bookingRequest) {
         System.out.println("Booking bus for: " + client.getName());
         System.out.println("Bus: " + busDetails.getBusNumber() + " from " +
                 busDetails.getBusDepartureStation() + " to " + busDetails.getBusArrivalStation());

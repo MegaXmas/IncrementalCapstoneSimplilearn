@@ -5,6 +5,7 @@ import { StationSearchComponent } from '../shared/station-search/station-search'
 import { BookingService, BookingSearchCriteria, AvailableTicket } from '../../services/booking-service';
 import { DateInputComponent } from "../shared/date-dropdown/date-input";
 import { TimeDropdownComponent } from '../shared/time-dropdown/time-dropdown';
+import { BusDetails } from '../../services/bus-details-service';
 
 @Component({
   selector: 'app-booking-search',
@@ -19,6 +20,9 @@ searchForm!: FormGroup;
   searchResults: AvailableTicket[] = [];
   isSearching = false;
   searchError = '';
+
+  isSubmitting = false;
+  submitMessage = ''
  
   @Output() ticketSelected = new EventEmitter<AvailableTicket>();
   
@@ -97,6 +101,16 @@ searchForm!: FormGroup;
   formatPrice(price: number): string {
     return this.bookingService.formatPrice(price);
   }
+
+  onSubmit(): void {
+    if (this.searchForm.valid) {
+      this.isSubmitting = true;
+      this.submitMessage = 'Search submitted successfully.';
+
+      const busTicket = this.selectTicket
+    }
+  }
+  
   
   // Clear search results
   clearSearch(): void {

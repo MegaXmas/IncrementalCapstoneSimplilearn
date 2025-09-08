@@ -46,7 +46,7 @@ export class BusDetailsService {
    * Get all bus Detailss
    * @returns Observable<BusDetails[]> List of bus Detailss
    */
-  getAllBusDetailss(): Observable<BusDetails[]> {
+  getAllBusDetails(): Observable<BusDetails[]> {
     return this.http.get<BusDetails[]>(this.baseUrl);
   }
 }

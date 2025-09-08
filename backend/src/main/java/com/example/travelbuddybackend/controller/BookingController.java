@@ -1,8 +1,10 @@
 package com.example.travelbuddybackend.controller;
 
+import com.example.travelbuddybackend.models.AvailableTicket;
 import com.example.travelbuddybackend.models.Booking;
 import com.example.travelbuddybackend.models.BusDetails;
 import com.example.travelbuddybackend.models.Client;
+import com.example.travelbuddybackend.service.BookingSearchService;
 import com.example.travelbuddybackend.service.BookingService;
 import com.example.travelbuddybackend.service.ClientService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,12 +20,13 @@ public class BookingController {
 
     @Autowired
     private BookingService bookingService;
+    private BookingSearchService bookingSearchService;
 
     @Autowired
     private ClientService clientService; // Assuming you have this service
 
     @PostMapping("/bus")
-    public ResponseEntity<?> createBusBooking(@RequestBody BusDetails busDetails, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> createBusBooking(@RequestBody AvailableTicket bookingRequest, HttpServletRequest httpRequest) {
         try {
             Client client = clientService.getClientFromToken(extractTokenFromRequest(httpRequest));
 
@@ -31,24 +34,10 @@ public class BookingController {
                 return ResponseEntity.status(401).body("Client not logged in");
             }
 
-            // Create BusDetails object from request
-            BusDetails busBooking = new BusDetails();
-            busDetails.setBusNumber(busDetails.getBusNumber());
-            busDetails.setBusLine(busDetails.getBusLine());
-            busDetails.setBusDepartureStation(busDetails.getBusDepartureStation());
-            busDetails.setBusArrivalStation(busDetails.getBusArrivalStation());
-            busDetails.setBusDepartureDate(busDetails.getBusDepartureDate());
-            busDetails.setBusDepartureTime(busDetails.getBusDepartureTime());
-            busDetails.setBusArrivalDate(busDetails.getBusArrivalDate());
-            busDetails.setBusArrivalTime(busDetails.getBusArrivalTime());
-            busDetails.setBusRidePrice(busDetails.getBusRidePrice());
-            busDetails.setBusRideDuration(busDetails.getBusRideDuration());
 
-            // Create booking
-            Booking booking = bookingService.bookBusTicket(client, busDetails);
 
-            if (booking != null) {
-                return ResponseEntity.ok(booking);
+            if (bookingRequest != null) {
+                return ResponseEntity.ok(bookingRequest);
             } else {
                 return ResponseEntity.status(500).body("Booking failed");
             }

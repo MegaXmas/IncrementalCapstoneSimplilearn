@@ -1,5 +1,8 @@
 package com.example.travelbuddybackend.models;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 public class Booking {
 
     private Integer id;
@@ -9,10 +12,14 @@ public class Booking {
     private String clientEmail;
     private String clientPhone;
 
-    public Booking() {}
+    private LocalDateTime created_at;
 
-    public Booking(Integer id, String bookingId, String clientName, String clientEmail, String clientPhone, String transportDetailsJson) {
-        this.id = id;
+    public Booking() {
+        this.created_at = LocalDateTime.now();
+    }
+
+    public Booking(String bookingId, String clientName, String clientEmail, String clientPhone, String transportDetailsJson) {
+        this();
         this.bookingId = bookingId;
         this.clientName = clientName;
         this.clientEmail = clientEmail;
@@ -66,6 +73,14 @@ public class Booking {
 
     public void setClientPhone(String clientPhone) {
         this.clientPhone = clientPhone;
+    }
+
+    public LocalDateTime getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(LocalDateTime created_at) {
+        this.created_at = created_at;
     }
 
     @Override

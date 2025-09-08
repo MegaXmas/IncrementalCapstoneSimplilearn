@@ -32,7 +32,7 @@ export interface AvailableTicket {
 export interface Booking {
   id?: number;
   bookingId: string;
-  transportDetailsJson: string;
+  transportDetails: AvailableTicket;
   clientName: string;
   clientEmail: string;
   clientPhone: string;
@@ -144,12 +144,21 @@ export class BookingService {
       );
   }
 
+  //
+  //
+  //
+  //
+  //
   // New method for creating bus bookings
-  createBusBooking(bookingRequest: BusDetails): Observable<any> {
+  createBusBooking(bookingRequest: AvailableTicket): Observable<any> {
     return this.http.post(`${this.baseUrl}/bookings/bus`, bookingRequest, {
       withCredentials: true  // Include session cookies
     });
   }
+  //
+  //
+  //
+  //
 
   /**
    * Get my bookings by email
