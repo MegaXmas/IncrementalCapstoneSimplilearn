@@ -40,8 +40,8 @@ export class BusFormComponent implements OnInit {
     this.busForm = this.fb.group({
       busNumber: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5)]],
       busLine: ['', [Validators.required, Validators.minLength(2)]],
-      busDepartureStation: ['', Validators.required],  // This matches the formControlName in template
-      busArrivalStation: ['', Validators.required],    // This matches the formControlName in template
+      busDepartureStation: ['', Validators.required],
+      busArrivalStation: ['', Validators.required],
       busDepartureDate: ['', [Validators.required, Validators.pattern(/\d{4}-\d{2}-\d{2}$/)]],
       busDepartureTime: ['', [Validators.required, Validators.pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)]],
       busArrivalDate: ['', [Validators.required, Validators.pattern(/\d{4}-\d{2}-\d{2}$/)]],
@@ -63,11 +63,11 @@ export class BusFormComponent implements OnInit {
       this.isSubmitting = true;
       this.submitMessage = '';
 
-      // Get station IDs from form (these come from StationSearchComponent)
+      // Get station IDs from form
       const departureStationId = this.busForm.value.busDepartureStation;
       const arrivalStationId = this.busForm.value.busArrivalStation;
 
-      // Get station objects to create the BusDetails properly
+      // Get station objects
       this.getStationObjects(departureStationId, arrivalStationId);
     } else {
       this.busForm.markAllAsTouched();
@@ -101,7 +101,7 @@ export class BusFormComponent implements OnInit {
           return;
         }
 
-        // Create the BusDetails object with full station data (matches Java model)
+        // Create the BusDetails object with full station data
         const busDetailsData: BusDetails = {
           busNumber: this.busForm.value.busNumber,
           busLine: this.busForm.value.busLine,

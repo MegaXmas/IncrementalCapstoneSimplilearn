@@ -14,7 +14,7 @@ export interface TrainDetails {
     trainArrivalDate: string; // ISO date string
     trainArrivalTime: string; // ISO time string
     trainRideDuration: string; // e.g., "2h 30m"
-    trainRidePrice: string; // Price in appropriate currency units
+    trainRidePrice: string;
 }
 
 @Injectable({

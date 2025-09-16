@@ -28,7 +28,6 @@ searchForm!: FormGroup;
   ) {}
 
   ngOnInit(): void {
-    // Create the search form for traines only
     this.searchForm = this.fb.group({
       departureStation: [''],
       arrivalStation: [''],
@@ -55,7 +54,6 @@ searchForm!: FormGroup;
 
     const searchCriteria: BookingSearchCriteria = {
       transportType: 'train',
-      // Form field names already match backend expectations
       departureStation: formValue.departureStation,
       arrivalStation: formValue.arrivalStation,
       departureTime: formValue.departureTime,
@@ -106,7 +104,6 @@ searchForm!: FormGroup;
     return this.bookingService.formatPrice(price);
   }
 
-  // Clear search results
   clearSearch(): void {
     this.searchResults = [];
     this.searchError = '';

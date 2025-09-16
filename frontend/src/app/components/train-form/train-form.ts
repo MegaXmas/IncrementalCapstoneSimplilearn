@@ -40,8 +40,8 @@ export class TrainFormComponent implements OnInit {
     this.trainForm = this.fb.group({
       trainNumber: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(10)]],
       trainLine: ['', [Validators.required, Validators.minLength(2)]],
-      trainDepartureStation: ['', Validators.required],  // This matches the formControlName in template
-      trainArrivalStation: ['', Validators.required],    // This matches the formControlName in template
+      trainDepartureStation: ['', Validators.required],
+      trainArrivalStation: ['', Validators.required],
       trainDepartureDate: ['', [Validators.required, Validators.pattern(/\d{4}-\d{2}-\d{2}$/)]],
       trainDepartureTime: ['', [Validators.required, Validators.pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)]],
       trainArrivalDate: ['', [Validators.required, Validators.pattern(/\d{4}-\d{2}-\d{2}$/)]],
@@ -63,11 +63,11 @@ export class TrainFormComponent implements OnInit {
       this.isSubmitting = true;
       this.submitMessage = '';
 
-      // Get station IDs from form (these come from StationSearchComponent)
+      // Get station IDs from form
       const departureStationId = this.trainForm.value.trainDepartureStation;
       const arrivalStationId = this.trainForm.value.trainArrivalStation;
 
-      // Get station objects to create the TrainDetails properly
+      // Get station objects to create the TrainDetails
       this.getStationObjects(departureStationId, arrivalStationId);
     } else {
       this.trainForm.markAllAsTouched();
@@ -101,7 +101,7 @@ export class TrainFormComponent implements OnInit {
           return;
         }
 
-        // Create the TrainDetails object with full station data (matches Java model)
+        // Create the TrainDetails object with full station data
         const trainDetailsData: TrainDetails = {
           trainNumber: this.trainForm.value.trainNumber,
           trainLine: this.trainForm.value.trainLine,

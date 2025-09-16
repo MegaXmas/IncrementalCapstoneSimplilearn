@@ -1,18 +1,15 @@
 export interface Client {
-  // Core Identity
   id?: number;
   username: string;
   email: string;
-  password?: string;  // Optional - never received from backend for security
+  password?: string;
 
-  // Personal Information
   firstName: string;
   lastName: string;
   phone: string;
   address?: string;
-  credit_card?: string;  // Usually masked when received from backend
+  credit_card?: string;
 
-  // Account Management
   enabled?: boolean;
   accountLocked?: boolean;
   createdAt?: string;    // ISO date string from backend
@@ -40,8 +37,6 @@ export interface ClientLogin {
   usernameOrEmail: string;
   password: string;
 }
-
-// src/app/services/client.service.ts
 
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';

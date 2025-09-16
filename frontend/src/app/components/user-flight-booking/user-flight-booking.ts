@@ -28,7 +28,6 @@ searchForm!: FormGroup;
   ) {}
 
   ngOnInit(): void {
-    // Create the search form for flights only
     this.searchForm = this.fb.group({
       originAirport: [''],
       destinationAirport: [''],
@@ -55,9 +54,8 @@ searchForm!: FormGroup;
 
   const searchCriteria: BookingSearchCriteria = {
     transportType: 'flight',
-    // Map frontend form fields to backend expected fields
-    departureStation: formValue.originAirport,      // backend expects departureStation
-    arrivalStation: formValue.destinationAirport,   // backend expects arrivalStation
+    departureStation: formValue.originAirport,
+    arrivalStation: formValue.destinationAirport,
     departureDate: formValue.departureDate,
     departureTime: formValue.departureTime,
     minPrice: formValue.minPrice,
@@ -107,7 +105,6 @@ searchForm!: FormGroup;
     return this.bookingService.formatPrice(price);
   }
 
-  // Clear search results
   clearSearch(): void {
     this.searchResults = [];
     this.searchError = '';

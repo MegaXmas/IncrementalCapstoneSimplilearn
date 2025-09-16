@@ -14,7 +14,7 @@ export interface BusDetails {
     busArrivalDate: string; // ISO date string
     busArrivalTime: string; // ISO time string
     busRideDuration: string; // e.g., "2h 30m"
-    busRidePrice: string; // Price in appropriate currency units
+    busRidePrice: string; //
 }
 
 @Injectable({

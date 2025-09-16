@@ -1,4 +1,3 @@
-// frontend/src/app/components/shared/date-input/date-input.ts
 import {Component, forwardRef, Input} from '@angular/core';
 import {NG_VALUE_ACCESSOR} from '@angular/forms';
 import {CommonModule} from '@angular/common';
@@ -45,7 +44,7 @@ export class DateInputComponent extends BaseFormControl {
 
   /**
    * Handle date input change
-   * Automatically outputs in YYYY-MM-DD format (same as your backend expects)
+   * Automatically outputs in YYYY-MM-DD format
    */
   onDateChange(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -55,7 +54,7 @@ export class DateInputComponent extends BaseFormControl {
 
   /**
    * Write value from form to component
-   * Expects YYYY-MM-DD format (same as your current component)
+   * Expects YYYY-MM-DD format
    */
   writeValue(value: string): void {
     this.dateValue = value || '';

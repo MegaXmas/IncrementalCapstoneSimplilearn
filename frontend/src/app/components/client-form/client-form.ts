@@ -3,7 +3,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {CommonModule} from '@angular/common';
 import {Client, ClientLogin, ClientRegistration, ClientService} from '../../services/client-service';
 
-
+//UNFINISHED IMPLEMENTATION
 @Component({
   selector: 'app-client-form',
   imports: [CommonModule, ReactiveFormsModule],
@@ -154,14 +154,12 @@ export class ClientFormComponent implements OnInit {
         if (response.success && response.data) {
           this.currentClient = response.data;
         } else {
-          // Token might be invalid, remove it
           this.clientService.removeToken();
           this.currentClient = null;
         }
       },
       error: (error) => {
         console.error('Profile loading error:', error);
-        // Token might be invalid, remove it
         this.clientService.removeToken();
         this.currentClient = null;
       }
@@ -236,7 +234,7 @@ export class ClientFormComponent implements OnInit {
     this.isEditMode = !this.isEditMode;
 
     if (this.isEditMode && this.currentClient) {
-      // Populate form with current client data for editing
+      // Populate form with current client data
       this.clientForm.patchValue(this.currentClient);
     }
   }

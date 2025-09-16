@@ -14,7 +14,7 @@ export interface FlightDetails {
     flightArrivalDate: string; // ISO date string
     flightArrivalTime: string; // ISO time string
     flightTravelTime: string; // e.g., "2h 30m"
-    flightPrice: string; // Price in appropriate currency units
+    flightPrice: string;
 }
 
 @Injectable({

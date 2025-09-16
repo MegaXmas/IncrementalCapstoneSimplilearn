@@ -5,7 +5,7 @@ import {Observable} from 'rxjs';
 export interface AdminUser {
   id?: number;
   adminUsername: string;
-  adminPassword?: string;  // Optional - never received from backend for security
+  adminPassword?: string;
   enabled?: boolean;
   accountLocked?: boolean;
   createdAt?: string;
@@ -46,7 +46,7 @@ export interface LoginResult {
 })
 export class AdminService {
 
-  private readonly API_BASE_URL = 'http://localhost:8080/api/admin'; // Adjust to your Spring Boot port
+  private readonly API_BASE_URL = 'http://localhost:8080/api/admin';
   private readonly TOKEN_KEY = 'admin_jwt_token';
 
   constructor(private http: HttpClient) {}

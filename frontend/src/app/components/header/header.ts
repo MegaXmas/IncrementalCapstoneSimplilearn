@@ -46,8 +46,7 @@ export class HeaderComponent implements OnInit {
   ) {}
 
   /**
-   * Lifecycle hook that is called after component initialization
-   * Used to check both client and admin login status when component starts
+   * Lifecycle hook to initialize component
    */
   ngOnInit(): void {
     this.checkAuthenticationStatus();
@@ -108,7 +107,6 @@ export class HeaderComponent implements OnInit {
 
   /**
    * Legacy logout method for backward compatibility
-   * Logs out whoever is currently logged in
    */
   onLogout(): void {
     if (this.isClientLoggedIn) {
@@ -156,7 +154,6 @@ export class HeaderComponent implements OnInit {
 
   /**
    * Method to refresh authentication status
-   * Useful to call after login/logout operations
    */
   refreshAuthStatus(): void {
     this.checkAuthenticationStatus();

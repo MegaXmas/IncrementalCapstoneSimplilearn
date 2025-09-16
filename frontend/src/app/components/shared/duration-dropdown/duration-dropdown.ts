@@ -76,7 +76,6 @@ export class DurationDropdownComponent extends BaseFormControl {
 
   /**
    * Lifecycle hook that is called after data-bound properties are initialized.
-   * It initializes the hours array based on the maxHours input.
    */
   ngOnInit() {
     this.hours = Array.from({ length: this.maxHours + 1 }, (_, i) => i);
@@ -112,11 +111,6 @@ export class DurationDropdownComponent extends BaseFormControl {
   /**
    * Method to update the value of the control and notify the parent form.
    * @param formattedDuration The formatted duration string in 'Xh Ym' format.
-   * If the selected hours and minutes are valid, it formats the duration as 'Xh Ym'
-   * and calls the base class method to update the value.
-   * If any of the selected values are empty, it resets the value to an empty string
-   * and calls the base class method to update the value.
-   * This method is used to ensure that the form control's value is updated correctly
    */
   private updateFormValue(): void {
     if (this.selectedHours !== '' && this.selectedMinutes !== '') {
@@ -131,12 +125,8 @@ export class DurationDropdownComponent extends BaseFormControl {
 
 
   /**
-   * Required implementation from base class.
    * Writes a value to the control.
    * @param value The value to write to the control in 'Xh Ym' format.
-   * If the value is empty, it resets the selected hours and minutes.
-   * If the value is provided, it parses the hours and minutes,
-   * and updates the selectedHours and selectedMinutes accordingly.
    */
   writeValue(value: string): void {
     if (value) {

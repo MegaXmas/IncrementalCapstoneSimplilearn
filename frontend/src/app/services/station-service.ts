@@ -3,7 +3,6 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
-// Backend data interfaces - matching your Java models
 export interface BusStation {
   id: number;
   busStationFullName: string;
@@ -45,7 +44,6 @@ export class StationService {
       return of([]);
     }
 
-    // Use 'term' parameter to match our airport controller
     const params = new HttpParams().set('searchTerm', query.trim());
 
     return this.http.get<Airport[]>(`${this.baseUrl}/airports/search`, { params })
@@ -90,14 +88,12 @@ export class StationService {
 
   /**
    * Search bus stations by any term (name, code, or city)
-   * Now implemented - connects to bus station controller
    */
   searchBusStations(query: string): Observable<BusStation[]> {
     if (!query || query.trim().length === 0) {
       return of([]);
     }
 
-    // Use 'searchTerm' parameter to match your bus controller
     const params = new HttpParams().set('searchTerm', query.trim());
 
     return this.http.get<BusStation[]>(`${this.baseUrl}/bus-stations/search`, { params })
@@ -128,14 +124,12 @@ export class StationService {
 
     /**
    * Search train stations by any term (name, code, or city)
-   * Now implemented - connects to train station controller
    */
   searchTrainStations(query: string): Observable<TrainStation[]> {
     if (!query || query.trim().length === 0) {
       return of([]);
     }
 
-    // Use 'searchTerm' parameter to match your train controller
     const params = new HttpParams().set('searchTerm', query.trim());
 
     return this.http.get<TrainStation[]>(`${this.baseUrl}/train-stations/search`, { params })

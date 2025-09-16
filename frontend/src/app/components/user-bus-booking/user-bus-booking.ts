@@ -34,7 +34,6 @@ export class UserBusBookingComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Create the search form for buses only
     this.searchForm = this.fb.group({
       departureStation: [''],
       arrivalStation: [''],
@@ -51,7 +50,6 @@ export class UserBusBookingComponent implements OnInit {
     return !!(field && field.invalid && (field.dirty || field.touched))
   }
 
-  // Always return 'bus' since this component is bus-specific
   getStationType(): 'bus' {
     return 'bus';
   }

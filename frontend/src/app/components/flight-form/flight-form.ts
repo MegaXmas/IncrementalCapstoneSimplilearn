@@ -41,7 +41,6 @@ export class FlightFormComponent implements OnInit {
         flightAirline: ['', [Validators.required, Validators.minLength(2)]],
         flightOrigin: ['', Validators.required],
         flightDestination: ['', Validators.required],
-        // FIX: Put ALL synchronous validators in the same array
         flightDepartureDate: ['', [Validators.required, Validators.pattern(/^\d{4}-\d{2}-\d{2}$/)]],
         flightArrivalDate: ['', [Validators.required, Validators.pattern(/^\d{4}-\d{2}-\d{2}$/)]],
         flightDepartureTime: ['', [Validators.required, Validators.pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)]],
@@ -67,11 +66,11 @@ isFieldInvalid(fieldName: string): boolean {
       this.isSubmitting = true;
       this.submitMessage = '';
 
-      // Get airport IDs from form (these come from AirportSearchComponent)
+      // Get airport IDs from form
       const originId = this.flightForm.value.flightOrigin;
       const destinationId = this.flightForm.value.flightDestination;
 
-      // Get Airport objects to create the flightDetails properly
+      // Get Airport objects to create the flightDetails
       this.getAirportObjects(originId, destinationId);
     } else {
       this.flightForm.markAllAsTouched();
@@ -106,7 +105,7 @@ isFieldInvalid(fieldName: string): boolean {
           return;
         }
 
-        // Create the AFlightDetails object with full Airport data (matches Java model)
+        // Create the AFlightDetails object with full Airport data
         const flightDetailsData: FlightDetails = {
           flightNumber: this.flightForm.value.flightNumber,
           flightAirline: this.flightForm.value.flightAirline,

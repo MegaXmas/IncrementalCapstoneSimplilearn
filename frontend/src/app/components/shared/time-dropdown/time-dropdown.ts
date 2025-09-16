@@ -104,7 +104,7 @@ export class TimeDropdownComponent extends BaseFormControl {
    * Update the form value and notify parent
    */
   private updateFormValue(): void {
-    // Check if all fields have values (selectedMinutes can be '0' which is falsy)
+    // Check if all fields have values
     if (this.selectedHours && this.selectedMinutes !== '' && this.selectedPeriod) {
       let hour = parseInt(this.selectedHours);
 
@@ -123,7 +123,7 @@ export class TimeDropdownComponent extends BaseFormControl {
   }
 
   /**
-   * Write value from form to component (ControlValueAccessor implementation)
+   * Write value from form to component
    */
   writeValue(value: string): void {
     if (value) {

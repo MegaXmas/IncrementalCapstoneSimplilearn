@@ -41,6 +41,6 @@ export const routes: Routes = [
     { path: 'admin/train-station/add', component: AdminTrainStationFormComponent },
     { path: 'admin-train-station-form', component: AdminTrainStationFormComponent },
 
-    // Wildcard route - must be last
+    // Wildcard route - redirects to login for any undefined paths
     { path: '**', redirectTo: '/client-form' }
 ];

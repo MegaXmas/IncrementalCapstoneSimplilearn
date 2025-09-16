@@ -43,7 +43,6 @@ export class AdminAirportFormComponent implements OnInit {
 
   /**
    * Check if a form field is invalid and has been touched or is dirty
-   * This method is referenced in the HTML template
    */
   isFieldInvalid(fieldName: string): boolean {
     const field = this.adminAirportForm.get(fieldName);
@@ -58,7 +57,7 @@ export class AdminAirportFormComponent implements OnInit {
       // Create airport object from form values
       const airportData: Airport = {
         airportFullName: this.adminAirportForm.value.airportFullName,
-        airportCode: this.adminAirportForm.value.airportCode.toUpperCase(), // Airport codes are typically uppercase
+        airportCode: this.adminAirportForm.value.airportCode.toUpperCase(),
         airportCityLocation: this.adminAirportForm.value.airportCityLocation,
         airportCountryLocation: this.adminAirportForm.value.airportCountryLocation,
         airportTimezone: this.adminAirportForm.value.airportTimezone

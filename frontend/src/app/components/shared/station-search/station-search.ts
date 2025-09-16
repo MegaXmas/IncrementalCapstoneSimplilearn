@@ -4,8 +4,6 @@ import {CommonModule} from '@angular/common';
 import {debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
 import {Observable, of, Subject} from 'rxjs';
 import {StationService} from '../../../services/station-service';
-
-// Simple station interface for component use
 export interface Station {
   id: string;
   fullName: string;
@@ -34,21 +32,17 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
   @Input() placeholder: string = 'Search for a station...';
   @Input() stationType: 'bus' | 'train' | 'airport' = 'airport';
 
-  // Basic component state
   searchQuery: string = '';
   selectedStation: Station | null = null;
   filteredStations: Station[] = [];
   isSearching: boolean = false;
 
-  // RxJS for search
   private searchSubject = new Subject<string>();
 
-  // Form control methods
   onChange = (value: any) => {};
   onTouch = () => {};
 
   constructor(private stationService: StationService) {
-    // Set up search with debouncing
     this.searchSubject.pipe(
       debounceTime(300),
       distinctUntilChanged(),
@@ -75,7 +69,7 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
     const query = (event.target as HTMLInputElement).value;
     this.searchQuery = query;
 
-    // ENHANCED LOGGING
+    // ENHANCED LOGGING FOR DEBUGGING
     console.log('⌨️ KEYUP EVENT:', {
       key: event.key,
       query: query,
@@ -200,7 +194,6 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
     this.onChange(null);
   }
 
-  // Required ControlValueAccessor methods
   writeValue(value: any): void {
     if (!value) {
       this.clearSelection();
@@ -216,6 +209,5 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
   }
 
   setDisabledState?(isDisabled: boolean): void {
-    // Handle disabled state if needed
   }
 }
