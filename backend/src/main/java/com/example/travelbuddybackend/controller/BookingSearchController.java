@@ -38,9 +38,8 @@ public class BookingSearchController {
             // Fix these to show the actual fields being sent:
             System.out.println("Departure Station: " + criteria.getDepartureStation());
             System.out.println("Arrival Station: " + criteria.getArrivalStation());
-            System.out.println("Departure City: " + criteria.getDepartureCity());
-            System.out.println("Arrival City: " + criteria.getArrivalCity());
             System.out.println("Airline/Line: " + criteria.getAirline() + "/" + criteria.getLine());
+            System.out.println("Price between " + criteria.getMinPrice() + " and " + criteria.getMaxPrice());
 
             List<AvailableTicket> results = bookingSearchService.searchAvailableTickets(criteria);
 

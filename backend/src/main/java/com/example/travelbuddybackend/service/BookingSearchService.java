@@ -264,6 +264,11 @@ public class BookingSearchService {
             buses = busDetailsService.findBusesByLine(criteria.getLine());
         }
 
+        if (criteria.departureStation != null && !criteria.departureStation.trim().isEmpty() &&
+        criteria.arrivalStation != null && !criteria.arrivalStation.trim().isEmpty()) {
+            buses = busDetailsService.getBusesByRoute(criteria.departureStation, criteria.arrivalStation);
+        }
+
         // Apply price range filter using your existing method
         if (criteria.getMinPrice() != null && criteria.getMaxPrice() != null) {
             buses = busDetailsService.findBusesByPriceRange(

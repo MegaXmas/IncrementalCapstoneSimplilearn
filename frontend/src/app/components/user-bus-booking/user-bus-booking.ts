@@ -16,12 +16,15 @@ import { BusDetails } from '../../services/bus-details-service';
 })
 export class UserBusBookingComponent implements OnInit {
  
-searchForm!: FormGroup;
+  searchForm!: FormGroup;
   searchResults: AvailableTicket[] = [];
   isSearching = false;
   searchError = '';
 
+  selectedTicket: AvailableTicket | null = null;
+
   isSubmitting = false;
+  submitSuccess = false;
   submitMessage = ''
  
   @Output() ticketSelected = new EventEmitter<AvailableTicket>();
@@ -86,6 +89,7 @@ searchForm!: FormGroup;
   }
   
   selectTicket(ticket: AvailableTicket): void {
+    this.selectedTicket = ticket; // Store the selected ticket
     this.ticketSelected.emit(ticket);
     console.log('Bus ticket selected:', ticket);
   }
@@ -102,12 +106,34 @@ searchForm!: FormGroup;
     return this.bookingService.formatPrice(price);
   }
 
-  onSubmit(): void {
-    if (this.searchForm.valid) {
+onSubmit(): void {
+    if (this.selectedTicket) {
       this.isSubmitting = true;
-      this.submitMessage = 'Search submitted successfully.';
+      this.submitMessage = 'Booking ticket...';
 
-      const busTicket = this.selectTicket
+      // Use the selected ticket as the booking request
+      const bookingRequest: AvailableTicket = this.selectedTicket;
+      
+      console.log('Submitting booking request:', bookingRequest);
+
+      this.bookingService.createBusBooking(bookingRequest).subscribe({
+        next: (response) => {
+          console.log('Bus booking created successfully:', response);
+          this.submitMessage = 'Bus booking created successfully.';
+          this.submitSuccess = true;
+          this.isSubmitting = false;
+          this.selectedTicket = null;
+        },
+        error: (error) => {
+          console.error('Error creating bus booking:', error);
+          this.submitMessage = 'Failed to create bus booking. Please try again.';
+          this.submitSuccess = false;
+          this.isSubmitting = false;
+        },
+      });
+    } else {
+      this.submitMessage = 'Please select a ticket first.';
+      this.submitSuccess = false;
     }
   }
   

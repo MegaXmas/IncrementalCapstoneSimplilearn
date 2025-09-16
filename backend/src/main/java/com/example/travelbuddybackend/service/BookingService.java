@@ -123,20 +123,20 @@ public class BookingService {
      * Book a bus ticket - handles bus-specific booking logic
      * Follows the same pattern as flight and train bookings
      * @param client The client making the booking
-     * @param busDetails The bus being booked
+     * @param bookingRequest The bus being booked
      * @return Booking object if successful, null if failed
      */
-    public Booking bookTicket(Client client, BookingSearchService.AvailableTicket bookingRequest) {
+    public Booking bookTicket(Client client, AvailableTicket bookingRequest) {
         System.out.println("Booking bus for: " + client.getName());
-        System.out.println("Bus: " + busDetails.getBusNumber() + " from " +
-                busDetails.getBusDepartureStation() + " to " + busDetails.getBusArrivalStation());
+        System.out.println("Bus: " + bookingRequest.getNumber() + " from " +
+                bookingRequest.getDepartureLocation() + " to " + bookingRequest.getArrivalLocation());
 
         try {
             // Generate unique booking ID with bus prefix
             String bookingId = generateBookingId("BS");
 
             // Convert bus details to JSON
-            String transportJson = objectMapper.writeValueAsString(busDetails);
+            String transportJson = objectMapper.writeValueAsString(bookingRequest);
 
             // Create booking object
             Booking booking = new Booking();

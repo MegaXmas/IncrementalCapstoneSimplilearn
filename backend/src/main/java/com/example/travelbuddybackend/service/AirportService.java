@@ -192,22 +192,6 @@ public class AirportService {
     }
 
     /**
-     * Find airports by code pattern - Uses in-memory filtering for complex patterns
-     */
-    public List<Airport> findAirportByCodePattern(String codePattern) {
-        if (codePattern == null || codePattern.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Code pattern cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        List<Airport> allAirports = getAllAirports();
-        return allAirports.stream()
-                .filter(airport -> airport.getAirportCode().toLowerCase()
-                        .contains(codePattern.toLowerCase().trim()))
-                .collect(Collectors.toList());
-    }
-
-    /**
      * Multi-criteria search - optimized to minimize database calls
      */
     public List<Airport> searchAirports(String searchTerm) {

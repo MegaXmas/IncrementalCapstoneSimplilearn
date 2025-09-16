@@ -127,13 +127,18 @@
         
         <div class="card-body p-0">
           @for (ticket of searchResults; track ticket.id) {
-            <div class="border-bottom p-3 ticket-item">
+            <div class="border-bottom p-3 ticket-item"
+                [class.selected-ticket]="selectedTicket?.id === ticket.id">
               <div class="row align-items-center">
                 <div class="col-md-8">
                   <div class="d-flex align-items-center mb-2">
                     <span class="badge bg-warning me-2">🚌 Bus</span>
                     <strong>{{ ticket.number }}</strong>
                     <span class="text-muted ms-2">{{ ticket.additionalInfo }}</span>
+                    <!-- Show selected indicator -->
+                    @if (selectedTicket?.id === ticket.id) {
+                      <span class="badge bg-success ms-2">✓ Selected</span>
+                    }
                   </div>
                   
                   <div class="route-info mb-2">
@@ -152,14 +157,37 @@
                 </div>
                 
                 <div class="col-md-2">
-                  <button class="btn btn-success w-100" 
+                  <button class="btn w-100" 
+                          [class]="selectedTicket?.id === ticket.id ? 'btn-success' : 'btn-outline-success'"
                           (click)="selectTicket(ticket)">
-                    Book Now
+                    @if (selectedTicket?.id === ticket.id) {
+                      ✓ Selected
+                    } @else {
+                      Select Ticket
+                    }
                   </button>
                 </div>
               </div>
             </div>
           }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Show selected ticket summary -->
+  @if (selectedTicket) {
+    <div class="selected-ticket-summary mt-3">
+      <div class="card border-success">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">🎫 Selected Ticket</h5>
+        </div>
+        <div class="card-body">
+          <strong>{{ selectedTicket.number }}</strong> - {{ formatTicketRoute(selectedTicket) }}
+          <br>
+          <small class="text-muted">{{ formatTicketTime(selectedTicket) }}</small>
+          <br>
+          <strong class="text-success">{{ formatPrice(selectedTicket.price) }}</strong>
         </div>
       </div>
     </div>
