@@ -1,7 +1,6 @@
 package com.example.travelbuddybackend.service;
 
 import com.example.travelbuddybackend.models.*;
-import com.example.travelbuddybackend.models.AvailableTicket;
 import com.example.travelbuddybackend.repository.BookingRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+//UNFINISHED IMPLEMENTATION
 @Service
 public class BookingService {
 
@@ -31,12 +31,10 @@ public class BookingService {
 
     // =============================================================
     // POLYMORPHIC BOOKING METHODS - Core business functionality
-    // These methods handle the specific logic for each transport type
     // =============================================================
 
     /**
      * Book a flight ticket - handles flight-specific booking logic
-     * This method creates a complete booking record for a flight reservation
      * @param client The client making the booking
      * @param flightDetails The flight being booked
      * @return Booking object if successful, null if failed
@@ -51,7 +49,6 @@ public class BookingService {
             String bookingId = generateBookingId("FL");
 
             // Convert flight details to JSON for storage
-            // This preserves all flight information in the booking record
             String transportJson = objectMapper.writeValueAsString(flightDetails);
 
             // Create the booking object
@@ -62,7 +59,6 @@ public class BookingService {
             booking.setClientEmail(client.getEmail());
             booking.setClientPhone(client.getPhone());
 
-            // Attempt to save to database
             boolean success = bookingRepository.createBooking(booking);
             if (success) {
                 System.out.println("✓ Flight booking successful! Booking ID: " + bookingId);
@@ -79,7 +75,6 @@ public class BookingService {
 
     /**
      * Book a train ticket - handles train-specific booking logic
-     * Similar to flight booking but with train-specific details and prefixes
      * @param client The client making the booking
      * @param trainDetails The train being booked
      * @return Booking object if successful, null if failed
@@ -104,7 +99,6 @@ public class BookingService {
             booking.setClientEmail(client.getEmail());
             booking.setClientPhone(client.getPhone());
 
-            // Save to database
             boolean success = bookingRepository.createBooking(booking);
             if (success) {
                 System.out.println("✓ Train booking successful! Booking ID: " + bookingId);
@@ -121,7 +115,6 @@ public class BookingService {
 
     /**
      * Book a bus ticket - handles bus-specific booking logic
-     * Follows the same pattern as flight and train bookings
      * @param client The client making the booking
      * @param bookingRequest The bus being booked
      * @return Booking object if successful, null if failed
@@ -146,7 +139,6 @@ public class BookingService {
             booking.setClientEmail(client.getEmail());
             booking.setClientPhone(client.getPhone());
 
-            // Save to database
             boolean success = bookingRepository.createBooking(booking);
             if (success) {
                 System.out.println("✓ Bus booking successful! Booking ID: " + bookingId);
@@ -163,12 +155,10 @@ public class BookingService {
 
     // =============================================================
     // STANDARD CRUD OPERATIONS
-    // These handle basic database operations for booking management
     // =============================================================
 
     /**
      * Get all bookings from the database
-     * Primarily used for administrative purposes and reporting
      * @return List of all bookings (empty list if none found or error occurs)
      */
     public List<Booking> getAllBookings() {
@@ -177,7 +167,6 @@ public class BookingService {
 
     /**
      * Get booking by internal database ID
-     * Used for internal system operations
      * @param id The internal booking ID to search for
      * @return Optional containing the booking if found, empty otherwise
      */
@@ -191,7 +180,6 @@ public class BookingService {
 
     /**
      * Get booking by customer-facing booking ID
-     * This is what customers use to look up their reservations
      * @param bookingId The customer booking ID (like "FL123456")
      * @return Optional containing the booking if found, empty otherwise
      */
@@ -205,7 +193,6 @@ public class BookingService {
 
     /**
      * Get all bookings for a specific customer email
-     * Used for "My Bookings" functionality in customer portals
      * @param clientEmail The customer's email address
      * @return List of bookings for that customer
      */
@@ -219,7 +206,6 @@ public class BookingService {
 
     /**
      * Update an existing booking
-     * Used for modifications or corrections to existing reservations
      * @param booking The booking with updated information
      * @return true if booking was successfully updated, false otherwise
      */
@@ -266,7 +252,6 @@ public class BookingService {
 
     /**
      * Hard delete a booking by internal ID
-     * Use with extreme caution - this permanently removes the booking record
      * @param id The internal booking ID to delete
      * @return true if booking was successfully deleted, false otherwise
      */
@@ -292,12 +277,10 @@ public class BookingService {
 
     // =============================================================
     // BUSINESS LOGIC AND UTILITY METHODS
-    // These provide additional functionality for booking management
     // =============================================================
 
     /**
      * Check if a booking exists by booking ID
-     * Useful for validation before operations
      * @param bookingId The customer booking ID to check
      * @return true if booking exists, false otherwise
      */
@@ -310,7 +293,6 @@ public class BookingService {
 
     /**
      * Get the total number of bookings in the system
-     * Used for reporting and analytics
      * @return The count of all bookings
      */
     public int getBookingCount() {
@@ -320,7 +302,6 @@ public class BookingService {
 
     /**
      * Find bookings by client name (partial match)
-     * Useful for customer service representatives looking up bookings
      * @param clientName The partial name to search for
      * @return List of bookings matching the name
      */
@@ -339,7 +320,6 @@ public class BookingService {
 
     /**
      * Find bookings by transport type (flight, train, bus)
-     * Uses the booking ID prefix to determine transport type
      * @param transportType "FL" for flights, "TR" for trains, "BS" for buses
      * @return List of bookings for that transport type
      */
@@ -405,7 +385,6 @@ public class BookingService {
 
     /**
      * Get booking statistics by transport type
-     * Returns count of bookings for each transport mode
      * @return String with booking statistics
      */
     public String getBookingStatistics() {
@@ -419,7 +398,6 @@ public class BookingService {
 
     /**
      * Validate booking data before operations
-     * Ensures all required fields are present and valid
      * @param booking The booking to validate
      * @return true if valid, false otherwise
      */
@@ -460,13 +438,11 @@ public class BookingService {
 
     // =============================================================
     // PRIVATE UTILITY METHODS
-    // Internal helper methods that support the public API
     // =============================================================
 
     /**
      * Generate a unique booking ID with the specified prefix
      * Format: PREFIX + YYYYMMDD + HHMMSS + 3-digit random number
-     * Example: FL20241211143022123
      * @param prefix Transport type prefix ("FL", "TR", "BS")
      * @return Unique booking ID string
      */

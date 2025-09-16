@@ -1,7 +1,6 @@
 package com.example.travelbuddybackend.repository;
 
 import com.example.travelbuddybackend.models.Client;
-import com.jayway.jsonpath.Criteria;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -9,23 +8,10 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-/**
- * Clean Client Repository for Authentication and Client Management
- *
- * This repository handles all database operations for client accounts.
- * It assumes your database table has all the modern authentication fields.
- *
- * Think of this as a well-organized digital filing cabinet that can:
- * - Store customer profiles with login credentials
- * - Find customers by username or email for login
- * - Track account activity and security status
- * - Manage all client information needed for travel bookings
- *
- * The key principle here is that every method has a single, clear purpose
- * and the code is easy to understand and maintain.
- */
 @Repository
 public class ClientRepository {
 
@@ -41,24 +27,20 @@ public class ClientRepository {
         public Client mapRow(ResultSet rs, int rowNum) throws SQLException {
             Client client = new Client();
 
-            // Core identity fields
             client.setId(rs.getInt("id"));
             client.setUsername(rs.getString("username"));
             client.setEmail(rs.getString("email"));
             client.setPassword(rs.getString("password"));
 
-            // Personal information
             client.setFirstName(rs.getString("first_name"));
             client.setLastName(rs.getString("last_name"));
             client.setPhone(rs.getString("phone"));
             client.setAddress(rs.getString("address"));
             client.setCredit_card(rs.getString("credit_card"));
 
-            // Account management fields
             client.setEnabled(rs.getBoolean("enabled"));
             client.setAccountLocked(rs.getBoolean("account_locked"));
 
-            // Handle timestamps (these might be null for some records)
             if (rs.getTimestamp("created_at") != null) {
                 client.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
             }
@@ -74,17 +56,10 @@ public class ClientRepository {
 
     // ============================================================================
     // CORE CLIENT MANAGEMENT METHODS
-    // These handle basic client operations that your booking system needs
     // ============================================================================
 
     /**
      * Find all clients in the database
-     *
-     * This retrieves every client account, which is useful for:
-     * - Admin dashboards showing all customers
-     * - Reports and analytics
-     * - System maintenance operations
-     *
      * @return List of all clients (empty list if none found)
      */
     public List<Client> findAll() {
@@ -109,10 +84,6 @@ public class ClientRepository {
 
     /**
      * Find a client by their unique ID
-     *
-     * This is the most direct way to get client information when you already
-     * know their ID (for example, from a session or JWT token).
-     *
      * @param id The client's unique identifier
      * @return Optional containing the client if found, empty if not found
      */
@@ -149,11 +120,6 @@ public class ClientRepository {
 
     /**
      * Create a new client account
-     *
-     * This is called during registration to add a new customer to the system.
-     * All the essential information is provided and the account is created
-     * with appropriate default settings (enabled, not locked).
-     *
      * @param client The client object containing all necessary information
      * @return true if client was successfully created, false otherwise
      */
@@ -205,11 +171,6 @@ public class ClientRepository {
 
     /**
      * Update an existing client's information
-     *
-     * This allows clients to modify their profile information or allows
-     * administrators to update account settings. The client ID must be valid
-     * and the client must exist in the database.
-     *
      * @param client The client object with updated information (must include valid ID)
      * @return true if client was successfully updated, false otherwise
      */
@@ -261,11 +222,6 @@ public class ClientRepository {
 
     /**
      * Delete a client account
-     *
-     * This permanently removes a client from the system. Use with caution!
-     * In many systems, you might prefer to disable accounts rather than delete them
-     * to maintain data integrity for historical bookings.
-     *
      * @param id The ID of the client to delete
      * @return true if client was successfully deleted, false otherwise
      */
@@ -299,12 +255,8 @@ public class ClientRepository {
     // ============================================================================
 
     /**
-     * Find a client by their username
-     *
-     * This is essential for login functionality. When a user enters their username
-     * at the login screen, this method finds their account so we can verify
-     * their password and grant access to the system.
-     *
+     * Find a client by their usernamE
+     * This is essential for login functionality.
      * @param username The username to search for (case-sensitive)
      * @return Optional containing the client if found, empty if not found
      */
@@ -341,11 +293,6 @@ public class ClientRepository {
 
     /**
      * Find a client by their email address
-     *
-     * This supports login-by-email functionality and helps prevent duplicate
-     * email addresses during registration. Many users prefer to log in with
-     * their email instead of remembering a separate username.
-     *
      * @param email The email address to search for (case-insensitive)
      * @return Optional containing the client if found, empty if not found
      */
@@ -381,11 +328,6 @@ public class ClientRepository {
 
     /**
      * Check if a username already exists in the system
-     *
-     * This is crucial during registration to ensure usernames are unique.
-     * We check this before creating a new account to prevent conflicts
-     * and provide clear error messages to users.
-     *
      * @param username The username to check for availability
      * @return true if username already exists, false if available
      */
@@ -412,11 +354,6 @@ public class ClientRepository {
 
     /**
      * Check if an email address already exists in the system
-     *
-     * This prevents duplicate email addresses during registration and helps
-     * maintain data integrity. Each client should have a unique email address
-     * for communication and login purposes.
-     *
      * @param email The email address to check for availability
      * @return true if email already exists, false if available
      */
@@ -443,11 +380,6 @@ public class ClientRepository {
 
     /**
      * Update a client's last login timestamp
-     *
-     * This is called whenever a client successfully logs in. It helps track
-     * user activity, identify inactive accounts, and can be useful for
-     * security monitoring and user analytics.
-     *
      * @param clientId The ID of the client who just logged in
      * @return true if timestamp was successfully updated, false otherwise
      */
@@ -475,11 +407,6 @@ public class ClientRepository {
 
     /**
      * Update a client's password
-     *
-     * This is used when clients change their passwords or when administrators
-     * reset passwords. The new password should already be encrypted by the
-     * service layer before calling this method.
-     *
      * @param clientId The ID of the client whose password is being changed
      * @param newEncryptedPassword The new password (already encrypted)
      * @return true if password was successfully updated, false otherwise
@@ -510,11 +437,6 @@ public class ClientRepository {
 
     /**
      * Update a client's account status (enable/disable)
-     *
-     * This allows administrators to activate or deactivate client accounts.
-     * Disabled accounts cannot log in, which is useful for temporarily
-     * suspending access without deleting the account.
-     *
      * @param clientId The ID of the client whose status is being changed
      * @param enabled true to enable the account, false to disable
      * @return true if status was successfully updated, false otherwise
@@ -544,11 +466,6 @@ public class ClientRepository {
 
     /**
      * Lock or unlock a client account
-     *
-     * Account locking is a security feature that can temporarily prevent
-     * login access. This might be used after multiple failed login attempts
-     * or for security investigations.
-     *
      * @param clientId The ID of the client whose lock status is being changed
      * @param locked true to lock the account, false to unlock
      * @return true if lock status was successfully updated, false otherwise
@@ -583,11 +500,6 @@ public class ClientRepository {
 
     /**
      * Validate that a client object has all required fields for creation
-     *
-     * This performs comprehensive validation before attempting to create
-     * a new client account. It checks that all essential fields are present
-     * and properly formatted.
-     *
      * @param client The client object to validate
      * @return true if client is valid for creation, false otherwise
      */
@@ -627,10 +539,6 @@ public class ClientRepository {
 
     /**
      * Get the total number of clients in the system
-     *
-     * This is useful for dashboard statistics, pagination calculations,
-     * and general system monitoring.
-     *
      * @return The total count of client accounts
      */
     public int getClientCount() {
@@ -646,32 +554,7 @@ public class ClientRepository {
     }
 
     /**
-     * Get the number of active (enabled and unlocked) clients
-     *
-     * This provides insight into how many clients can currently use the system.
-     * It's useful for capacity planning and user analytics.
-     *
-     * @return The count of active client accounts
-     */
-    public int getActiveClientCount() {
-        try {
-            String sql = "SELECT COUNT(*) FROM clients WHERE enabled = true AND account_locked = false";
-            Integer count = jdbcTemplate.queryForObject(sql, Integer.class);
-            return count != null ? count : 0;
-
-        } catch (Exception e) {
-            System.out.println("✗ Repository: Error getting active client count: " + e.getMessage());
-            return 0;
-        }
-    }
-
-    /**
      * Find clients created within a specific time period
-     *
-     * This is useful for analytics, onboarding campaigns, and understanding
-     * user growth patterns. For example, you could find all clients who
-     * registered in the last 30 days.
-     *
      * @param startDate The beginning of the time period
      * @param endDate The end of the time period
      * @return List of clients created within the specified period

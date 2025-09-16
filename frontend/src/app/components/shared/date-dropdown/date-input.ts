@@ -1,8 +1,8 @@
 // frontend/src/app/components/shared/date-input/date-input.ts
-import { Component, Input, forwardRef } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { BaseFormControl } from '../base-form-control';
+import {Component, forwardRef, Input} from '@angular/core';
+import {NG_VALUE_ACCESSOR} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {BaseFormControl} from '../base-form-control';
 
 @Component({
   selector: 'app-date-input',
@@ -11,7 +11,7 @@ import { BaseFormControl } from '../base-form-control';
   template: `
     <div class="form-group">
       <label [for]="id">{{ label }}</label>
-      <input 
+      <input
         [id]="id"
         type="date"
         class="form-control"
@@ -33,7 +33,7 @@ import { BaseFormControl } from '../base-form-control';
   }]
 })
 export class DateInputComponent extends BaseFormControl {
-  
+
   @Input() label: string = 'Date';
   @Input() id: string = 'date-input';
   @Input() isInvalid: boolean = false;

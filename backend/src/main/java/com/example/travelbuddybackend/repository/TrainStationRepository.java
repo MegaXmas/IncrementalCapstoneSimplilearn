@@ -116,7 +116,7 @@ public class TrainStationRepository {
 
         if (!isValidTrainStation(trainStation)) {
             return false;
-        };
+        }
 
         try {
             int rowsAffected = jdbcTemplate.update(
@@ -140,7 +140,7 @@ public class TrainStationRepository {
 
         if (!isValidTrainStation(trainStation)) {
             return false;
-        };
+        }
 
         try {
             int rowsAffected = jdbcTemplate.update(

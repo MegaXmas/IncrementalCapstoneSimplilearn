@@ -1,6 +1,5 @@
 package com.example.travelbuddybackend.service;
 
-import com.example.travelbuddybackend.models.Airport;
 import com.example.travelbuddybackend.models.BusStation;
 import com.example.travelbuddybackend.repository.BusStationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -176,7 +175,7 @@ public class BusStationService {
     }
 
     /**
-     * Find bus stations by partial name match (useful for search functionality)
+     * Find bus stations by partial name match
      * @param partialName The partial name to search for
      * @return List of bus stations whose names contain the partial name
      */

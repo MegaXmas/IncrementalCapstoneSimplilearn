@@ -4,7 +4,6 @@ import com.example.travelbuddybackend.models.TrainDetails;
 import com.example.travelbuddybackend.models.TrainStation;
 import com.example.travelbuddybackend.repository.TrainDetailsRepository;
 import com.example.travelbuddybackend.repository.TrainStationRepository;
-import com.example.travelbuddybackend.service.ValidatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,15 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Train Details Service - Business Logic Layer
- *
- * Fixed Architecture:
- * - Only depends on repositories (no service-to-service dependencies)
- * - Handles business validation and logic
- * - Coordinates repository operations
- * - No circular dependencies
- */
 @Service
 public class TrainDetailsService {
 
@@ -69,7 +59,6 @@ public class TrainDetailsService {
             return new ArrayList<>();
         }
 
-        // Find stations by codes using repository (not service)
         Optional<TrainStation> departureStation = trainStationRepository.findByStationCode(departureStationCode.toUpperCase().trim());
         Optional<TrainStation> arrivalStation = trainStationRepository.findByStationCode(arrivalStationCode.toUpperCase().trim());
 
@@ -138,7 +127,6 @@ public class TrainDetailsService {
             return false;
         }
 
-        // Check if train exists
         if (trainDetailsRepository.findById(trainDetails.getId()).isEmpty()) {
             System.out.println("✗ Service Error: Train details not found for update");
             return false;
@@ -159,7 +147,6 @@ public class TrainDetailsService {
             return false;
         }
 
-        // Check if train exists before deletion
         if (trainDetailsRepository.findById(id).isEmpty()) {
             System.out.println("✗ Service Error: Train not found for deletion");
             return false;
@@ -283,7 +270,6 @@ public class TrainDetailsService {
             return false;
         }
 
-        // Basic field validation
         if (trainDetails.getTrainNumber() == null || trainDetails.getTrainNumber().trim().isEmpty()) {
             System.out.println("✗ Service Error: Train number is required");
             return false;
@@ -299,13 +285,11 @@ public class TrainDetailsService {
             return false;
         }
 
-        // Business logic validation
         if (trainDetails.getTrainDepartureStation().getId().equals(trainDetails.getTrainArrivalStation().getId())) {
             System.out.println("✗ Service Error: Departure and arrival stations cannot be the same");
             return false;
         }
 
-        // Validate stations exist in database
         if (trainStationRepository.findById(trainDetails.getTrainDepartureStation().getId()).isEmpty()) {
             System.out.println("✗ Service Error: Departure station not found in database");
             return false;
@@ -316,7 +300,6 @@ public class TrainDetailsService {
             return false;
         }
 
-        // Date and time validation
         if (!validatorService.isValidDate(trainDetails.getTrainDepartureDate()) ||
                 !validatorService.isValidDate(trainDetails.getTrainArrivalDate())) {
             System.out.println("✗ Service Error: Invalid date format. Use YYYY-MM-DD");
@@ -329,7 +312,6 @@ public class TrainDetailsService {
             return false;
         }
 
-        // Price validation
         if (trainDetails.getTrainRidePrice() == null || trainDetails.getTrainRidePrice().trim().isEmpty()) {
             System.out.println("✗ Service Error: Train price is required");
             return false;

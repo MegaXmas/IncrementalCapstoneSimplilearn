@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { ClientService } from '../../services/client-service';
-import { AdminService } from '../../services/admin-service';
+import {Component, OnInit} from '@angular/core';
+import {Router, RouterModule} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {ClientService} from '../../services/client-service';
+import {AdminService} from '../../services/admin-service';
 
 @Component({
   selector: 'app-header',
@@ -36,7 +35,7 @@ export class HeaderComponent implements OnInit {
   get userName(): string {
     return this.clientUsername || this.adminUsername || 'Guest';
   }
-  
+
   /**
    * Constructor to inject dependencies
    */
@@ -76,15 +75,15 @@ export class HeaderComponent implements OnInit {
    */
   onClientLogout(event: Event): void {
     event.preventDefault();
-    
+
     // Clear client authentication
     this.clientService.removeToken();
     this.isClientLoggedIn = false;
     this.clientUsername = '';
-    
+
     // Navigate to home or login page
     this.router.navigate(['/client-form']);
-    
+
     // Show logout confirmation
     alert('You have been logged out successfully!');
   }
@@ -94,15 +93,15 @@ export class HeaderComponent implements OnInit {
    */
   onAdminLogout(event: Event): void {
     event.preventDefault();
-    
+
     // Clear admin authentication
     this.adminService.removeToken();
     this.isAdminLoggedIn = false;
     this.adminUsername = '';
-    
+
     // Navigate to admin login page
     this.router.navigate(['/admin-login']);
-    
+
     // Show logout confirmation
     alert('Admin session ended successfully!');
   }

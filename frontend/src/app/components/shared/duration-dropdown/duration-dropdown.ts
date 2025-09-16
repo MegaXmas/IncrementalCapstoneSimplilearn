@@ -1,7 +1,7 @@
-import { Component, Input, forwardRef } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { BaseFormControl } from '../base-form-control';
+import {Component, forwardRef, Input} from '@angular/core';
+import {NG_VALUE_ACCESSOR} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {BaseFormControl} from '../base-form-control';
 
 @Component({
   selector: 'app-duration-dropdown',
@@ -102,7 +102,7 @@ export class DurationDropdownComponent extends BaseFormControl {
     this.updateFormValue();
   }
 
-  
+
     onPeriodChange(event: Event): void {
     this.selectedPeriod = (event.target as HTMLSelectElement).value;
     this.updateFormValue();
@@ -129,7 +129,7 @@ export class DurationDropdownComponent extends BaseFormControl {
   }
 
 
-  
+
   /**
    * Required implementation from base class.
    * Writes a value to the control.
@@ -143,7 +143,7 @@ export class DurationDropdownComponent extends BaseFormControl {
       // Parse "Xh Ym" format
       const hourMatch = value.match(/(\d+)h/);
       const minuteMatch = value.match(/(\d+)m/);
-      
+
       this.selectedHours = hourMatch ? hourMatch[1] : '';
       this.selectedMinutes = minuteMatch ? minuteMatch[1] : '';
     } else {

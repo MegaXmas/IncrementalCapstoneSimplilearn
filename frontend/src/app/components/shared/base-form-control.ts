@@ -1,4 +1,4 @@
-import { ControlValueAccessor } from '@angular/forms';
+import {ControlValueAccessor} from '@angular/forms';
 
 export abstract class BaseFormControl implements ControlValueAccessor {
 
@@ -59,7 +59,7 @@ export abstract class BaseFormControl implements ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
-  
+
   /**
    * Method to update the value of the control and notify the parent form.
    * @param newValue The new value to set in the control.

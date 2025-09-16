@@ -1,10 +1,9 @@
-import { Component, Input, forwardRef, OnInit } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
-import { Subject, Observable, of } from 'rxjs';
-import { StationService } from '../../../services/station-service';
+import {Component, forwardRef, Input, OnInit} from '@angular/core';
+import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {Observable, of, Subject} from 'rxjs';
+import {StationService} from '../../../services/station-service';
 
 // Simple station interface for component use
 export interface Station {
@@ -29,12 +28,12 @@ export interface Station {
   ]
 })
 export class StationSearchComponent implements ControlValueAccessor, OnInit {
-  
+
   @Input() label: string = 'Station';
   @Input() id: string = 'station-search';
   @Input() placeholder: string = 'Search for a station...';
   @Input() stationType: 'bus' | 'train' | 'airport' = 'airport';
-  
+
   // Basic component state
   searchQuery: string = '';
   selectedStation: Station | null = null;
@@ -112,7 +111,7 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
         return this.stationService.searchAirports(query).pipe(
           map(airports => this.convertToStationInterface(airports, 'airport'))
         );
-      
+
       case 'bus':
         console.log('🚌 Searching bus stations...');
         return this.stationService.searchBusStations(query).pipe(
@@ -121,7 +120,7 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
             return this.convertToStationInterface(busStations, 'bus');
           })
         );
-      
+
       case 'train':
         console.log('🚌 Searching train stations...');
         return this.stationService.searchTrainStations(query).pipe(
@@ -130,8 +129,8 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
             return this.convertToStationInterface(trainStations, 'train');
           })
         );
-      
-      
+
+
       default:
         console.log('❓ Unknown station type:', this.stationType);
         return of([]);
@@ -144,7 +143,7 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
   private convertToStationInterface(stations: any[], type: string): Station[] {
     console.log(`🔄 Converting ${stations.length} ${type} stations to interface`);
     console.log('🔄 First station structure:', stations[0]);
-    
+
     return stations.map(station => {
       switch (type) {
         case 'airport':
@@ -184,7 +183,7 @@ export class StationSearchComponent implements ControlValueAccessor, OnInit {
     this.selectedStation = station;
     this.searchQuery = `${station.code} - ${station.fullName}`;
     this.filteredStations = [];
-    
+
     // Update form value with the station ID
     this.onChange(station.code);
     this.onTouch();

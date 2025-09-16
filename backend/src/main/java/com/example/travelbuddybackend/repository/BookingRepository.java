@@ -11,18 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+//UNFINISHED IMPLEMENTATION
 @Repository
 public class BookingRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    // Constructor injection - Spring automatically provides JdbcTemplate
     public BookingRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // RowMapper converts database rows into Booking objects
-    // This is the bridge between your database columns and Java object fields
     private static class BookingRowMapper implements RowMapper<Booking> {
         @Override
         public Booking mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -37,7 +35,6 @@ public class BookingRepository {
         }
     }
 
-    // Retrieve all bookings - useful for admin dashboards
     public List<Booking> findAll() {
         try {
             List<Booking> bookings = jdbcTemplate.query(
@@ -51,7 +48,6 @@ public class BookingRepository {
         }
     }
 
-    // Find booking by database ID - internal system use
     public Optional<Booking> findById(int id) {
         if (id <= 0) {
             System.out.println("✗ Repository: Error: Invalid booking ID: " + id);
@@ -76,8 +72,6 @@ public class BookingRepository {
         }
     }
 
-    // Find booking by bookingId - this is what customers use to look up their bookings
-    // BookingId is the user-facing identifier (like "BK123456")
     public Optional<Booking> findByBookingId(String bookingId) {
         if (bookingId == null || bookingId.trim().isEmpty()) {
             System.out.println("✗ Repository: Error: Invalid booking ID: " + bookingId);
@@ -102,7 +96,6 @@ public class BookingRepository {
         }
     }
 
-    // Find all bookings for a specific client email - useful for "My Bookings" page
     public List<Booking> findByClientEmail(String clientEmail) {
         if (clientEmail == null || clientEmail.trim().isEmpty()) {
             System.out.println("✗ Repository: Error: Invalid client email: " + clientEmail);
@@ -122,7 +115,6 @@ public class BookingRepository {
         }
     }
 
-    // Create a new booking - this is called when customers complete their reservation
     public boolean createBooking(Booking booking) {
         if (booking == null) {
             System.out.println("✗ Repository: Error: Cannot create null booking");
@@ -174,7 +166,6 @@ public class BookingRepository {
         }
     }
 
-    // Update an existing booking - useful for modifications or corrections
     public boolean updateBooking(Booking booking) {
         if (booking == null) {
             System.out.println("✗ Repository: Error: Cannot update null booking");
@@ -231,7 +222,6 @@ public class BookingRepository {
         }
     }
 
-    // Delete booking by ID - use with caution, consider soft delete for audit purposes
     public boolean deleteBooking(int id) {
         if (id <= 0) {
             System.out.println("✗ Repository: Error: Invalid booking ID: " + id);
@@ -255,7 +245,6 @@ public class BookingRepository {
     }
 
     // Additional method: Cancel booking by bookingId (soft delete approach)
-    // This is often better than hard delete for business records
     public boolean cancelBooking(String bookingId) {
         if (bookingId == null || bookingId.trim().isEmpty()) {
             System.out.println("✗ Repository: Error: Invalid booking ID: " + bookingId);
@@ -263,8 +252,6 @@ public class BookingRepository {
         }
 
         try {
-            // This assumes you have a 'status' column in your bookings table
-            // If not, you could add one: ALTER TABLE bookings ADD COLUMN status VARCHAR(20) DEFAULT 'ACTIVE'
             int rowsAffected = jdbcTemplate.update(
                     "UPDATE bookings SET status = 'CANCELLED' WHERE bookingId = ?",
                     bookingId);

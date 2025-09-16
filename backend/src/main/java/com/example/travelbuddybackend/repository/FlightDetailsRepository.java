@@ -23,7 +23,6 @@ public class FlightDetailsRepository {
         this.airportRepository = airportRepository;
     }
 
-    // Optimized RowMapper using JOINs - CORRECTED column names
     private static class FlightDetailsRowMapper implements RowMapper<FlightDetails> {
         @Override
         public FlightDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -63,7 +62,6 @@ public class FlightDetailsRepository {
 
     public List<FlightDetails> findAll() {
         try {
-            // CORRECTED SQL using your actual database column names
             String sql = """
                 SELECT 
                     fd.id as fd_id, 
@@ -338,7 +336,6 @@ public class FlightDetailsRepository {
         }
 
         try {
-            // Using your exact database column names
             int rowsAffected = jdbcTemplate.update(
                     "UPDATE flight_details SET flightNumber = ?, flightAirline = ?, flightOrigin = ?, " +
                             "flightDestination = ?, flightDepartureDate = ?, flightArrivalDate = ?, " +
@@ -391,7 +388,6 @@ public class FlightDetailsRepository {
         }
     }
 
-    // Repository-level validation (data constraints only)
     private boolean isValidForRepository(FlightDetails flightDetails) {
         if (flightDetails == null) {
             System.out.println("✗ Repository: Flight details cannot be null");

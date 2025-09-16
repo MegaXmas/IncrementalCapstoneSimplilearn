@@ -1,8 +1,8 @@
 package com.example.travelbuddybackend.models;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
+//UNFINISHED IMPLEMENTATION
 public class Booking {
 
     private Integer id;

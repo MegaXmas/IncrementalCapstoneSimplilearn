@@ -32,7 +32,6 @@ public class TrainDetailsRepository {
         this.trainStationRepository = trainStationRepository;
     }
 
-    // Optimized RowMapper using JOINs - CORRECTED column names
     private static class TrainDetailsRowMapper implements RowMapper<TrainDetails> {
         @Override
         public TrainDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -66,7 +65,6 @@ public class TrainDetailsRepository {
         }
     }
 
-    // Simple RowMapper for queries without station details
     private static class SimpleTrainDetailsRowMapper implements RowMapper<TrainDetails> {
         @Override
         public TrainDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -103,7 +101,6 @@ public class TrainDetailsRepository {
 
     public List<TrainDetails> findAll() {
         try {
-            // CORRECTED SQL using your actual database column names with JOINs
             String sql = """
                 SELECT 
                     td.id as td_id, 
@@ -282,7 +279,6 @@ public class TrainDetailsRepository {
         }
 
         try {
-            // Using your exact database column names
             List<TrainDetails> trains = jdbcTemplate.query(
                     "SELECT id, trainNumber, trainLine, trainDepartureStation, trainArrivalStation, " +
                             "trainDepartureDate, trainDepartureTime, trainArrivalDate, trainArrivalTime, " +
@@ -303,7 +299,6 @@ public class TrainDetailsRepository {
         }
 
         try {
-            // Using your exact database column names
             int rowsAffected = jdbcTemplate.update(
                     "INSERT INTO train_details (trainNumber, trainLine, trainDepartureStation, trainArrivalStation, " +
                             "trainDepartureDate, trainDepartureTime, trainArrivalDate, trainArrivalTime, " +
@@ -338,7 +333,6 @@ public class TrainDetailsRepository {
         }
 
         try {
-            // Using your exact database column names
             int rowsAffected = jdbcTemplate.update(
                     "UPDATE train_details SET trainNumber = ?, trainLine = ?, trainDepartureStation = ?, " +
                             "trainArrivalStation = ?, trainDepartureDate = ?, trainDepartureTime = ?, " +
@@ -391,7 +385,6 @@ public class TrainDetailsRepository {
         }
     }
 
-    // Repository-level validation (data constraints only)
     private boolean isValidForRepository(TrainDetails trainDetails) {
         if (trainDetails == null) {
             System.out.println("✗ Repository: Train details cannot be null");

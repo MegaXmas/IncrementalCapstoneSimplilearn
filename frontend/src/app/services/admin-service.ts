@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {Observable} from 'rxjs';
 
 export interface AdminUser {
   id?: number;
@@ -45,7 +45,7 @@ export interface LoginResult {
   providedIn: 'root'
 })
 export class AdminService {
-  
+
   private readonly API_BASE_URL = 'http://localhost:8080/api/admin'; // Adjust to your Spring Boot port
   private readonly TOKEN_KEY = 'admin_jwt_token';
 
@@ -60,9 +60,9 @@ export class AdminService {
       adminUsername: loginData.adminUsername,
       adminPassword: loginData.adminPassword
     };
-    
+
     return this.http.post<ApiResponse<LoginResult>>(
-      `${this.API_BASE_URL}/login`, 
+      `${this.API_BASE_URL}/login`,
       loginRequest
     );
   }
@@ -113,7 +113,7 @@ export class AdminService {
 
       const payload = JSON.parse(atob(tokenParts[1]));
       const currentTime = Math.floor(Date.now() / 1000);
-      
+
       return payload.exp > currentTime;
     } catch (error) {
       console.error('Invalid token format:', error);

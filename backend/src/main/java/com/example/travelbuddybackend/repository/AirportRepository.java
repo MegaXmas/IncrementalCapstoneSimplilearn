@@ -11,14 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Airport Repository - Pure Data Access Layer
- *
- * Already follows Spring Boot best practices:
- * - No service dependencies
- * - Single responsibility: data access only
- * - Clean separation of concerns
- */
 @Repository
 public class AirportRepository {
 

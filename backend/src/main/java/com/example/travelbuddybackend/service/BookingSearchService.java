@@ -1,4 +1,3 @@
-// Enhanced BookingSearchService.java - Uses your existing detail services
 package com.example.travelbuddybackend.service;
 
 import com.example.travelbuddybackend.models.*;
@@ -16,7 +15,6 @@ public class BookingSearchService {
     @Autowired
     private BookingService bookingService;
 
-    // Use your existing detail services
     @Autowired
     private FlightDetailsService flightDetailsService;
 
@@ -26,7 +24,6 @@ public class BookingSearchService {
     @Autowired
     private BusDetailsService busDetailsService;
 
-    // Simple search criteria class
     public static class BookingSearchCriteria {
         private String transportType;
         private String departureCity;
@@ -75,40 +72,28 @@ public class BookingSearchService {
     }
 
 
-
-    /**
-     * Search available tickets using your existing detail services
-     * This finds available flights, trains, and buses to book
-     */
     public List<AvailableTicket> searchAvailableTickets(BookingSearchCriteria criteria) {
         System.out.println("🔍 Searching available tickets with criteria");
 
         List<AvailableTicket> allTickets = new ArrayList<>();
 
-        // Search flights using your FlightDetailsService
         if (criteria.getTransportType() == null || criteria.getTransportType().equals("flight")) {
             allTickets.addAll(searchFlights(criteria));
         }
 
-        // Search trains using your TrainDetailsService
         if (criteria.getTransportType() == null || criteria.getTransportType().equals("train")) {
             allTickets.addAll(searchTrains(criteria));
         }
 
-        // Search buses using your BusDetailsService
         if (criteria.getTransportType() == null || criteria.getTransportType().equals("bus")) {
             allTickets.addAll(searchBuses(criteria));
         }
 
-        // Apply additional filters
         return allTickets.stream()
                 .filter(ticket -> matchesPriceRange(ticket.getPrice(), criteria.getMinPrice(), criteria.getMaxPrice()))
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Search existing bookings using your BookingService methods
-     */
     public List<Booking> searchExistingBookings(BookingSearchCriteria criteria) {
         if (criteria.getTransportType() != null) {
             String prefix = getTransportPrefix(criteria.getTransportType());
@@ -117,7 +102,6 @@ public class BookingSearchService {
         return bookingService.getAllBookings();
     }
 
-    // Search flights using your existing FlightDetailsService methods
     private List<AvailableTicket> searchFlights(BookingSearchCriteria criteria) {
         List<FlightDetails> flights = flightDetailsService.getAllFlightDetails();
 
@@ -129,7 +113,7 @@ public class BookingSearchService {
             System.out.println("🛩️ After airline filter (" + criteria.getAirline() + "): " + flights.size());
         }
 
-        // Apply price range filter using your existing method
+        // Apply price range filter
         if (criteria.getMinPrice() != null && criteria.getMaxPrice() != null) {
             flights = flightDetailsService.findFlightsByPriceRange(
                     criteria.getMinPrice().toString(),
@@ -201,7 +185,7 @@ public class BookingSearchService {
             System.out.println("🚂 After line filter: " + trains.size() + " trains");
         }
 
-        // Apply price range filter using your existing method
+        // Apply price range filter
         if (criteria.getMinPrice() != null && criteria.getMaxPrice() != null) {
             trains = trainDetailsService.findTrainsByPriceRange(
                     criteria.getMinPrice().toString(),
@@ -210,7 +194,7 @@ public class BookingSearchService {
             System.out.println("🚂 After price filter: " + trains.size() + " trains");
         }
 
-        // Enhanced filtering with detailed logging
+        // Enhanced filtering
         List<AvailableTicket> results = trains.stream()
                 .filter(train -> {
                     String depCode = train.getTrainDepartureStation() != null ?
@@ -255,11 +239,10 @@ public class BookingSearchService {
         return results;
     }
 
-    // Search buses using your existing BusDetailsService methods
     private List<AvailableTicket> searchBuses(BookingSearchCriteria criteria) {
         List<BusDetails> buses = busDetailsService.getAllBusDetails();
 
-        // Apply line filter if specified
+        // Apply line filter
         if (criteria.getLine() != null && !criteria.getLine().trim().isEmpty()) {
             buses = busDetailsService.findBusesByLine(criteria.getLine());
         }
@@ -269,7 +252,7 @@ public class BookingSearchService {
             buses = busDetailsService.getBusesByRoute(criteria.departureStation, criteria.arrivalStation);
         }
 
-        // Apply price range filter using your existing method
+        // Apply price range filter
         if (criteria.getMinPrice() != null && criteria.getMaxPrice() != null) {
             buses = busDetailsService.findBusesByPriceRange(
                     criteria.getMinPrice().toString(),
@@ -295,16 +278,15 @@ public class BookingSearchService {
                 .collect(Collectors.toList());
     }
 
-    // Helper methods for handling complex objects
     private boolean matchesAirportLocation(Airport airport, String searchLocation) {
         if (searchLocation == null || searchLocation.trim().isEmpty()) {
-            return true; // No filter applied
+            return true;
         }
         if (airport == null) return false;
 
         String search = searchLocation.toLowerCase().trim();
 
-        // Check if search is a numeric ID (from station search component)
+        // Check if search is a numeric ID
         try {
             Long searchId = Long.parseLong(search);
             if (airport.getId() != null && airport.getId().equals(searchId.intValue())) {
@@ -312,10 +294,9 @@ public class BookingSearchService {
                 return true;
             }
         } catch (NumberFormatException e) {
-            // Not a number, continue with text matching
         }
 
-        // Text-based matching for manual input
+        // Text-based matching
         boolean nameMatch = airport.getAirportFullName() != null && airport.getAirportFullName().toLowerCase().contains(search);
         boolean codeMatch = airport.getAirportCode() != null && airport.getAirportCode().toUpperCase().contains(search);
         boolean cityMatch = airport.getAirportCityLocation() != null && airport.getAirportCityLocation().toLowerCase().contains(search);
@@ -336,7 +317,7 @@ public class BookingSearchService {
 
         if (searchLocation == null || searchLocation.trim().isEmpty()) {
             System.out.println("   ✅ No filter applied - returning true");
-            return true; // No filter applied
+            return true;
         }
 
         if (station == null) {
@@ -387,7 +368,7 @@ public class BookingSearchService {
 
     private boolean matchesBusStationLocation(BusStation station, String searchLocation) {
         if (searchLocation == null || searchLocation.trim().isEmpty()) {
-            return true; // No filter applied
+            return true;
         }
         if (station == null) return false;
 
@@ -401,7 +382,6 @@ public class BookingSearchService {
                 return true;
             }
         } catch (NumberFormatException e) {
-            // Not a number, continue with text matching
         }
 
         // Text-based matching for manual input
@@ -427,7 +407,6 @@ public class BookingSearchService {
         return station.getBusStationFullName() + " (" + station.getBusStationCode() + ")";
     }
 
-    // Helper method for price range filtering
     private boolean matchesPriceRange(Double price, Double minPrice, Double maxPrice) {
         boolean minOk = minPrice == null || price >= minPrice;
         boolean maxOk = maxPrice == null || price <= maxPrice;

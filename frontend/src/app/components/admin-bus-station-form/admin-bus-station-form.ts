@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { BusStationService, BusStation } from '../../services/bus-station-service';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {BusStation, BusStationService} from '../../services/bus-station-service';
 
 @Component({
   selector: 'app-admin-bus-station-form',
@@ -46,7 +46,7 @@ export class AdminBusStationFormComponent implements OnInit {
     if (this.adminBusStationForm.valid) {
       this.isSubmitting = true;
       this.submitMessage = '';
-    
+
       const busStationData: BusStation = {
         busStationFullName: this.adminBusStationForm.value.busStationFullName,
         busStationCode: this.adminBusStationForm.value.busStationCode.toUpperCase(),

@@ -6,7 +6,6 @@ import com.example.travelbuddybackend.service.ClientService.LoginRequest;
 import com.example.travelbuddybackend.service.ClientService.LoginResponse;
 import com.example.travelbuddybackend.service.ClientService.RegistrationRequest;
 import com.example.travelbuddybackend.service.ClientService.RegistrationResponse;
-import com.example.travelbuddybackend.service.ValidatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

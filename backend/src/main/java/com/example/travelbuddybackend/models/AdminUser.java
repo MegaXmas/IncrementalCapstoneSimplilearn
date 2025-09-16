@@ -8,10 +8,10 @@ public class AdminUser {
     private String adminUsername;
     private String adminPassword;
 
-    private boolean enabled = true;        // Can the client log in? (account active/inactive)
-    private boolean accountLocked = false; // Is account temporarily locked? (security measure)
-    private LocalDateTime createdAt;       // When was this account created?
-    private LocalDateTime lastLogin;       // When did client last successfully log in?
+    private boolean enabled = true;
+    private boolean accountLocked = false;
+    private LocalDateTime createdAt;
+    private LocalDateTime lastLogin;
 
     // ============================================================================
     // CONSTRUCTORS

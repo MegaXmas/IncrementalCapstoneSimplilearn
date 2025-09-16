@@ -1,8 +1,7 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import { BusDetails } from './bus-details-service';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {Observable, of} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 
 export interface BookingSearchCriteria {
   transportType?: string;
@@ -11,7 +10,7 @@ export interface BookingSearchCriteria {
   departureStation?: string;
   arrivalStation?: string;
   departureTime?: string;
-  departureDate?: string; 
+  departureDate?: string;
   minPrice?: number;
   maxPrice?: number;
   airline?: string; // For flights
@@ -42,9 +41,9 @@ export interface Booking {
   providedIn: 'root'
 })
 export class BookingService {
-  
+
   private baseUrl = 'http://localhost:8080/api/search';
-  
+
   constructor(private http: HttpClient) {}
 
   /**
@@ -53,7 +52,7 @@ export class BookingService {
    */
   searchAvailableTickets(criteria: BookingSearchCriteria): Observable<AvailableTicket[]> {
     console.log('🔍 Searching available tickets with criteria:', criteria);
-    
+
     return this.http.post<AvailableTicket[]>(`${this.baseUrl}/available-tickets`, criteria)
       .pipe(
         map(tickets => {
@@ -73,7 +72,7 @@ export class BookingService {
    */
   searchExistingBookings(criteria: BookingSearchCriteria): Observable<Booking[]> {
     console.log('🔍 Searching existing bookings with criteria:', criteria);
-    
+
     return this.http.post<Booking[]>(`${this.baseUrl}/existing-bookings`, criteria)
       .pipe(
         map(bookings => {

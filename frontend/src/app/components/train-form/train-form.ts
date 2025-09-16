@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { forkJoin } from 'rxjs';
-import { DateInputComponent } from '../shared/date-dropdown/date-input';
-import { TimeDropdownComponent } from '../shared/time-dropdown/time-dropdown';
-import { DurationDropdownComponent } from '../shared/duration-dropdown/duration-dropdown';
-import { TrainDetailsService, TrainDetails } from '../../services/train-details-service';
-import { StationSearchComponent } from "../shared/station-search/station-search";
-import { StationService } from '../../services/station-service';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {forkJoin} from 'rxjs';
+import {DateInputComponent} from '../shared/date-dropdown/date-input';
+import {TimeDropdownComponent} from '../shared/time-dropdown/time-dropdown';
+import {DurationDropdownComponent} from '../shared/duration-dropdown/duration-dropdown';
+import {TrainDetails, TrainDetailsService} from '../../services/train-details-service';
+import {StationSearchComponent} from "../shared/station-search/station-search";
+import {StationService} from '../../services/station-service';
 
 @Component({
   selector: 'app-train-form',
@@ -17,7 +17,7 @@ import { StationService } from '../../services/station-service';
     DateInputComponent,
     TimeDropdownComponent,
     DurationDropdownComponent,
-    StationSearchComponent 
+    StationSearchComponent
   ],
   standalone: true,
   templateUrl: './train-form.html',
@@ -33,9 +33,9 @@ export class TrainFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private trainDetailsService: TrainDetailsService,
-    private stationService: StationService  
+    private stationService: StationService
   ) {}
- 
+
   ngOnInit(): void {
     this.trainForm = this.fb.group({
       trainNumber: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(10)]],
@@ -106,13 +106,13 @@ export class TrainFormComponent implements OnInit {
           trainNumber: this.trainForm.value.trainNumber,
           trainLine: this.trainForm.value.trainLine,
           trainDepartureStation: {
-            id: stations.departureStation.id,                              
+            id: stations.departureStation.id,
             trainStationFullName: stations.departureStation.trainStationFullName,
             trainStationCode: stations.departureStation.trainStationCode,
             trainStationCityLocation: stations.departureStation.trainStationCityLocation
           },
           trainArrivalStation: {
-            id: stations.arrivalStation.id,                                
+            id: stations.arrivalStation.id,
             trainStationFullName: stations.arrivalStation.trainStationFullName,
             trainStationCode: stations.arrivalStation.trainStationCode,
             trainStationCityLocation: stations.arrivalStation.trainStationCityLocation

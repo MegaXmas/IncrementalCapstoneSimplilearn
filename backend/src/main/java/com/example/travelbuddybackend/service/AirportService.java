@@ -2,7 +2,6 @@ package com.example.travelbuddybackend.service;
 
 import com.example.travelbuddybackend.models.Airport;
 import com.example.travelbuddybackend.repository.AirportRepository;
-import com.example.travelbuddybackend.service.ValidatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,12 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Airport Service - Business Logic Layer
- *
- * Optimized version that leverages database queries instead of in-memory filtering
- * for better performance with large datasets
- */
 @Service
 public class AirportService {
 
@@ -58,7 +51,6 @@ public class AirportService {
             return false;
         }
 
-        // Check for duplicate airport code
         if (airportRepository.findByAirportCode(airport.getAirportCode()).isPresent()) {
             System.out.println("✗ Service Error: Airport code already exists: " + airport.getAirportCode());
             return false;
@@ -83,13 +75,11 @@ public class AirportService {
             return false;
         }
 
-        // Check if airport exists
         if (airportRepository.findById(airport.getId()).isEmpty()) {
             System.out.println("✗ Service Error: Airport not found for update");
             return false;
         }
 
-        // Check for duplicate airport code (excluding current airport)
         Optional<Airport> existingAirport = airportRepository.findByAirportCode(airport.getAirportCode());
         if (existingAirport.isPresent() && !existingAirport.get().getId().equals(airport.getId())) {
             System.out.println("✗ Service Error: Airport code already exists: " + airport.getAirportCode());
@@ -111,7 +101,6 @@ public class AirportService {
             return false;
         }
 
-        // Check if airport exists before deletion
         if (airportRepository.findById(id).isEmpty()) {
             System.out.println("✗ Service Error: Airport not found for deletion");
             return false;
@@ -148,48 +137,9 @@ public class AirportService {
         return airportRepository.findAll().size();
     }
 
-    // ============================================================================
-    // SEARCH METHODS - OPTIMIZED to use database queries instead of in-memory filtering
-    // ============================================================================
-
-    /**
-     * Find airports by partial name match - OPTIMIZED with database query
-     */
-    public List<Airport> findAirportByPartialName(String partialName) {
-        if (partialName == null || partialName.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Partial name cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        // Use database LIKE query instead of loading all airports into memory
-        return airportRepository.findByPartialName(partialName.trim());
-    }
-
-    /**
-     * Find airports by city location - OPTIMIZED with database query
-     */
-    public List<Airport> findAirportByCityLocation(String cityLocation) {
-        if (cityLocation == null || cityLocation.trim().isEmpty()) {
-            System.out.println("✗ Service Error: City location cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        // Use database LIKE query instead of in-memory filtering
-        return airportRepository.findByCityLocation(cityLocation.trim());
-    }
-
-    /**
-     * Find airports by country location - OPTIMIZED with database query
-     */
-    public List<Airport> findAirportByCountryLocation(String countryLocation) {
-        if (countryLocation == null || countryLocation.trim().isEmpty()) {
-            System.out.println("✗ Service Error: Country location cannot be null or empty");
-            return new ArrayList<>();
-        }
-
-        // Use database LIKE query instead of in-memory filtering
-        return airportRepository.findByCountryLocation(countryLocation.trim());
-    }
+    // ===========================================================
+    // SEARCH METHODS
+    // ===========================================================
 
     /**
      * Multi-criteria search - optimized to minimize database calls
@@ -202,7 +152,6 @@ public class AirportService {
 
         String trimmedTerm = searchTerm.trim();
 
-        // Try exact code match first (most specific)
         Optional<Airport> exactMatch = airportRepository.findByAirportCode(trimmedTerm.toUpperCase());
         if (exactMatch.isPresent()) {
             List<Airport> result = new ArrayList<>();
@@ -211,7 +160,6 @@ public class AirportService {
         }
 
         // If not exact code match, do comprehensive search using in-memory filtering
-        // This is acceptable for search functionality where we want comprehensive results
         String lowerSearchTerm = trimmedTerm.toLowerCase();
         List<Airport> allAirports = getAllAirports();
 
@@ -276,7 +224,6 @@ public class AirportService {
         }
 
         String trimmed = airportCode.trim();
-        // Airport codes are typically 3-4 uppercase letters (IATA/ICAO standards)
         return trimmed.length() >= 3 && trimmed.length() <= 4 && trimmed.matches("[A-Z]{3,4}");
     }
 }

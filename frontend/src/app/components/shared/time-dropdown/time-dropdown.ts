@@ -1,7 +1,7 @@
-import { Component, Input, Output, EventEmitter, forwardRef } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { BaseFormControl } from '../base-form-control';
+import {Component, forwardRef, Input} from '@angular/core';
+import {NG_VALUE_ACCESSOR} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {BaseFormControl} from '../base-form-control';
 
 @Component({
   selector: 'app-time-dropdown',
@@ -107,14 +107,14 @@ export class TimeDropdownComponent extends BaseFormControl {
     // Check if all fields have values (selectedMinutes can be '0' which is falsy)
     if (this.selectedHours && this.selectedMinutes !== '' && this.selectedPeriod) {
       let hour = parseInt(this.selectedHours);
-      
+
       // Convert 12-hour to 24-hour format
       if (this.selectedPeriod === 'PM' && hour !== 12) {
         hour += 12;
       } else if (this.selectedPeriod === 'AM' && hour === 12) {
         hour = 0;
       }
-      
+
       const formattedTime = `${hour.toString().padStart(2, '0')}:${this.selectedMinutes.padStart(2, '0')}`;
       this.updateValue(formattedTime);
     } else {
@@ -129,7 +129,7 @@ export class TimeDropdownComponent extends BaseFormControl {
     if (value) {
       const [hourStr, minuteStr] = value.split(':');
       let hour = parseInt(hourStr);
-      
+
       // Convert from 24-hour to 12-hour format
       if (hour === 0) {
         this.selectedHours = '12';
@@ -144,7 +144,7 @@ export class TimeDropdownComponent extends BaseFormControl {
         this.selectedHours = (hour - 12).toString();
         this.selectedPeriod = 'PM';
       }
-      
+
       this.selectedMinutes = minuteStr || '';
     } else {
       this.selectedHours = '';

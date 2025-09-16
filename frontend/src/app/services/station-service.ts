@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {Observable, of} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 
 // Backend data interfaces - matching your Java models
 export interface BusStation {
@@ -22,7 +22,7 @@ export interface Airport {
   id: number;
   airportFullName: string;
   airportCode: string;
-  airportCityLocation: string; 
+  airportCityLocation: string;
   airportCountryLocation: string;
   airportTimezone: string;
 }
@@ -31,9 +31,9 @@ export interface Airport {
   providedIn: 'root'
 })
 export class StationService {
-  
+
   private baseUrl = 'http://localhost:8080/api';
-  
+
   constructor(private http: HttpClient) {}
 
   /**
@@ -47,7 +47,7 @@ export class StationService {
 
     // Use 'term' parameter to match our airport controller
     const params = new HttpParams().set('searchTerm', query.trim());
-    
+
     return this.http.get<Airport[]>(`${this.baseUrl}/airports/search`, { params })
       .pipe(
         map(airports => {
@@ -99,7 +99,7 @@ export class StationService {
 
     // Use 'searchTerm' parameter to match your bus controller
     const params = new HttpParams().set('searchTerm', query.trim());
-    
+
     return this.http.get<BusStation[]>(`${this.baseUrl}/bus-stations/search`, { params })
       .pipe(
         map(stations => {
@@ -137,7 +137,7 @@ export class StationService {
 
     // Use 'searchTerm' parameter to match your train controller
     const params = new HttpParams().set('searchTerm', query.trim());
-    
+
     return this.http.get<TrainStation[]>(`${this.baseUrl}/train-stations/search`, { params })
       .pipe(
         map(stations => {

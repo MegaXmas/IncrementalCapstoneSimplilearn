@@ -1,10 +1,10 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { StationSearchComponent } from '../shared/station-search/station-search';
-import { BookingService, BookingSearchCriteria, AvailableTicket } from '../../services/booking-service';
-import { DateInputComponent } from "../shared/date-dropdown/date-input";
-import { TimeDropdownComponent } from '../shared/time-dropdown/time-dropdown';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {StationSearchComponent} from '../shared/station-search/station-search';
+import {AvailableTicket, BookingSearchCriteria, BookingService} from '../../services/booking-service';
+import {DateInputComponent} from "../shared/date-dropdown/date-input";
+import {TimeDropdownComponent} from '../shared/time-dropdown/time-dropdown';
 
 @Component({
   selector: 'app-booking-search',

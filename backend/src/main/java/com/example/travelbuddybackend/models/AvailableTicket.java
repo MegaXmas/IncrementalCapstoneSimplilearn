@@ -1,16 +1,16 @@
 package com.example.travelbuddybackend.models;
 
-// Simple result class that combines available tickets from all services
+//UNFINISHED IMPLEMENTATION
 public class AvailableTicket {
-    private Long id;
-    private String transportType;
-    private String number; // flight/train/bus number
-    private String departureLocation;
-    private String arrivalLocation;
-    private String departureTime;
-    private String arrivalTime;
-    private Double price;
-    private String additionalInfo; // airline, line, etc.
+    private final Long id;
+    private final String transportType;
+    private final String number; // flight/train/bus number
+    private final String departureLocation;
+    private final String arrivalLocation;
+    private final String departureTime;
+    private final String arrivalTime;
+    private final Double price;
+    private final String additionalInfo; // airline, line, etc.
 
     public AvailableTicket(Long id, String transportType, String number,
                            String departureLocation, String arrivalLocation,

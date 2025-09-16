@@ -23,7 +23,6 @@ public class BusDetailsRepository {
         this.busStationRepository = busStationRepository;
     }
 
-    // Optimized RowMapper using JOINs - CORRECTED column names
     private static class BusDetailsRowMapper implements RowMapper<BusDetails> {
         @Override
         public BusDetails mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -270,8 +269,6 @@ public class BusDetailsRepository {
             return new ArrayList<>();
         }
     }
-
-// Fix this method in your BusDetailsRepository.java
 
     public boolean createBusDetails(BusDetails busDetails) {
         if (!isValidForRepository(busDetails)) {

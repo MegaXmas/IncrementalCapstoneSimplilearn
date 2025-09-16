@@ -1,6 +1,5 @@
 package com.example.travelbuddybackend.service;
 
-import com.example.travelbuddybackend.models.BusStation;
 import com.example.travelbuddybackend.models.TrainStation;
 import com.example.travelbuddybackend.repository.TrainStationRepository;
 import org.springframework.beans.factory.annotation.Autowired;

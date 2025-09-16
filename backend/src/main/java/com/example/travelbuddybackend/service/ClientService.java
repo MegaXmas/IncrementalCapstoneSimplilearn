@@ -1,6 +1,5 @@
 package com.example.travelbuddybackend.service;
 
-import com.example.travelbuddybackend.service.JwtService;
 import com.example.travelbuddybackend.models.Client;
 import com.example.travelbuddybackend.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,22 +13,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * Enhanced Client Service with Authentication Support
- *
- * This service acts as the business logic layer for client management and authentication.
- * Think of it as your customer service manager who:
- * - Handles new customer registrations
- * - Processes login requests
- * - Manages client accounts and profiles
- * - Enforces business rules and security policies
- *
- * Key Principles:
- * - Passwords are always encrypted before storage
- * - All input is validated before database operations
- * - Clear error messages help users understand issues
- * - Security is built into every authentication operation
- */
+//UNFINISHED IMPLEMENTATION
 @Service
 public class ClientService {
 
@@ -37,7 +21,6 @@ public class ClientService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    // Email validation pattern - ensures proper email format
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$"
     );
@@ -173,10 +156,6 @@ public class ClientService {
 
     /**
      * Change a client's password
-     *
-     * This allows clients to update their passwords securely.
-     * It verifies the old password before setting the new one.
-     *
      * @param clientId The ID of the client changing their password
      * @param oldPassword The current password for verification
      * @param newPassword The new password to set
@@ -188,7 +167,6 @@ public class ClientService {
             return false;
         }
 
-        // Find the client
         Optional<Client> clientOptional = clientRepository.findById(clientId);
         if (clientOptional.isEmpty()) {
             System.out.println("✗ Service: Client not found for password change");
@@ -197,19 +175,16 @@ public class ClientService {
 
         Client client = clientOptional.get();
 
-        // Verify old password
         if (!passwordEncoder.matches(oldPassword, client.getPassword())) {
             System.out.println("✗ Service: Old password is incorrect");
             return false;
         }
 
-        // Validate new password
         if (newPassword.length() < 6) {
             System.out.println("✗ Service: New password must be at least 6 characters long");
             return false;
         }
 
-        // Encrypt and update new password
         String encryptedNewPassword = passwordEncoder.encode(newPassword);
         boolean updated = clientRepository.updatePassword(clientId, encryptedNewPassword);
 
@@ -222,16 +197,12 @@ public class ClientService {
 
     /**
      * Validate a JWT token and return the associated client
-     *
-     * This method is essential for protecting endpoints that require authentication.
-     * It verifies the token is valid and returns the client it belongs to.
-     *
      * @param token The JWT token from the request header
      * @return Optional containing the client if token is valid, empty otherwise
      */
     public Optional<Client> validateTokenAndGetClient(String token) {
         try {
-            // First check if the token is structurally valid
+            // Check if the token is structurally valid
             if (!jwtService.isTokenValid(token)) {
                 System.out.println("✗ Service: Invalid JWT token structure");
                 return Optional.empty();
@@ -270,10 +241,6 @@ public class ClientService {
 
     /**
      * Refresh a JWT token
-     *
-     * This allows clients to get a new token before their current one expires,
-     * providing seamless authentication without requiring re-login.
-     *
      * @param oldToken The current token to refresh
      * @return New token if successful, null if failed
      */
@@ -302,10 +269,6 @@ public class ClientService {
 
     /**
      * Get client information from a JWT token without full validation
-     *
-     * This is useful when you need to display user information but don't need
-     * to perform security-critical operations. It's faster than database lookup.
-     *
      * @param token The JWT token to extract information from
      * @return Client information embedded in the token, or null if extraction fails
      */
@@ -327,7 +290,6 @@ public class ClientService {
             client.setUsername(username);
             client.setEmail(email);
 
-            // Split full name back into first and last name if available
             if (fullName != null && fullName.contains(" ")) {
                 String[] nameParts = fullName.split(" ", 2);
                 client.setFirstName(nameParts[0]);
@@ -348,8 +310,6 @@ public class ClientService {
 
     /**
      * Get all clients in the system
-     * This method works exactly as before - no changes needed
-     *
      * @return List of all clients (empty list if none found)
      */
     public List<Client> getAllClients() {
@@ -358,8 +318,6 @@ public class ClientService {
 
     /**
      * Get a client by their ID
-     * This method works exactly as before - no changes needed
-     *
      * @param id The client ID to search for
      * @return Optional containing the client if found, empty otherwise
      */
@@ -373,8 +331,6 @@ public class ClientService {
 
     /**
      * Add a new client to the database
-     * This method has been enhanced to handle authentication fields
-     *
      * @param client The client to add
      * @return true if client was successfully added, false otherwise
      */
@@ -384,7 +340,6 @@ public class ClientService {
             return false;
         }
 
-        // If the client has a password, encrypt it
         if (client.getPassword() != null && !client.getPassword().isEmpty()) {
             String encryptedPassword = passwordEncoder.encode(client.getPassword());
             client.setPassword(encryptedPassword);
@@ -401,8 +356,6 @@ public class ClientService {
 
     /**
      * Update an existing client's information
-     * This method now handles authentication fields properly
-     *
      * @param client The client with updated information
      * @return true if client was successfully updated, false otherwise
      */
@@ -428,8 +381,6 @@ public class ClientService {
 
     /**
      * Delete a client from the database
-     * This method works exactly as before - no changes needed
-     *
      * @param id The ID of the client to delete
      * @return true if client was successfully deleted, false otherwise
      */
@@ -455,8 +406,6 @@ public class ClientService {
 
     /**
      * Check if a client exists in the database
-     * This method works exactly as before - no changes needed
-     *
      * @param id The client ID to check
      * @return true if client exists, false otherwise
      */
@@ -469,8 +418,6 @@ public class ClientService {
 
     /**
      * Get the total number of clients
-     * This is useful for dashboard statistics and pagination
-     *
      * @return The total count of clients
      */
     public int getClientCount() {
@@ -483,10 +430,6 @@ public class ClientService {
 
     /**
      * Enable or disable a client account
-     *
-     * This allows administrators to activate or deactivate accounts.
-     * Disabled accounts cannot log in but retain all their data.
-     *
      * @param clientId The ID of the client
      * @param enabled true to enable, false to disable
      * @return true if status was updated successfully, false otherwise
@@ -507,10 +450,6 @@ public class ClientService {
 
     /**
      * Lock or unlock a client account
-     *
-     * Account locking is a security feature for temporarily preventing access.
-     * This might be used after failed login attempts or security concerns.
-     *
      * @param clientId The ID of the client
      * @param locked true to lock, false to unlock
      * @return true if lock status was updated successfully, false otherwise
@@ -531,10 +470,6 @@ public class ClientService {
 
     /**
      * Get clients who registered recently
-     *
-     * This is useful for new user onboarding, welcome campaigns,
-     * and understanding user growth patterns.
-     *
      * @param days Number of days to look back
      * @return List of clients who registered within the specified days
      */
@@ -667,10 +602,6 @@ public class ClientService {
 
     /**
      * Find a client by username or email
-     *
-     * This supports flexible login - users can log in with either
-     * their username or email address.
-     *
      * @param usernameOrEmail The login identifier
      * @return Optional containing the client if found
      */
@@ -691,10 +622,6 @@ public class ClientService {
 
     /**
      * Validate registration data
-     *
-     * This performs comprehensive validation of all registration fields
-     * to ensure data quality and prevent common registration errors.
-     *
      * @param request The registration request to validate
      * @return ValidationResult indicating success or specific error
      */
@@ -738,12 +665,6 @@ public class ClientService {
         // Validate password strength
         if (request.getPassword().length() < 6) {
             return new ValidationResult(false, "Password must be at least 6 characters long");
-        }
-
-        // Check for common weak passwords
-        String password = request.getPassword().toLowerCase();
-        if (password.equals("password") || password.equals("123456") || password.equals("qwerty")) {
-            return new ValidationResult(false, "Please choose a stronger password");
         }
 
         return new ValidationResult(true, "Valid");
@@ -887,8 +808,8 @@ public class ClientService {
      * Used internally to check if data is valid
      */
     private static class ValidationResult {
-        private boolean valid;
-        private String errorMessage;
+        private final boolean valid;
+        private final String errorMessage;
 
         public ValidationResult(boolean valid, String errorMessage) {
             this.valid = valid;

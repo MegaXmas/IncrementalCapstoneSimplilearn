@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { AdminUser, AdminLogin, AdminService } from '../../services/admin-service';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {AdminLogin, AdminService, AdminUser} from '../../services/admin-service';
 
 @Component({
   selector: 'app-admin-login',
@@ -12,14 +12,14 @@ import { AdminUser, AdminLogin, AdminService } from '../../services/admin-servic
 export class AdminLoginComponent implements OnInit {
 
   adminLoginForm: FormGroup;
-  
+
   currentAdmin: AdminUser | null = null;
   isLoading = false;
   showPassword = false;
 
   successMessage: string = '';
   errorMessage: string = '';
-  
+
   constructor(
     private formBuilder: FormBuilder,
     private adminService: AdminService
@@ -50,9 +50,9 @@ export class AdminLoginComponent implements OnInit {
     if (this.adminLoginForm.valid) {
       this.isLoading = true;
       this.clearMessages();
-      
+
       const loginData: AdminLogin = this.adminLoginForm.value;
-      
+
       this.adminService.login(loginData).subscribe({
         next: (response) => {
           this.isLoading = false;
@@ -132,7 +132,7 @@ export class AdminLoginComponent implements OnInit {
    */
   getFieldError(fieldName: string): string {
     const field = this.adminLoginForm.get(fieldName);
-    
+
     if (field?.errors && field.touched) {
       if (field.errors['required']) {
         return `${fieldName} is required`;
@@ -147,7 +147,7 @@ export class AdminLoginComponent implements OnInit {
         return this.getPatternErrorMessage(fieldName);
       }
     }
-    
+
     return '';
   }
 

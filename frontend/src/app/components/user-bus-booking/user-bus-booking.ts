@@ -1,11 +1,10 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { StationSearchComponent } from '../shared/station-search/station-search';
-import { BookingService, BookingSearchCriteria, AvailableTicket } from '../../services/booking-service';
-import { DateInputComponent } from "../shared/date-dropdown/date-input";
-import { TimeDropdownComponent } from '../shared/time-dropdown/time-dropdown';
-import { BusDetails } from '../../services/bus-details-service';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {StationSearchComponent} from '../shared/station-search/station-search';
+import {AvailableTicket, BookingSearchCriteria, BookingService} from '../../services/booking-service';
+import {DateInputComponent} from "../shared/date-dropdown/date-input";
+import {TimeDropdownComponent} from '../shared/time-dropdown/time-dropdown';
 
 @Component({
   selector: 'app-booking-search',
@@ -15,7 +14,7 @@ import { BusDetails } from '../../services/bus-details-service';
   styleUrls: ['../shared/booking-search/booking-search.css', '../shared/form-styles.css']
 })
 export class UserBusBookingComponent implements OnInit {
- 
+
   searchForm!: FormGroup;
   searchResults: AvailableTicket[] = [];
   isSearching = false;
@@ -26,14 +25,14 @@ export class UserBusBookingComponent implements OnInit {
   isSubmitting = false;
   submitSuccess = false;
   submitMessage = ''
- 
+
   @Output() ticketSelected = new EventEmitter<AvailableTicket>();
-  
+
   constructor(
     private fb: FormBuilder,
     private bookingService: BookingService
   ) {}
-  
+
   ngOnInit(): void {
     // Create the search form for buses only
     this.searchForm = this.fb.group({
@@ -51,30 +50,30 @@ export class UserBusBookingComponent implements OnInit {
     const field = this.searchForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched))
   }
-  
+
   // Always return 'bus' since this component is bus-specific
   getStationType(): 'bus' {
     return 'bus';
   }
-  
+
   onSearch(): void {
     const searchCriteria: BookingSearchCriteria = {
       transportType: 'bus',
       ...this.searchForm.value
     };
-    
+
     console.log('Searching buses with criteria:', searchCriteria);
-    
+
     this.isSearching = true;
     this.searchError = '';
     this.searchResults = [];
-    
+
     this.bookingService.searchAvailableTickets(searchCriteria).subscribe({
       next: (tickets: AvailableTicket[]) => {
         console.log('✅ Bus search completed, found tickets:', tickets);
         this.searchResults = tickets;
         this.isSearching = false;
-        
+
         if (tickets.length === 0) {
           this.searchError = 'No bus tickets found matching your criteria. Try adjusting your search.';
         }
@@ -87,21 +86,21 @@ export class UserBusBookingComponent implements OnInit {
       }
     });
   }
-  
+
   selectTicket(ticket: AvailableTicket): void {
     this.selectedTicket = ticket; // Store the selected ticket
     this.ticketSelected.emit(ticket);
     console.log('Bus ticket selected:', ticket);
   }
-  
+
   formatTicketRoute(ticket: AvailableTicket): string {
     return this.bookingService.formatTicketRoute(ticket);
   }
-  
+
   formatTicketTime(ticket: AvailableTicket): string {
     return this.bookingService.formatTicketTime(ticket);
   }
-  
+
   formatPrice(price: number): string {
     return this.bookingService.formatPrice(price);
   }
@@ -113,7 +112,7 @@ onSubmit(): void {
 
       // Use the selected ticket as the booking request
       const bookingRequest: AvailableTicket = this.selectedTicket;
-      
+
       console.log('Submitting booking request:', bookingRequest);
 
       this.bookingService.createBusBooking(bookingRequest).subscribe({
@@ -136,8 +135,8 @@ onSubmit(): void {
       this.submitSuccess = false;
     }
   }
-  
-  
+
+
   // Clear search results
   clearSearch(): void {
     this.searchResults = [];

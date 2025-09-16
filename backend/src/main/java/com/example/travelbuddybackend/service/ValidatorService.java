@@ -1,25 +1,13 @@
 package com.example.travelbuddybackend.service;
 
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.regex.Pattern;
 
-/**
- * Centralized validation service for travel booking system
- *
- * Handles validation for:
- * - Date format validation (YYYY-MM-DD)
- * - Time format validation (HH:MM)
- * - Duration format validation (e.g., "2h 30m", "45m", "1h")
- *
- * This service follows SpringBoot best practices by:
- * - Using @Service annotation for dependency injection
- * - Providing consistent error logging
- * - Centralizing validation logic to avoid duplication
- */
 @Service
 public class ValidatorService {
 
@@ -37,7 +25,6 @@ public class ValidatorService {
     /**
      * Validates date string format from Angular date dropdown
      * Expected format: YYYY-MM-DD (e.g., "2024-12-25")
-     *
      * @param dateString The date string to validate
      * @return true if valid format and represents a real date, false otherwise
      */
@@ -61,7 +48,6 @@ public class ValidatorService {
     /**
      * Validates time string format
      * Expected format: HH:MM in 24-hour format (e.g., "14:30", "09:15")
-     *
      * @param timeString The time string to validate
      * @return true if valid format, false otherwise
      */
@@ -84,7 +70,6 @@ public class ValidatorService {
     /**
      * Validates duration string format for travel times
      * Expected formats: "2h 30m", "1h", "45m", "3h 0m"
-     *
      * @param durationString The duration string to validate
      * @return true if valid format, false otherwise
      */
@@ -113,14 +98,12 @@ public class ValidatorService {
 
     /**
      * Validates that a departure date is not in the past
-     * Useful for booking validation
-     *
      * @param dateString Date string in YYYY-MM-DD format
      * @return true if date is today or future, false if past or invalid
      */
     public boolean isValidFutureDate(String dateString) {
         if (!isValidDate(dateString)) {
-            return false; // Already logged in isValidDate()
+            return false;
         }
 
         try {
@@ -142,8 +125,6 @@ public class ValidatorService {
 
     /**
      * Comprehensive validation for booking date fields
-     * Validates both format and business rules
-     *
      * @param departureDate Departure date string
      * @param arrivalDate Arrival date string (can be null for same-day travel)
      * @return true if both dates are valid, false otherwise

@@ -1,16 +1,16 @@
-import { Routes } from '@angular/router';
-import { AdminLoginComponent } from './components/admin-login/admin-login';
-import { FlightFormComponent } from './components/flight-form/flight-form';
-import { TrainFormComponent } from './components/train-form/train-form';
-import { BusFormComponent } from './components/bus-form/bus-form';
-import { UserBusBookingComponent } from './components/user-bus-booking/user-bus-booking';
-import { UserFlightBookingComponent } from './components/user-flight-booking/user-flight-booking';
-import { AdminAirportFormComponent } from './components/admin-airport-form/admin-airport-form';
-import { AdminBusStationFormComponent } from './components/admin-bus-station-form/admin-bus-station-form';
-import { AdminTrainStationFormComponent } from './components/admin-train-station-form/admin-train-station-form';
-import { ClientFormComponent } from './components/client-form/client-form';
-import { UserTrainBookingComponent } from './components/user-train-booking/user-train-booking';
-import { BookingSearchComponent } from './components/shared/booking-search/booking-search';
+import {Routes} from '@angular/router';
+import {AdminLoginComponent} from './components/admin-login/admin-login';
+import {FlightFormComponent} from './components/flight-form/flight-form';
+import {TrainFormComponent} from './components/train-form/train-form';
+import {BusFormComponent} from './components/bus-form/bus-form';
+import {UserBusBookingComponent} from './components/user-bus-booking/user-bus-booking';
+import {UserFlightBookingComponent} from './components/user-flight-booking/user-flight-booking';
+import {AdminAirportFormComponent} from './components/admin-airport-form/admin-airport-form';
+import {AdminBusStationFormComponent} from './components/admin-bus-station-form/admin-bus-station-form';
+import {AdminTrainStationFormComponent} from './components/admin-train-station-form/admin-train-station-form';
+import {ClientFormComponent} from './components/client-form/client-form';
+import {UserTrainBookingComponent} from './components/user-train-booking/user-train-booking';
+import {BookingSearchComponent} from './components/shared/booking-search/booking-search';
 
 // Define application routes
 export const routes: Routes = [
@@ -40,7 +40,7 @@ export const routes: Routes = [
 
     { path: 'admin/train-station/add', component: AdminTrainStationFormComponent },
     { path: 'admin-train-station-form', component: AdminTrainStationFormComponent },
-    
+
     // Wildcard route - must be last
     { path: '**', redirectTo: '/client-form' }
 ];

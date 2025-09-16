@@ -1,23 +1,22 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { DateInputComponent } from '../shared/date-dropdown/date-input';
-import { TimeDropdownComponent } from '../shared/time-dropdown/time-dropdown';
-import { DurationDropdownComponent } from '../shared/duration-dropdown/duration-dropdown';
-import { AirportService } from '../../services/airport-service';
-import { forkJoin } from 'rxjs';
-import { StationService } from '../../services/station-service';
-import { FlightDetailsService, FlightDetails } from '../../services/flight-details-service';
-import { StationSearchComponent } from '../shared/station-search/station-search';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {DateInputComponent} from '../shared/date-dropdown/date-input';
+import {TimeDropdownComponent} from '../shared/time-dropdown/time-dropdown';
+import {DurationDropdownComponent} from '../shared/duration-dropdown/duration-dropdown';
+import {forkJoin} from 'rxjs';
+import {StationService} from '../../services/station-service';
+import {FlightDetails, FlightDetailsService} from '../../services/flight-details-service';
+import {StationSearchComponent} from '../shared/station-search/station-search';
 
 @Component({
   selector: 'app-flight-form',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
+    CommonModule,
+    ReactiveFormsModule,
     DateInputComponent,
-    TimeDropdownComponent, 
+    TimeDropdownComponent,
     DurationDropdownComponent,
     StationSearchComponent
   ],
@@ -112,7 +111,7 @@ isFieldInvalid(fieldName: string): boolean {
           flightNumber: this.flightForm.value.flightNumber,
           flightAirline: this.flightForm.value.flightAirline,
           flightOrigin: {
-            id: airports.originAirport.id,                              
+            id: airports.originAirport.id,
             airportFullName: airports.originAirport.airportFullName,
             airportCode: airports.originAirport.airportCode,
             airportCityLocation: airports.originAirport.airportCityLocation,
@@ -120,7 +119,7 @@ isFieldInvalid(fieldName: string): boolean {
             airportTimezone: airports.originAirport.airportTimezone
           },
           flightDestination: {
-            id: airports.destinationAirport.id,                                
+            id: airports.destinationAirport.id,
             airportFullName: airports.destinationAirport.airportFullName,
             airportCode: airports.destinationAirport.airportCode,
             airportCityLocation: airports.destinationAirport.airportCityLocation,

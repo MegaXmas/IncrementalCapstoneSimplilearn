@@ -43,9 +43,9 @@ export interface ClientLogin {
 
 // src/app/services/client.service.ts
 
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {Observable} from 'rxjs';
 
 /**
  * Angular service to communicate with Spring Boot ClientController
@@ -55,10 +55,10 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ClientService {
-  
+
   private readonly API_BASE_URL = 'http://localhost:8080/api/clients'; // Adjust to your Spring Boot port
 
-  
+
   constructor(private http: HttpClient) {}
 
   /**
@@ -67,7 +67,7 @@ export class ClientService {
    */
   register(registrationData: ClientRegistration): Observable<ApiResponse<RegistrationResult>> {
     return this.http.post<ApiResponse<RegistrationResult>>(
-      `${this.API_BASE_URL}/register`, 
+      `${this.API_BASE_URL}/register`,
       registrationData
     );
   }
@@ -81,9 +81,9 @@ export class ClientService {
       usernameOrEmail: loginData.usernameOrEmail,
       password: loginData.password
     };
-    
+
     return this.http.post<ApiResponse<LoginResult>>(
-      `${this.API_BASE_URL}/login`, 
+      `${this.API_BASE_URL}/login`,
       loginRequest
     );
   }
@@ -110,7 +110,7 @@ export class ClientService {
 
       // Decode the payload (middle part)
       const payload = JSON.parse(atob(tokenParts[1]));
-      
+
       // JWT stores username in the 'sub' field
       return payload.sub || null;
     } catch (error) {
@@ -140,7 +140,7 @@ export class ClientService {
       currentPassword,
       newPassword
     };
-    
+
     return this.http.post<ApiResponse<string>>(
       `${this.API_BASE_URL}/change-password`,
       passwordChangeRequest,

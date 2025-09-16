@@ -1,7 +1,7 @@
-import { Component, OnInit} from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { Client, ClientRegistration, ClientLogin, ClientService } from '../../services/client-service';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {Client, ClientLogin, ClientRegistration, ClientService} from '../../services/client-service';
 
 
 @Component({
@@ -25,7 +25,7 @@ export class ClientFormComponent implements OnInit {
 
   successMessage: string = '';
   errorMessage: string = '';
-  
+
   constructor(
     private formBuilder: FormBuilder,
     private clientService: ClientService
@@ -85,9 +85,9 @@ export class ClientFormComponent implements OnInit {
     if (this.clientForm.valid) {
       this.isLoading = true;
       this.clearMessages();
-      
+
       const clientData: ClientRegistration = this.clientForm.value;
-      
+
       // Call the backend registration API
       this.clientService.register(clientData).subscribe({
         next: (response) => {
@@ -118,9 +118,9 @@ export class ClientFormComponent implements OnInit {
     if (this.loginForm.valid) {
       this.isLoading = true;
       this.clearMessages();
-      
+
       const loginData: ClientLogin = this.loginForm.value;
-      
+
       this.clientService.login(loginData).subscribe({
         next: (response) => {
           this.isLoading = false;
@@ -175,12 +175,12 @@ export class ClientFormComponent implements OnInit {
     if (this.clientForm.valid && this.currentClient) {
       this.isLoading = true;
       this.clearMessages();
-      
+
       const updatedClient: Client = {
         ...this.currentClient,
         ...this.clientForm.value
       };
-      
+
       this.clientService.updateProfile(updatedClient).subscribe({
         next: (response) => {
           this.isLoading = false;
@@ -234,7 +234,7 @@ export class ClientFormComponent implements OnInit {
    */
   toggleEditMode(): void {
     this.isEditMode = !this.isEditMode;
-    
+
     if (this.isEditMode && this.currentClient) {
       // Populate form with current client data for editing
       this.clientForm.patchValue(this.currentClient);
@@ -246,7 +246,7 @@ export class ClientFormComponent implements OnInit {
    */
   getFieldError(fieldName: string): string {
     const field = this.clientForm.get(fieldName);
-    
+
     if (field?.errors && field.touched) {
       if (field.errors['required']) {
         return `${fieldName} is required`;
@@ -264,7 +264,7 @@ export class ClientFormComponent implements OnInit {
         return this.getPatternErrorMessage(fieldName);
       }
     }
-    
+
     return '';
   }
 

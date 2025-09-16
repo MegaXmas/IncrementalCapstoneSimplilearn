@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { AdminBusStationFormComponent } from './admin-bus-station-form';
+import {AdminBusStationFormComponent} from './admin-bus-station-form';
 
 describe('AdminBusStationForm', () => {
   let component: AdminBusStationFormComponent;

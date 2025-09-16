@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { forkJoin } from 'rxjs';
-import { DateInputComponent } from '../shared/date-dropdown/date-input';
-import { TimeDropdownComponent } from '../shared/time-dropdown/time-dropdown';
-import { DurationDropdownComponent } from '../shared/duration-dropdown/duration-dropdown';
-import { BusDetailsService, BusDetails } from '../../services/bus-details-service';
-import { StationSearchComponent } from "../shared/station-search/station-search";
-import { StationService } from '../../services/station-service';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {forkJoin} from 'rxjs';
+import {DateInputComponent} from '../shared/date-dropdown/date-input';
+import {TimeDropdownComponent} from '../shared/time-dropdown/time-dropdown';
+import {DurationDropdownComponent} from '../shared/duration-dropdown/duration-dropdown';
+import {BusDetails, BusDetailsService} from '../../services/bus-details-service';
+import {StationSearchComponent} from "../shared/station-search/station-search";
+import {StationService} from '../../services/station-service';
 
 @Component({
   selector: 'app-bus-form',
@@ -33,9 +33,9 @@ export class BusFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private busDetailsService: BusDetailsService,
-    private stationService: StationService  
+    private stationService: StationService
   ) {}
- 
+
   ngOnInit(): void {
     this.busForm = this.fb.group({
       busNumber: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(5)]],
@@ -106,13 +106,13 @@ export class BusFormComponent implements OnInit {
           busNumber: this.busForm.value.busNumber,
           busLine: this.busForm.value.busLine,
           busDepartureStation: {
-            id: stations.departureStation.id,                              
+            id: stations.departureStation.id,
             busStationFullName: stations.departureStation.busStationFullName,
             busStationCode: stations.departureStation.busStationCode,
             busStationCityLocation: stations.departureStation.busStationCityLocation
           },
           busArrivalStation: {
-            id: stations.arrivalStation.id,                                
+            id: stations.arrivalStation.id,
             busStationFullName: stations.arrivalStation.busStationFullName,
             busStationCode: stations.arrivalStation.busStationCode,
             busStationCityLocation: stations.arrivalStation.busStationCityLocation

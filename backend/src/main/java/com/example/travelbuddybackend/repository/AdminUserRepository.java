@@ -8,23 +8,10 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-/**
- * Admin Repository for Admin User Management and Authentication
- *
- * This repository handles all database operations for admin accounts.
- * It follows the same patterns and conventions as ClientRepository.
- *
- * Think of this as a secure filing cabinet that can:
- * - Store admin profiles with login credentials
- * - Find admins by username for login
- * - Track admin account activity and security status
- * - Manage all admin information needed for system administration
- *
- * The key principle here is that every method has a single, clear purpose
- * and the code is easy to understand and maintain.
- */
 @Repository
 public class AdminUserRepository {
 
@@ -71,11 +58,6 @@ public class AdminUserRepository {
     /**
      * Find all admin users in the database
      *
-     * This retrieves every admin account, which is useful for:
-     * - Super admin dashboards showing all administrators
-     * - Reports and analytics
-     * - System maintenance operations
-     *
      * @return List of all admin users (empty list if none found)
      */
     public List<AdminUser> findAll() {
@@ -99,10 +81,6 @@ public class AdminUserRepository {
 
     /**
      * Find an admin user by their unique ID
-     *
-     * This is the most direct way to get admin information when you already
-     * know their ID (for example, from a session or JWT token).
-     *
      * @param id The admin's unique identifier
      * @return Optional containing the admin if found, empty if not found
      */
@@ -138,11 +116,6 @@ public class AdminUserRepository {
 
     /**
      * Create a new admin account
-     *
-     * This is called when adding a new administrator to the system.
-     * All the essential information is provided and the account is created
-     * with appropriate default settings (enabled, not locked).
-     *
      * @param admin The admin object containing all necessary information
      * @return true if admin was successfully created, false otherwise
      */
@@ -187,10 +160,6 @@ public class AdminUserRepository {
 
     /**
      * Update an existing admin's information
-     *
-     * This allows updating admin account settings and information.
-     * The admin ID must be valid and the admin must exist in the database.
-     *
      * @param admin The admin object with updated information (must include valid ID)
      * @return true if admin was successfully updated, false otherwise
      */
@@ -235,11 +204,6 @@ public class AdminUserRepository {
 
     /**
      * Delete an admin account
-     *
-     * This permanently removes an admin from the system. Use with extreme caution!
-     * In many systems, you might prefer to disable accounts rather than delete them
-     * to maintain data integrity for audit logs.
-     *
      * @param id The ID of the admin to delete
      * @return true if admin was successfully deleted, false otherwise
      */
@@ -274,11 +238,6 @@ public class AdminUserRepository {
 
     /**
      * Find an admin by their username
-     *
-     * This is essential for login functionality. When an admin enters their username
-     * at the login screen, this method finds their account so we can verify
-     * their password and grant access to the admin system.
-     *
      * @param adminUsername The admin username to search for (case-sensitive)
      * @return Optional containing the admin if found, empty if not found
      */
@@ -314,11 +273,6 @@ public class AdminUserRepository {
 
     /**
      * Check if an admin username already exists in the system
-     *
-     * This is crucial when creating new admin accounts to ensure usernames are unique.
-     * We check this before creating a new account to prevent conflicts
-     * and provide clear error messages.
-     *
      * @param adminUsername The admin username to check for availability
      * @return true if username already exists, false if available
      */
@@ -345,11 +299,6 @@ public class AdminUserRepository {
 
     /**
      * Update an admin's last login timestamp
-     *
-     * This is called whenever an admin successfully logs in. It helps track
-     * admin activity, identify inactive accounts, and can be useful for
-     * security monitoring and audit purposes.
-     *
      * @param adminId The ID of the admin who just logged in
      * @return true if timestamp was successfully updated, false otherwise
      */
@@ -377,11 +326,6 @@ public class AdminUserRepository {
 
     /**
      * Update an admin's password
-     *
-     * This is used when admins change their passwords or when super administrators
-     * reset passwords. The new password should already be encrypted by the
-     * service layer before calling this method.
-     *
      * @param adminId The ID of the admin whose password is being changed
      * @param newEncryptedPassword The new password (already encrypted)
      * @return true if password was successfully updated, false otherwise
@@ -412,11 +356,6 @@ public class AdminUserRepository {
 
     /**
      * Update an admin's account status (enable/disable)
-     *
-     * This allows super administrators to activate or deactivate admin accounts.
-     * Disabled accounts cannot log in, which is useful for temporarily
-     * suspending access without deleting the account.
-     *
      * @param adminId The ID of the admin whose status is being changed
      * @param enabled true to enable the account, false to disable
      * @return true if status was successfully updated, false otherwise
@@ -448,10 +387,6 @@ public class AdminUserRepository {
 
     /**
      * Update an admin's account lock status
-     *
-     * This allows locking/unlocking admin accounts for security purposes.
-     * Locked accounts cannot log in even if they are enabled.
-     *
      * @param adminId The ID of the admin whose lock status is being changed
      * @param locked true to lock the account, false to unlock
      * @return true if lock status was successfully updated, false otherwise
@@ -482,58 +417,11 @@ public class AdminUserRepository {
     }
 
     // ============================================================================
-    // UTILITY AND STATISTICS METHODS
-    // ============================================================================
-
-    /**
-     * Get the total number of admin users in the system
-     *
-     * This is useful for dashboard statistics and system monitoring.
-     *
-     * @return The total count of admin accounts
-     */
-    public int getAdminCount() {
-        try {
-            String sql = "SELECT COUNT(*) FROM admin_users";
-            Integer count = jdbcTemplate.queryForObject(sql, Integer.class);
-            return count != null ? count : 0;
-
-        } catch (Exception e) {
-            System.out.println("✗ Repository: Error getting admin count: " + e.getMessage());
-            return 0;
-        }
-    }
-
-    /**
-     * Get the number of active (enabled and unlocked) admin users
-     *
-     * This provides insight into how many admins can currently use the system.
-     * It's useful for security monitoring and access control.
-     *
-     * @return The count of active admin accounts
-     */
-    public int getActiveAdminCount() {
-        try {
-            String sql = "SELECT COUNT(*) FROM admin_users WHERE enabled = true AND accountLocked = false";
-            Integer count = jdbcTemplate.queryForObject(sql, Integer.class);
-            return count != null ? count : 0;
-
-        } catch (Exception e) {
-            System.out.println("✗ Repository: Error getting active admin count: " + e.getMessage());
-            return 0;
-        }
-    }
-
-    // ============================================================================
     // PRIVATE HELPER METHODS
     // ============================================================================
 
     /**
      * Validate that an admin object has all required fields for database creation
-     *
-     * This is called before attempting to insert a new admin record.
-     * It checks that all essential fields are present and properly formatted.
-     *
      * @param admin The admin object to validate
      * @return true if admin is valid for creation, false otherwise
      */

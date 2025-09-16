@@ -2,9 +2,8 @@ package com.example.travelbuddybackend.service;
 
 import com.example.travelbuddybackend.models.Airport;
 import com.example.travelbuddybackend.models.FlightDetails;
-import com.example.travelbuddybackend.repository.FlightDetailsRepository;
 import com.example.travelbuddybackend.repository.AirportRepository;
-import com.example.travelbuddybackend.service.ValidatorService;
+import com.example.travelbuddybackend.repository.FlightDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,15 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Flight Details Service - Business Logic Layer
- *
- * Following Spring Boot Best Practices:
- * - Only depends on repositories (never other services for core operations)
- * - Handles all business validation and logic
- * - Coordinates multiple repository operations
- * - No circular dependencies
- */
 @Service
 public class FlightDetailsService {
 
@@ -170,7 +160,6 @@ public class FlightDetailsService {
             return false;
         }
 
-        // Check if flight exists before deletion
         if (flightDetailsRepository.findById(id).isEmpty()) {
             System.out.println("✗ Service Error: Flight not found for deletion");
             return false;
@@ -294,7 +283,6 @@ public class FlightDetailsService {
             return false;
         }
 
-        // Basic field validation
         if (flightDetails.getFlightNumber() == null || flightDetails.getFlightNumber().trim().isEmpty()) {
             System.out.println("✗ Service Error: Flight number is required");
             return false;
@@ -310,13 +298,11 @@ public class FlightDetailsService {
             return false;
         }
 
-        // Business logic validation
         if (flightDetails.getFlightOrigin().getId().equals(flightDetails.getFlightDestination().getId())) {
             System.out.println("✗ Service Error: Origin and destination airports cannot be the same");
             return false;
         }
 
-        // Validate airports exist in database
         if (airportRepository.findById(flightDetails.getFlightOrigin().getId()).isEmpty()) {
             System.out.println("✗ Service Error: Origin airport not found in database");
             return false;
@@ -327,7 +313,6 @@ public class FlightDetailsService {
             return false;
         }
 
-        // Date and time validation
         if (!validatorService.isValidDate(flightDetails.getFlightDepartureDate()) ||
                 !validatorService.isValidDate(flightDetails.getFlightArrivalDate())) {
             System.out.println("✗ Service Error: Invalid date format. Use YYYY-MM-DD");
@@ -340,7 +325,6 @@ public class FlightDetailsService {
             return false;
         }
 
-        // Price validation
         if (flightDetails.getFlightPrice() == null || flightDetails.getFlightPrice().trim().isEmpty()) {
             System.out.println("✗ Service Error: Flight price is required");
             return false;

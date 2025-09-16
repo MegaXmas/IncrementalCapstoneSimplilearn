@@ -1,18 +1,17 @@
 package com.example.travelbuddybackend.controller;
 
 import com.example.travelbuddybackend.models.AvailableTicket;
-import com.example.travelbuddybackend.models.Booking;
-import com.example.travelbuddybackend.models.BusDetails;
 import com.example.travelbuddybackend.models.Client;
 import com.example.travelbuddybackend.service.BookingSearchService;
 import com.example.travelbuddybackend.service.BookingService;
 import com.example.travelbuddybackend.service.ClientService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
+//UNFINISHED IMPLEMENTATION
 @RestController
 @RequestMapping("/api/bookings")
 @CrossOrigin(origins = "http://localhost:4200")

@@ -4,7 +4,6 @@ import com.example.travelbuddybackend.models.BusDetails;
 import com.example.travelbuddybackend.models.BusStation;
 import com.example.travelbuddybackend.repository.BusDetailsRepository;
 import com.example.travelbuddybackend.repository.BusStationRepository;
-import com.example.travelbuddybackend.service.ValidatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,15 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Bus Details Service - Business Logic Layer
- *
- * Fixed Architecture:
- * - Only depends on repositories (no service-to-service dependencies)
- * - Handles business validation and logic
- * - Coordinates repository operations
- * - No circular dependencies
- */
 @Service
 public class BusDetailsService {
 

@@ -1,12 +1,8 @@
 package com.example.travelbuddybackend.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.validation.constraints.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+
 import java.time.LocalDateTime;
 
 /**
@@ -116,9 +112,6 @@ public class Client {
     }
 
     /**
-     * Constructor for creating a new client account
-     * This is typically used during registration when all basic info is provided
-     *
      * @param username Unique username for login
      * @param email Email address for login and communication
      * @param password Raw password (will be encrypted by the service layer)
@@ -136,9 +129,6 @@ public class Client {
     }
 
     /**
-     * Constructor for basic client information (useful for booking operations)
-     * This might be used when creating a client record from booking information
-     *
      * @param firstName Client's first name
      * @param lastName Client's last name
      * @param email Email address
@@ -266,8 +256,7 @@ public class Client {
 
     /**
      * Get the client's full name
-     * This combines first and last name into a single string for display purposes
-     *
+     * This combines first and last name into a single string for display purposeS
      * @return "FirstName LastName" format
      */
     public String getFullName() {
@@ -283,8 +272,6 @@ public class Client {
 
     /**
      * Get a name field for backward compatibility
-     * Some parts of your system might expect a single 'name' field
-     *
      * @return The full name as a single string
      */
     public String getName() {
@@ -293,8 +280,6 @@ public class Client {
 
     /**
      * Set the full name by splitting it into first and last names
-     * This helps when you receive a full name and need to split it
-     *
      * @param fullName Name in "First Last" format
      */
     public void setName(String fullName) {
@@ -363,7 +348,6 @@ public class Client {
 
     /**
      * Check if this client account was created recently
-     * This can be useful for new user onboarding or special promotions
      *
      * @param days Number of days to consider "recent"
      * @return true if account was created within the specified days
