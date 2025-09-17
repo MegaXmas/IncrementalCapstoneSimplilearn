@@ -1,5 +1,4 @@
 services:
-  # MySQL Database
   mysql:
     image: mysql:8.0
     container_name: travel-mysql
@@ -12,6 +11,7 @@ services:
       - MYSQL_PASSWORD=travel_password
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./backup.sql:/docker-entrypoint-initdb.d/backup.sql  # Auto-import your existing backup file
     networks:
       - travel-network
 
@@ -46,11 +46,9 @@ services:
     networks:
       - travel-network
 
-# Create a custom network for communication between services
 networks:
   travel-network:
     driver: bridge
 
-# Persist database data
 volumes:
   mysql_data:
